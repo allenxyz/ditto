@@ -1,6 +1,14 @@
 This is for eecs285 group
-collaborators:
-Allen Zhao
-Jessica Wu
-Patrick Juanito
-Eleanor Rhode
+
+
+Collaborators:
+	Allen Zhao
+	Jessica Wu
+	Patrick Wan
+	Eleanor Rhode
+
+
+Project:
+	Image processing
+	Simulatenous, multi-people editing
+	
