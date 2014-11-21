@@ -3,9 +3,13 @@ package eecs285.proj4;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+
+import eecs285.proj4.ImageProcessor;
+
 
 public class ImageProcessorGUI extends JFrame
 {
@@ -16,7 +20,9 @@ public class ImageProcessorGUI extends JFrame
   private JMenuItem Exit;
   private JMenuItem Undo;
   private JMenuItem Redo;
-  
+ 
+  JPanel ImageDisplay = new JPanel();
+  JPanel DisplayImage = new JPanel();
  
   private JPanel ColorMiddleR2;
   private JPanel ColorMiddleR3;
@@ -36,6 +42,9 @@ public class ImageProcessorGUI extends JFrame
   JTextField ColorF;
   JTextField ColorG;
   
+  private BufferedImage mBufferedImage;
+
+  
   public static void main(String[] arg){
     win = new ImageProcessorGUI();
    win.setMinimumSize(new Dimension(1120, 650));
@@ -50,17 +59,32 @@ public class ImageProcessorGUI extends JFrame
     
     super("Insta-Paint");
     //setResizable(false);
+
     
     JPanel EditPalette = new JPanel();
     JPanel ColorBlock = new JPanel();
     JPanel InstaFilter = new JPanel();
     JPanel Custom = new JPanel();
-    JPanel ImageDisplay = new JPanel();
     
     JMenuBar Menu = new JMenuBar();
     JMenu File = new JMenu("File");
     JMenu Edit = new JMenu("Edit");
     Open = new JMenuItem("Open Image");
+    Open.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent ae)
+      {
+        FileDialog fd = new FileDialog(ImageProcessorGUI.this);
+        fd.show();
+        if( fd.getFile() == null )
+          return;
+        String path = fd.getDirectory() + fd.getFile();
+        loadImage(path);
+        //repaint();
+        //ImageDisplay.add(DisplayImage);
+        //ImageDisplay.add()
+      }
+    });
     Save = new JMenuItem("Save Image");
     Exit = new JMenuItem("Exit Program");
     Undo = new JMenuItem("Undo");
@@ -79,7 +103,6 @@ public class ImageProcessorGUI extends JFrame
     //EditPalette.add(FilterA);
     //EditPalette.add(FilterB);
     JPanel ColorTop = new JPanel();
-    //ColorTop.setLayout(new BoxLayout(ColorTop, BoxLayout.PAGE_AXIS));
     JRadioButton Color3 = new JRadioButton("3 Color Image");
     JRadioButton Color5 = new JRadioButton("5 Color Image");
     JRadioButton Color7 = new JRadioButton("7 Color Image");
@@ -162,37 +185,18 @@ public class ImageProcessorGUI extends JFrame
     ColorBlock.add(ColorMiddle);
     ColorBlock.add(ColorBottom);
     
-    JButton NoFilter = new JButton( new ImageIcon("../../Cube.jpg"));
-    NoFilter.setMargin(new Insets(0, 0,0,0));
-    JButton FilterA = new JButton(new ImageIcon("../../CubeA.jpg"));
-    FilterA.setMargin(new Insets(0,0,0,0));
-    JButton FilterB = new JButton(new ImageIcon("../../CubeA.jpg"));
-    FilterB.setMargin(new Insets(0,0,0,0));
-    JButton FilterC = new JButton(new ImageIcon("../../CubeA.jpg"));
-    FilterC.setMargin(new Insets(0,0,0,0));
-    JButton FilterD = new JButton(new ImageIcon("../../CubeA.jpg"));
-    FilterD.setMargin(new Insets(0,0,0,0));
-    JButton FilterE = new JButton(new ImageIcon("../../CubeA.jpg"));
-    FilterE.setMargin(new Insets(0,0,0,0));
-    JButton FilterF = new JButton(new ImageIcon("../../CubeA.jpg"));
-    FilterF.setMargin(new Insets(0,0,0,0));
-    JButton FilterG = new JButton(new ImageIcon("../../CubeA.jpg"));
-    FilterG.setMargin(new Insets(0,0,0,0));
-    JButton FilterH = new JButton(new ImageIcon("../../CubeA.jpg"));
-    FilterH.setMargin(new Insets(0,0,0,0));
+    JComboBox<String> Filter;
+    Filter = new JComboBox<String>();
+    Filter.addItem("No Filter");
+    Filter.addItem("Valencia");
+    Filter.addItem("Filter B");
+
     
-    JPanel Instawrap = new JPanel(new GridLayout(3,3));
+    JPanel Instawrap = new JPanel();
     TitledBorder FilterTitle = new TitledBorder("Filter Palette");
     InstaFilter.setBorder(FilterTitle);
-    Instawrap.add(NoFilter);
-    Instawrap.add(FilterA);
-    Instawrap.add(FilterB);
-    Instawrap.add(FilterC);
-    Instawrap.add(FilterD);
-    Instawrap.add(FilterE);
-    Instawrap.add(FilterF);
-    Instawrap.add(FilterG);
-    Instawrap.add(FilterH);
+    Instawrap.add(Filter);
+
     InstaFilter.add(Instawrap);
     
     TitledBorder CustomTitle = new TitledBorder("Custom Settings");
@@ -213,15 +217,51 @@ public class ImageProcessorGUI extends JFrame
     
     
     
-    add(EditWrap, BorderLayout.WEST);
+    add(EditWrap, BorderLayout.WEST); 
     //ImageDisplay.setMinimumSize(new Dimension(300,300));
-    add(ImageDisplay, BorderLayout.EAST);
+    //ImageDisplay.setLayout(new BoxLayout(ImageDisplay, BoxLayout.LINE_AXIS));
+    add(ImageDisplay);
     
     //apply.add(Menu, BorderLayout.NORTH);
     
     //add(apply); 
     
     
+  }
+  
+  public void loadImage(String fileName)
+  {
+    // Use a MediaTracker to fully load the image.
+    Image image = Toolkit.getDefaultToolkit().getImage(fileName);
+    MediaTracker mt = new MediaTracker(this);
+    mt.addImage(image, 0);
+    try
+    {
+      mt.waitForID(0);
+    }
+    catch( InterruptedException ie )
+    {
+      return;
+    }
+    if( mt.isErrorID(0) )
+      return;
+    // Make a BufferedImage from the Image.
+    mBufferedImage = new BufferedImage(image.getWidth(null),
+        image.getHeight(null), BufferedImage.TYPE_INT_RGB);
+    Graphics2D g2 = mBufferedImage.createGraphics();
+    g2.drawImage(image, null, ImageDisplay);
+    ImageIcon disp = new ImageIcon(mBufferedImage);
+    JLabel display = new JLabel(disp);
+    //display.setIcon(new ImageIcon(mBufferedImage));
+    
+    ImageDisplay.add(display);
+    pack();
+    //adjustToImageSize();
+    //center();
+    //ImageDisplay.validate();
+    //ImageDisplay.repaint();
+    
+    //setTitle(kBanner + ": " + fileName);
   }
   
   class ColorNumSelect implements ActionListener{
