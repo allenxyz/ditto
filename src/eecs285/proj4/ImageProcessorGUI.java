@@ -9,6 +9,9 @@ import java.awt.image.BufferedImageOp;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
+import javax.imageio.ImageIO;
+import java.io.*;
+
 import eecs285.proj4.ImageProcessor;
 
 
@@ -192,6 +195,23 @@ public class ImageProcessorGUI extends JFrame
     ColorBlock.add(ColorMiddle);
     ColorBlock.add(ColorBottom);
 
+    //FUCKKKK
+    BufferedImage myPicture = null;
+    try
+    {
+      myPicture = ImageIO.read(new File("wheel.png"));
+    }
+    catch( IOException e )
+    {
+      System.out.println("rip\n");
+    }
+    JLabel picLabel = new JLabel(new ImageIcon(myPicture));
+    JPanel newPanel = new JPanel();
+    newPanel.setLayout(new BorderLayout(100,100));
+    newPanel.add(picLabel);
+
+    
+    
     Filter = new JComboBox<String>();
     Filter.addItem("None");
     Filter.addItem("Sharpen");
@@ -216,10 +236,10 @@ public class ImageProcessorGUI extends JFrame
     Custom.add(CustomBlock);
     Custom.add(CustomFilter);
     Custom.setBorder(CustomTitle);
-
-
+    
     EditPalette.setLayout(new BoxLayout(EditPalette, BoxLayout.PAGE_AXIS));
     EditPalette.add(ColorBlock);
+    EditPalette.add(newPanel);
     EditPalette.add(InstaFilter);
     EditPalette.add(Custom);
 
