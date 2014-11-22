@@ -47,8 +47,9 @@ public class ImageProcessorGUI extends JFrame
   JTextField ColorG;
 
   JComboBox<String> Filter;
-  
+
   private BufferedImage mBufferedImage;
+  private Graphics2D g2;
 
   ImageProcessor image;
 
@@ -73,7 +74,7 @@ public class ImageProcessorGUI extends JFrame
     JPanel EditPalette = new JPanel();
     JPanel ColorBlock = new JPanel();
     JPanel InstaFilter = new JPanel();
- 
+
     JPanel Custom = new JPanel();
 
     JMenuBar Menu = new JMenuBar();
@@ -89,6 +90,7 @@ public class ImageProcessorGUI extends JFrame
         if( fd.getFile() == null )
           return;
         String path = fd.getDirectory() + fd.getFile();
+        ImageDisplay.removeAll();
         loadImage(path);
         // repaint();
         // ImageDisplay.add(DisplayImage);
@@ -195,7 +197,7 @@ public class ImageProcessorGUI extends JFrame
     ColorBlock.add(ColorMiddle);
     ColorBlock.add(ColorBottom);
 
-    //FUCKKKK
+    // FUCKKKK
     BufferedImage myPicture = null;
     try
     {
@@ -207,11 +209,10 @@ public class ImageProcessorGUI extends JFrame
     }
     JLabel picLabel = new JLabel(new ImageIcon(myPicture));
     JPanel newPanel = new JPanel();
-    newPanel.setLayout(new BorderLayout(100,100));
+    newPanel.setLayout(new BorderLayout(100, 100));
     newPanel.add(picLabel);
 
-    
-    
+
     Filter = new JComboBox<String>();
     Filter.addItem("None");
     Filter.addItem("Sharpen");
@@ -219,6 +220,7 @@ public class ImageProcessorGUI extends JFrame
     Filter.addItem("Invert");
     Filter.addItem("Posterize");
     Filter.addItem("Blue Invert");
+    Filter.addItem("Bins");
     Filter.setEnabled(false);
     Filter.addActionListener(new Filter());
 
@@ -236,7 +238,7 @@ public class ImageProcessorGUI extends JFrame
     Custom.add(CustomBlock);
     Custom.add(CustomFilter);
     Custom.setBorder(CustomTitle);
-    
+
     EditPalette.setLayout(new BoxLayout(EditPalette, BoxLayout.PAGE_AXIS));
     EditPalette.add(ColorBlock);
     EditPalette.add(newPanel);
@@ -276,16 +278,32 @@ public class ImageProcessorGUI extends JFrame
     }
     if( mt.isErrorID(0) )
       return;
+
+
     // Make a BufferedImage from the Image.
     mBufferedImage = new BufferedImage(grabimage.getWidth(null),
         grabimage.getHeight(null), BufferedImage.TYPE_INT_RGB);
-    
-     image = new ImageProcessor();
-     image.saveOriginal(mBufferedImage);
-   
-    
-    Graphics2D g2 = mBufferedImage.createGraphics();
-    g2.drawImage(grabimage, null, ImageDisplay);
+
+
+    image = new ImageProcessor();
+    image.saveOriginal(mBufferedImage);
+
+
+    g2 = mBufferedImage.createGraphics();
+    // resize grabimage if it's too big
+   /* if( mBufferedImage.getWidth() > ImageDisplay.getWidth()
+        || mBufferedImage.getHeight() > ImageDisplay.getWidth() )
+    {
+      g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+          RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+      g2.drawImage(mBufferedImage, 0, 0, mBufferedImage.getWidth() / 2,
+          mBufferedImage.getHeight() / 2, ImageDisplay);
+
+    }
+    else
+    {*/
+      g2.drawImage(grabimage, null, ImageDisplay);
+    //}
     ImageIcon disp = new ImageIcon(mBufferedImage);
     JLabel display = new JLabel(disp);
     // display.setIcon(new ImageIcon(mBufferedImage));
@@ -304,8 +322,8 @@ public class ImageProcessorGUI extends JFrame
   {
     public void actionPerformed(ActionEvent e)
     {
-      
-      
+
+
       JComboBox<String> Filter = (JComboBox<String>) e.getSource();
       if( Filter.getSelectedItem().equals("None") )
       {
@@ -313,35 +331,45 @@ public class ImageProcessorGUI extends JFrame
         ImageDisplay.removeAll();
         ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
         pack();
-      }else if( Filter.getSelectedItem().equals("Sharpen")){
+      }
+      else if( Filter.getSelectedItem().equals("Sharpen") )
+      {
         mBufferedImage = image.getOriginal();
         BufferedImageOp op = (BufferedImageOp) image.mOps.get("Sharpen");
         mBufferedImage = op.filter(mBufferedImage, null);
         ImageDisplay.removeAll();
         ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
         pack();
-      }else if( Filter.getSelectedItem().equals("Edge Detector")){
+      }
+      else if( Filter.getSelectedItem().equals("Edge Detector") )
+      {
         mBufferedImage = image.getOriginal();
         BufferedImageOp op = (BufferedImageOp) image.mOps.get("Edge detector");
         mBufferedImage = op.filter(mBufferedImage, null);
         ImageDisplay.removeAll();
         ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
         pack();
-      }else if( Filter.getSelectedItem().equals("Invert")){
+      }
+      else if( Filter.getSelectedItem().equals("Invert") )
+      {
         mBufferedImage = image.getOriginal();
         BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert");
         mBufferedImage = op.filter(mBufferedImage, null);
         ImageDisplay.removeAll();
         ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
         pack();
-      }else if( Filter.getSelectedItem().equals("Posterize")){
+      }
+      else if( Filter.getSelectedItem().equals("Posterize") )
+      {
         mBufferedImage = image.getOriginal();
         BufferedImageOp op = (BufferedImageOp) image.mOps.get("Posterize");
         mBufferedImage = op.filter(mBufferedImage, null);
         ImageDisplay.removeAll();
         ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
         pack();
-      }else if( Filter.getSelectedItem().equals("Blue Invert")){
+      }
+      else if( Filter.getSelectedItem().equals("Blue Invert") )
+      {
         mBufferedImage = image.getOriginal();
         BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert blue");
         mBufferedImage = op.filter(mBufferedImage, null);
@@ -349,9 +377,62 @@ public class ImageProcessorGUI extends JFrame
         ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
         pack();
       }
-
+      else if (Filter.getSelectedItem().equals("Bins")){
+        mBufferedImage = image.getOriginal();
+        colorBin();
+        ImageDisplay.removeAll();
+        ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+        pack();
+        
+      }
     }
 
+  }
+
+  int calculateBrightness(Color c1)
+  {
+    return (int) Math.sqrt(.241 * c1.getRed() * c1.getRed() + .691
+        * c1.getGreen() * c1.getGreen() + .068 * c1.getBlue() * c1.getBlue());
+  }
+  
+  int calculateBrightness(int r, int g, int b){
+    return (int) Math.sqrt(.241 * r*r + .691
+        * g*g + .068 * b*b);
+    
+  }
+
+  // color binning code
+  //add numbins param later
+  //WILL FIX BUT IT WORKS OMG YAYYYYYYY
+  void colorBin(){
+    int binEdges[] = {0,0,0}; //based on brightness
+    //for now, assume using 3 colors:
+    Color darkBlue = new Color(53, 3, 78);
+    Color limeGreen = new Color(43, 206, 96);
+    Color beige = new Color(251, 224, 155); 
+      binEdges[2] = calculateBrightness(darkBlue);
+      binEdges[1] = calculateBrightness(limeGreen);
+      binEdges[0] = calculateBrightness(beige);
+      
+      for(int i = 0; i <mBufferedImage.getWidth(); ++i){
+        for(int j = 0; j < mBufferedImage.getHeight(); ++j){
+          int argb = mBufferedImage.getRGB(i, j);
+          int red = (argb >> 16) & 0xff; //red
+          int green = (argb >>  8) & 0xff; //green
+          int blue = (argb      ) & 0xff;  //blue
+          int currentBrightness = calculateBrightness(red, green, blue);
+          if(0 <= currentBrightness && currentBrightness < 85){
+            mBufferedImage.setRGB(i, j, darkBlue.getRGB());
+          }
+          else if ( 85 <= currentBrightness && currentBrightness <170){
+            mBufferedImage.setRGB(i, j, limeGreen.getRGB());
+          }
+          else{
+            mBufferedImage.setRGB(i, j, beige.getRGB());
+            
+          }
+        }
+      }
   }
 
   class ColorNumSelect implements ActionListener
