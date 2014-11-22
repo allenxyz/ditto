@@ -5,11 +5,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-
 import javax.imageio.ImageIO;
+
 import java.io.*;
 
 import eecs285.proj4.ImageProcessor;
@@ -379,15 +381,23 @@ public class ImageProcessorGUI extends JFrame
       }
       else if (Filter.getSelectedItem().equals("Bins")){
         mBufferedImage = image.getOriginal();
-        colorBin();
+        BufferedImage binimage = deepCopy(mBufferedImage);
+        colorBin(binimage);
         ImageDisplay.removeAll();
-        ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+        ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
         pack();
         
       }
     }
 
   }
+  
+  static BufferedImage deepCopy(BufferedImage bi) {
+    ColorModel cm = bi.getColorModel();
+    boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+    WritableRaster raster = bi.copyData(null);
+    return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+   }
 
   int calculateBrightness(Color c1)
   {
@@ -404,7 +414,7 @@ public class ImageProcessorGUI extends JFrame
   // color binning code
   //add numbins param later
   //WILL FIX BUT IT WORKS OMG YAYYYYYYY
-  void colorBin(){
+  void colorBin(BufferedImage binimage){
     int binEdges[] = {0,0,0}; //based on brightness
     //for now, assume using 3 colors:
     Color darkBlue = new Color(53, 3, 78);
@@ -414,21 +424,21 @@ public class ImageProcessorGUI extends JFrame
       binEdges[1] = calculateBrightness(limeGreen);
       binEdges[0] = calculateBrightness(beige);
       
-      for(int i = 0; i <mBufferedImage.getWidth(); ++i){
-        for(int j = 0; j < mBufferedImage.getHeight(); ++j){
-          int argb = mBufferedImage.getRGB(i, j);
+      for(int i = 0; i <binimage.getWidth(); ++i){
+        for(int j = 0; j < binimage.getHeight(); ++j){
+          int argb = binimage.getRGB(i, j);
           int red = (argb >> 16) & 0xff; //red
           int green = (argb >>  8) & 0xff; //green
           int blue = (argb      ) & 0xff;  //blue
           int currentBrightness = calculateBrightness(red, green, blue);
           if(0 <= currentBrightness && currentBrightness < 85){
-            mBufferedImage.setRGB(i, j, darkBlue.getRGB());
+            binimage.setRGB(i, j, darkBlue.getRGB());
           }
           else if ( 85 <= currentBrightness && currentBrightness <170){
-            mBufferedImage.setRGB(i, j, limeGreen.getRGB());
+            binimage.setRGB(i, j, limeGreen.getRGB());
           }
           else{
-            mBufferedImage.setRGB(i, j, beige.getRGB());
+            binimage.setRGB(i, j, beige.getRGB());
             
           }
         }
