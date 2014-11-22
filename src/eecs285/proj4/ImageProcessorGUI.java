@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -14,26 +15,26 @@ import eecs285.proj4.ImageProcessor;
 public class ImageProcessorGUI extends JFrame
 {
   public static ImageProcessorGUI win;
-  
+
   private JMenuItem Open;
   private JMenuItem Save;
   private JMenuItem Exit;
   private JMenuItem Undo;
   private JMenuItem Redo;
- 
+
   JPanel ImageDisplay = new JPanel();
   JPanel DisplayImage = new JPanel();
- 
+
   private JPanel ColorMiddleR2;
   private JPanel ColorMiddleR3;
   private JPanel ColorMiddle;
   private JLabel A;
   private JLabel B;
   private JLabel C;
-  
+
   private JButton Apply;
   private JButton ClearFields;
-  
+
   JTextField ColorA;
   JTextField ColorB;
   JTextField ColorC;
@@ -41,31 +42,37 @@ public class ImageProcessorGUI extends JFrame
   JTextField ColorE;
   JTextField ColorF;
   JTextField ColorG;
+
+  JComboBox<String> Filter;
   
   private BufferedImage mBufferedImage;
 
-  
-  public static void main(String[] arg){
+  ImageProcessor image;
+
+  public static void main(String[] arg)
+  {
     win = new ImageProcessorGUI();
-   win.setMinimumSize(new Dimension(1120, 650));
+    win.setMinimumSize(new Dimension(1120, 650));
     win.pack();
 
     win.setVisible(true);
     win.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-    
+
   }
 
-  public ImageProcessorGUI(){
-    
-    super("Insta-Paint");
-    //setResizable(false);
+  public ImageProcessorGUI()
+  {
 
-    
+    super("Insta-Paint");
+    // setResizable(false);
+
+
     JPanel EditPalette = new JPanel();
     JPanel ColorBlock = new JPanel();
     JPanel InstaFilter = new JPanel();
+ 
     JPanel Custom = new JPanel();
-    
+
     JMenuBar Menu = new JMenuBar();
     JMenu File = new JMenu("File");
     JMenu Edit = new JMenu("Edit");
@@ -80,9 +87,9 @@ public class ImageProcessorGUI extends JFrame
           return;
         String path = fd.getDirectory() + fd.getFile();
         loadImage(path);
-        //repaint();
-        //ImageDisplay.add(DisplayImage);
-        //ImageDisplay.add()
+        // repaint();
+        // ImageDisplay.add(DisplayImage);
+        // ImageDisplay.add()
       }
     });
     Save = new JMenuItem("Save Image");
@@ -97,11 +104,11 @@ public class ImageProcessorGUI extends JFrame
     Menu.add(File);
     Menu.add(Edit);
     setJMenuBar(Menu);
-    
-    //JButton FilterA = new JButton("Filter A");
-    //JButton FilterB = new JButton("Filter B");
-    //EditPalette.add(FilterA);
-    //EditPalette.add(FilterB);
+
+    // JButton FilterA = new JButton("Filter A");
+    // JButton FilterB = new JButton("Filter B");
+    // EditPalette.add(FilterA);
+    // EditPalette.add(FilterB);
     JPanel ColorTop = new JPanel();
     JRadioButton Color3 = new JRadioButton("3 Color Image");
     JRadioButton Color5 = new JRadioButton("5 Color Image");
@@ -144,9 +151,9 @@ public class ImageProcessorGUI extends JFrame
     ColorC = new JTextField(7);
     ColorC.setEnabled(false);
     ColorD = new JTextField(7);
-    //ColorD.setVisible(false);
+    // ColorD.setVisible(false);
     ColorE = new JTextField(7);
-    //ColorE.setVisible(false);
+    // ColorE.setVisible(false);
     ColorF = new JTextField(7);
     ColorG = new JTextField(7);
     ColorMiddleR1.add(A);
@@ -177,64 +184,68 @@ public class ImageProcessorGUI extends JFrame
     ClearFields.setEnabled(false);
     ColorBottom.add(Apply);
     ColorBottom.add(ClearFields);
-    
+
     TitledBorder ColorTitle = new TitledBorder("Color Block Palette");
     ColorBlock.setBorder(ColorTitle);
     ColorBlock.setLayout(new BoxLayout(ColorBlock, BoxLayout.PAGE_AXIS));
     ColorBlock.add(ColorTop);
     ColorBlock.add(ColorMiddle);
     ColorBlock.add(ColorBottom);
-    
-    JComboBox<String> Filter;
-    Filter = new JComboBox<String>();
-    Filter.addItem("No Filter");
-    Filter.addItem("Valencia");
-    Filter.addItem("Filter B");
 
-    
+    Filter = new JComboBox<String>();
+    Filter.addItem("None");
+    Filter.addItem("Sharpen");
+    Filter.addItem("Edge Detector");
+    Filter.addItem("Invert");
+    Filter.addItem("Posterize");
+    Filter.addItem("Blue Invert");
+    Filter.setEnabled(false);
+    Filter.addActionListener(new Filter());
+
+
     JPanel Instawrap = new JPanel();
     TitledBorder FilterTitle = new TitledBorder("Filter Palette");
     InstaFilter.setBorder(FilterTitle);
     Instawrap.add(Filter);
 
     InstaFilter.add(Instawrap);
-    
+
     TitledBorder CustomTitle = new TitledBorder("Custom Settings");
     JButton CustomBlock = new JButton("Custom Color Block");
     JButton CustomFilter = new JButton("Custom Filter");
     Custom.add(CustomBlock);
     Custom.add(CustomFilter);
     Custom.setBorder(CustomTitle);
-    
-    
+
+
     EditPalette.setLayout(new BoxLayout(EditPalette, BoxLayout.PAGE_AXIS));
     EditPalette.add(ColorBlock);
     EditPalette.add(InstaFilter);
     EditPalette.add(Custom);
-    
+
     JPanel EditWrap = new JPanel();
     EditWrap.add(EditPalette);
-    
-    
-    
-    add(EditWrap, BorderLayout.WEST); 
-    //ImageDisplay.setMinimumSize(new Dimension(300,300));
-    //ImageDisplay.setLayout(new BoxLayout(ImageDisplay, BoxLayout.LINE_AXIS));
+
+
+    add(EditWrap, BorderLayout.WEST);
+    // ImageDisplay.setMinimumSize(new Dimension(300,300));
+    // ImageDisplay.setLayout(new BoxLayout(ImageDisplay, BoxLayout.LINE_AXIS));
     add(ImageDisplay);
-    
-    //apply.add(Menu, BorderLayout.NORTH);
-    
-    //add(apply); 
-    
-    
+
+    // apply.add(Menu, BorderLayout.NORTH);
+
+    // add(apply);
+
+
   }
-  
+
   public void loadImage(String fileName)
   {
     // Use a MediaTracker to fully load the image.
-    Image image = Toolkit.getDefaultToolkit().getImage(fileName);
+    Filter.setEnabled(true);
+    Image grabimage = Toolkit.getDefaultToolkit().getImage(fileName);
     MediaTracker mt = new MediaTracker(this);
-    mt.addImage(image, 0);
+    mt.addImage(grabimage, 0);
     try
     {
       mt.waitForID(0);
@@ -246,25 +257,85 @@ public class ImageProcessorGUI extends JFrame
     if( mt.isErrorID(0) )
       return;
     // Make a BufferedImage from the Image.
-    mBufferedImage = new BufferedImage(image.getWidth(null),
-        image.getHeight(null), BufferedImage.TYPE_INT_RGB);
+    mBufferedImage = new BufferedImage(grabimage.getWidth(null),
+        grabimage.getHeight(null), BufferedImage.TYPE_INT_RGB);
+    
+     image = new ImageProcessor();
+     image.saveOriginal(mBufferedImage);
+   
+    
     Graphics2D g2 = mBufferedImage.createGraphics();
-    g2.drawImage(image, null, ImageDisplay);
+    g2.drawImage(grabimage, null, ImageDisplay);
     ImageIcon disp = new ImageIcon(mBufferedImage);
     JLabel display = new JLabel(disp);
-    //display.setIcon(new ImageIcon(mBufferedImage));
-    
+    // display.setIcon(new ImageIcon(mBufferedImage));
+
     ImageDisplay.add(display);
     pack();
-    //adjustToImageSize();
-    //center();
-    //ImageDisplay.validate();
-    //ImageDisplay.repaint();
-    
-    //setTitle(kBanner + ": " + fileName);
+    // adjustToImageSize();
+    // center();
+    // ImageDisplay.validate();
+    // ImageDisplay.repaint();
+
+    // setTitle(kBanner + ": " + fileName);
   }
-  
-  class ColorNumSelect implements ActionListener{
+
+  class Filter implements ActionListener
+  {
+    public void actionPerformed(ActionEvent e)
+    {
+      
+      
+      JComboBox<String> Filter = (JComboBox<String>) e.getSource();
+      if( Filter.getSelectedItem().equals("None") )
+      {
+        mBufferedImage = image.getOriginal();
+        ImageDisplay.removeAll();
+        ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+        pack();
+      }else if( Filter.getSelectedItem().equals("Sharpen")){
+        mBufferedImage = image.getOriginal();
+        BufferedImageOp op = (BufferedImageOp) image.mOps.get("Sharpen");
+        mBufferedImage = op.filter(mBufferedImage, null);
+        ImageDisplay.removeAll();
+        ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+        pack();
+      }else if( Filter.getSelectedItem().equals("Edge Detector")){
+        mBufferedImage = image.getOriginal();
+        BufferedImageOp op = (BufferedImageOp) image.mOps.get("Edge detector");
+        mBufferedImage = op.filter(mBufferedImage, null);
+        ImageDisplay.removeAll();
+        ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+        pack();
+      }else if( Filter.getSelectedItem().equals("Invert")){
+        mBufferedImage = image.getOriginal();
+        BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert");
+        mBufferedImage = op.filter(mBufferedImage, null);
+        ImageDisplay.removeAll();
+        ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+        pack();
+      }else if( Filter.getSelectedItem().equals("Posterize")){
+        mBufferedImage = image.getOriginal();
+        BufferedImageOp op = (BufferedImageOp) image.mOps.get("Posterize");
+        mBufferedImage = op.filter(mBufferedImage, null);
+        ImageDisplay.removeAll();
+        ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+        pack();
+      }else if( Filter.getSelectedItem().equals("Blue Invert")){
+        mBufferedImage = image.getOriginal();
+        BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert blue");
+        mBufferedImage = op.filter(mBufferedImage, null);
+        ImageDisplay.removeAll();
+        ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+        pack();
+      }
+
+    }
+
+  }
+
+  class ColorNumSelect implements ActionListener
+  {
 
     public void actionPerformed(ActionEvent e)
     {
@@ -277,23 +348,28 @@ public class ImageProcessorGUI extends JFrame
       A.setEnabled(true);
       B.setEnabled(true);
       C.setEnabled(true);
-      
-      if (e.getActionCommand() == "three"){
+
+      if( e.getActionCommand() == "three" )
+      {
         ColorMiddleR2.setVisible(false);
         ColorMiddleR3.setVisible(false);
-        
-      }else if( e.getActionCommand() == "five"){
+
+      }
+      else if( e.getActionCommand() == "five" )
+      {
         ColorMiddleR2.setVisible(true);
         ColorMiddleR3.setVisible(false);
-        
-      }else if(e.getActionCommand()=="seven"){
+
+      }
+      else if( e.getActionCommand() == "seven" )
+      {
         ColorMiddleR2.setVisible(true);
         ColorMiddleR3.setVisible(true);
-        
+
       }
-      
+
     }
-    
+
   }
-  
+
 }

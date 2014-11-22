@@ -36,14 +36,14 @@ public class ImageProcessor extends Frame
    * Instantiates an ImageDicer with an image file name. If no image file name
    * is specified on the command line, "default" is used.
    **/
-  public static void main(String[] args)
+/*  public static void main(String[] args)
   {
     String fileName = "default.jpg";
     if( args.length > 0 )
       fileName = args[0];
     new ImageProcessor(fileName);
   }
-
+*/
   /**
    * kBanner holds the application title which is used in the window title.
    **/
@@ -53,20 +53,20 @@ public class ImageProcessor extends Frame
    * ImageDicer's constructor creates a set of image processing operations,
    * creates user controls, and loads the named image.
    **/
-  public ImageProcessor(String fileName)
+  public ImageProcessor()
   {
-    super(kBanner);
+   // super(kBanner);
     createOps();
-    createUI();
-    loadImage(fileName);
-    setVisible(true);
+   // createUI();
+   // loadImage(fileName);
+   // setVisible(true);
   }
 
   /**
    * A Hashtable member variable holds the image processing operations, keyed by
    * their names.
    **/
-  private Hashtable mOps;
+  Hashtable mOps;
 
   /**
    * The createOps() method creates the image processing operations discussed in
@@ -193,7 +193,7 @@ public class ImageProcessor extends Frame
         if( fd.getFile() == null )
           return;
         String path = fd.getDirectory() + fd.getFile();
-        loadImage(path);
+        //loadImage(path);
       }
     });
 
@@ -253,7 +253,8 @@ public class ImageProcessor extends Frame
    * Finally, it adjusts the window size and placement based on the new image
    * size.
    **/
-  private void loadImage(String fileName)
+ /*
+  private void loadImage())
   {
     // Use a MediaTracker to fully load the image.
     Image image = Toolkit.getDefaultToolkit().getImage(fileName);
@@ -281,10 +282,24 @@ public class ImageProcessor extends Frame
     repaint();
     setTitle(kBanner + ": " + fileName);
   }
-
+  */
+ 
+  
+  BufferedImage savedOriginal;
+  
+  public void saveOriginal(BufferedImage original){
+   
+    savedOriginal = original;
+  }
+  
+  public BufferedImage getOriginal(){
+    return savedOriginal;
+  }
+  
   /**
    * All paint() has to do is show the current image.
    **/
+  
   public void paint(Graphics g)
   {
     if( mBufferedImage == null )
