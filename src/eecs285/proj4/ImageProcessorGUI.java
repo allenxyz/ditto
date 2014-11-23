@@ -19,6 +19,9 @@ import eecs285.proj4.Exceptions.EmptyTextFieldException;
 import eecs285.proj4.ImageProcessor;
 import eecs285.proj4.server.*;
 
+import java.awt.event.*;
+import java.awt.Robot;
+
 
 public class ImageProcessorGUI extends JFrame
 {
@@ -241,7 +244,7 @@ public class ImageProcessorGUI extends JFrame
     JPanel palettePanel = new JPanel();
     palettePanel.setLayout(new BorderLayout(100, 100));
     palettePanel.add(picLabel);
-
+    
     JPanel paletteText = new JPanel();
     JLabel red = new JLabel("R: ");
     JTextField redPal = new JTextField(5);
@@ -258,6 +261,40 @@ public class ImageProcessorGUI extends JFrame
     paletteText.add(greenPal);
     paletteText.add(blue);
     paletteText.add(bluePal);
+    
+    palettePanel.addMouseListener(new MouseAdapter()
+    {
+      @Override
+      public void mouseClicked(MouseEvent e){
+        PointerInfo a = MouseInfo.getPointerInfo();
+        Point b = a.getLocation();
+        int x = (int) b.getX();
+        int y = (int) b.getY();
+        int getRed = 0;
+        int getGreen = 0;
+        int getBlue = 0;
+        try
+        {
+          Robot r = new Robot();
+          Color color = r.getPixelColor(x, y);
+          getRed = color.getRed();
+          getGreen = color.getGreen();
+          getBlue = color.getBlue();
+        }
+        catch( AWTException e1 )
+        {
+          System.out.println("You aren't supposed to be here, LEAVE!");
+        }
+        if(getRed != 234 && getGreen != 234 && getBlue != 234)
+        {
+          redPal.setText(String.valueOf(getRed));
+          greenPal.setText(String.valueOf(getGreen));
+          bluePal.setText(String.valueOf(getBlue));
+        }
+      }
+    });
+
+
 
     Filter = new JComboBox<String>();
     Filter.addItem("None");
