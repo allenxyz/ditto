@@ -152,8 +152,28 @@ System.out.println("ipaddr: " + ipAddr + " portNum: " + portNum);
          System.exit(8);
       }
       
-      //need to change this
-      System.out.println(receivedString);
+      if (receivedString == "Sharpen")
+         win.sharpen();
+      else if (receivedString == "None")
+         win.noFilter();
+      else if (receivedString == "Edge Detector")
+         win.edgeDetector();
+      else if (receivedString == "Invert")
+         win.invert();
+      else if (receivedString == "Posterize")
+         win.posterize();
+      else if (receivedString == "Blue Invert")
+         win.blueInvert();
+      else if (receivedString == "Bins")
+         win.bins();
+      else if (receivedString == "three")
+         win.colorNumSelectThree();
+      else if (receivedString == "five")
+         win.colorNumSelectFive();
+      else if (receivedString == "seven")
+         win.colorNumSelectSeven();
+      else
+         System.out.println("Unrecognized command when recieving Event");
    }
       
       

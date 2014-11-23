@@ -133,7 +133,6 @@ System.out.println("ipaddr: " + ipAddr + " portNum: " + portNum);
          System.exit(8);
       }
       
-      //need to change this
       if (receivedString == "Sharpen")
          win.sharpen();
       else if (receivedString == "None")
@@ -146,6 +145,14 @@ System.out.println("ipaddr: " + ipAddr + " portNum: " + portNum);
          win.posterize();
       else if (receivedString == "Blue Invert")
          win.blueInvert();
+      else if (receivedString == "Bins")
+         win.bins();
+      else if (receivedString == "three")
+         win.colorNumSelectThree();
+      else if (receivedString == "five")
+         win.colorNumSelectFive();
+      else if (receivedString == "seven")
+         win.colorNumSelectSeven();
       else
          System.out.println("Unrecognized command when recieving Event");
    }

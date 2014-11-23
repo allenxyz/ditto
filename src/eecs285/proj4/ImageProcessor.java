@@ -305,5 +305,9 @@ public class ImageProcessor extends Frame
       return;
     Insets insets = getInsets();
     g.drawImage(mBufferedImage, insets.left, insets.top, null);
+    
+    
+    
+    
   }
 }
