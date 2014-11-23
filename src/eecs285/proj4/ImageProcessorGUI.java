@@ -26,7 +26,6 @@ import java.awt.Robot;
 public class ImageProcessorGUI extends JFrame
 {
   private final ImageProcessingSocket socket;
-  
   public static ImageProcessorGUI win;
 
   private JMenuItem Open;
@@ -46,7 +45,8 @@ public class ImageProcessorGUI extends JFrame
   private JLabel A;
   private JLabel B;
   private JLabel C;
-
+  private JLabel display;
+  
   private JButton Apply;
   private JButton ClearFields;
 
@@ -247,11 +247,11 @@ public class ImageProcessorGUI extends JFrame
     
     JPanel paletteText = new JPanel();
     JLabel red = new JLabel("R: ");
-    JTextField redPal = new JTextField(5);
+    final JTextField redPal = new JTextField(5);
     JLabel green = new JLabel("G: ");
-    JTextField greenPal = new JTextField(5);
+    final JTextField greenPal = new JTextField(5);
     JLabel blue = new JLabel("B: ");
-    JTextField bluePal = new JTextField(5);
+    final JTextField bluePal = new JTextField(5);
     redPal.setEditable(false);
     greenPal.setEditable(false);
     bluePal.setEditable(false);
@@ -342,7 +342,7 @@ public class ImageProcessorGUI extends JFrame
 
     // add(apply);
 
-
+    
     setMinimumSize(new Dimension(1120, 650));
   }
 
@@ -388,6 +388,7 @@ public class ImageProcessorGUI extends JFrame
     // ImageDisplay.repaint();   
 
     // setTitle(kBanner + ": " + fileName);
+    resizeToScale();
     if (socket != null) {
        socket.loadOccurred(mBufferedImage);
     }
@@ -436,7 +437,7 @@ public class ImageProcessorGUI extends JFrame
       g2.drawImage(grabimage, null, ImageDisplay);
     //}
     ImageIcon disp = new ImageIcon(mBufferedImage);
-    JLabel display = new JLabel(disp);
+    display = new JLabel(disp);
     // display.setIcon(new ImageIcon(mBufferedImage));
 
     ImageDisplay.add(display);
@@ -666,4 +667,27 @@ public class ImageProcessorGUI extends JFrame
   
   
   
+  public final int displayImageWidth = 650;
+  public final int displayImageHeight = 650;
+  public void resizeToScale()
+  {
+     int height = mBufferedImage.getHeight();
+     int width = mBufferedImage.getWidth();
+     double hwRatio = (double)height/(double)width;
+     if (height > displayImageHeight) 
+     {
+        height = displayImageHeight;
+        width = (int) (height / hwRatio);
+     }
+     if (width > displayImageWidth)
+     {
+        width = displayImageWidth;
+        height = (int) (width * hwRatio);
+     }
+     
+     Image tmp = mBufferedImage.getScaledInstance(width, height, BufferedImage.SCALE_FAST);
+     BufferedImage buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+     buffered.getGraphics().drawImage(tmp, 0, 0, null);
+     mBufferedImage = buffered;
+  }
 }

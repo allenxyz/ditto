@@ -11,10 +11,19 @@ public class Server
    {
       socket = new ServerSideSocket(inIP, 40000);
       socket.start();
-
-      while (true)
-      {
-         Server.socket.checkInput();
-      }
+      
+//      try {
+//      Thread.sleep(5000);
+//      }
+//      catch (Exception e)
+//      {
+//         System.out.println(2);
+//      }
+      
+      
+//      while (true)
+//      {
+//         Server.socket.checkInput();
+//      }
    }
 }

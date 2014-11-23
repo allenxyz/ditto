@@ -11,10 +11,19 @@ public class Client
    {
       socket = new ClientSideSocket(inIP, 40000);
       socket.start();
-      while (true)
-      {
-         System.out.println(1);
-         Client.socket.checkInput();
-      }
+//      try {
+//      Thread.sleep(5000);
+//      }
+//      catch (Exception e)
+//      {
+//         System.out.println(1);
+//      }
+      
+//      
+//      while (true)
+//      {
+//         System.out.println(1);
+//         Client.socket.checkInput();
+//      }
    }
 }
