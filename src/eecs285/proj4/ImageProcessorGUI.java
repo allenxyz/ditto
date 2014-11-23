@@ -219,10 +219,26 @@ public class ImageProcessorGUI extends JFrame
       System.out.println("rip\n");
     }
     JLabel picLabel = new JLabel(new ImageIcon(myPicture));
-    JPanel newPanel = new JPanel();
-    newPanel.setLayout(new BorderLayout(100, 100));
-    newPanel.add(picLabel);
+    JPanel palettePanel = new JPanel();
+    palettePanel.setLayout(new BorderLayout(100, 100));
+    palettePanel.add(picLabel);
 
+    JPanel paletteText = new JPanel();
+    JLabel red = new JLabel("R: ");
+    JTextField redPal = new JTextField(5);
+    JLabel green = new JLabel("G: ");
+    JTextField greenPal = new JTextField(5);
+    JLabel blue = new JLabel("B: ");
+    JTextField bluePal = new JTextField(5);
+    redPal.setEditable(false);
+    greenPal.setEditable(false);
+    bluePal.setEditable(false);
+    paletteText.add(red);
+    paletteText.add(redPal);
+    paletteText.add(green);
+    paletteText.add(greenPal);
+    paletteText.add(blue);
+    paletteText.add(bluePal);
 
     Filter = new JComboBox<String>();
     Filter.addItem("None");
@@ -252,7 +268,8 @@ public class ImageProcessorGUI extends JFrame
 
     EditPalette.setLayout(new BoxLayout(EditPalette, BoxLayout.PAGE_AXIS));
     EditPalette.add(ColorBlock);
-    EditPalette.add(newPanel);
+    EditPalette.add(palettePanel);
+    EditPalette.add(paletteText);
     EditPalette.add(InstaFilter);
     EditPalette.add(Custom);
 
