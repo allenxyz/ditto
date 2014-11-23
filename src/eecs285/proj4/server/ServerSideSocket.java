@@ -2,6 +2,7 @@ package eecs285.proj4.server;
 
 
 import static java.lang.System.out;
+import eecs285.proj4.*;
 
 import java.net.Socket;
 import java.net.ServerSocket;
@@ -10,25 +11,30 @@ import java.io.DataOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Vector;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+
+import javax.imageio.ImageIO;
 
 
 
-public class ServerSideSocket {
+public class ServerSideSocket extends ImageProcessingSocket {
    
-   private String ipAddr;
-   private int portNum;
    private Socket socket;
    private DataOutputStream outData;
    private DataInputStream inData;
+   private ImageProcessorGUI win;
    
    
    public ServerSideSocket(String inIPAddr, int inPortNum)
    {
-      ipAddr = inIPAddr;
-      portNum = inPortNum;
-      inData = null;
-      outData = null;
+      super(inIPAddr, inPortNum);
       socket = null;
+      outData = null;
+      inData = null;
+      win = new ImageProcessorGUI("Server Side", this);
+      win.setVisible(true);
    }
    
    public void start()
@@ -36,44 +42,95 @@ public class ServerSideSocket {
       ServerSocket serverSock;
       try
       {
+System.out.println("ipaddr: " + ipAddr + " portNum: " + portNum);
          serverSock = new ServerSocket(portNum);
-         System.out.println("Waiting for client to connect...");
+         out.println("Waiting for client to connect...");
          socket = serverSock.accept();
          outData = new DataOutputStream(socket.getOutputStream());
          inData = new DataInputStream(socket.getInputStream());
-         System.out.println("Client connection accepted");
+         out.println("Client connection accepted");
       }
       catch (IOException ioe)
       {
+         ioe.printStackTrace();
          System.out.println("ERROR: Caught exception starting server");
          System.exit(7);
       }
+      
    }
    
    
-   public boolean sendString(String strToSend)
-   {
+   //these are the functions that will write to the outData
+   //if the first byte is :
+   // 1 - it is an event that occured
+   // 2 - a load image occured
+   public boolean eventOccurred(String e) 
+   {  
       boolean success = false;
       try
       {
-         outData.writeBytes(strToSend);
+         outData.writeByte(1);
+         outData.writeBytes(e.toString());
          outData.writeByte(0); //send 0 to signal the end of the string
          success = true;
       }
-      catch (IOException e)
+      catch (IOException except)
       {
-         System.out.println("Caught IOException Writing To Socket Stream!");
+         System.out.println("Caught IOException Writing To Client side!");
          System.exit(-1);
       }
-      return (success);
+      return success;
    }
    
-   public String recvString()
+   public boolean loadOccurred(BufferedImage im) 
+   {
+
+      boolean success = false;
+      if (im == null)
+         System.out.println("well thats embarassing..");
+      try 
+      {
+         outData.writeByte(2);
+         ImageIO.write((RenderedImage) im, "JPG", outData);
+         success = true;
+      }
+      catch (Exception except) 
+      {
+         System.out.println("Filed to load image TO the Server side");
+         System.exit(-1);
+      }
+      return success;
+   }
+
+   
+   //this function is the interface to recieve things from inData
+   // essentially just needs to check the first byte, then call the 
+   // corresponding function to do the appropriate job
+   public void receiveInput() 
+   {
+      Byte recByte = null;
+      try 
+      {
+         recByte = inData.readByte();
+      }
+      catch (Exception e)
+      {
+         System.out.println("Failed to read the first Byte of input data");
+      }
+      
+      if ((int)recByte == 1)
+         eventRecieve();
+      else if ((int) recByte == 2)
+         loadRecieve();
+   }
+   
+   private void eventRecieve() 
    {
       Vector< Byte > byteVec = new Vector< Byte >();
       byte [] byteAry;
       byte recByte;
       String receivedString = "";
+
       try
       {
          recByte = inData.readByte();
@@ -84,7 +141,9 @@ public class ServerSideSocket {
          }
          byteAry = new byte[byteVec.size()];
          for (int ind = 0; ind < byteVec.size(); ind++)
+         {
             byteAry[ind] = byteVec.elementAt(ind).byteValue();
+         }
          receivedString = new String(byteAry);
       }
       catch (IOException ioe)
@@ -92,6 +151,42 @@ public class ServerSideSocket {
          out.println("ERROR: receiving string from socket");
          System.exit(8);
       }
-      return (receivedString);
+      
+      //need to change this
+      System.out.println(receivedString);
+   }
+      
+      
+   public void loadRecieve() {
+System.out.println("Load recieved!");      
+      BufferedImage img = null;
+      try {
+          img = ImageIO.read(ImageIO.createImageInputStream(inData));
+          System.out.println("Image received!!!!");
+      } catch (IOException ex) {
+          System.out.println("Error reading loadImage datainput" + ex);
+      }
+      
+      win.loadImage(img);
+      win.repaint();
+  }
+   
+   
+   public boolean checkInput()
+   {
+      try {
+         if (inData.available() != 0)
+         {
+            receiveInput();
+            return true;
+         }
+         
+      }
+      catch (Exception e)
+      {
+         System.out.println("ClientSocket Error: checkInput");
+      }
+      return false;
    }
 }
+   
