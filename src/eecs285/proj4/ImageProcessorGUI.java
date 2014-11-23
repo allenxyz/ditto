@@ -33,18 +33,23 @@ public class ImageProcessorGUI extends JFrame
   private JMenuItem Exit;
   private JMenuItem Undo;
   private JMenuItem Redo;
-  
-  boolean isLoaded  = false;
+
+  boolean isLoaded = false;
 
   JPanel ImageDisplay = new JPanel();
   JPanel DisplayImage = new JPanel();
+<<<<<<< HEAD
   
+=======
+
+
+>>>>>>> d968f9daec3bf0b1fb16a0e707ca9c730e777700
   private JPanel ColorBottom;
   private JLabel A;
   private JLabel B;
   private JLabel C;
   private JLabel display;
-  
+
   private JButton Apply;
   private JButton ClearFields;
 
@@ -55,7 +60,7 @@ public class ImageProcessorGUI extends JFrame
   JTextField ColorE;
   JTextField ColorF;
   JTextField ColorG;
-  
+
   JRadioButton Color3;
   JRadioButton Color5;
   JRadioButton Color7;
@@ -63,6 +68,7 @@ public class ImageProcessorGUI extends JFrame
   JComboBox<String> Filter;
 
   private BufferedImage mBufferedImage;
+  private Color selectedColors[] = new Color[256];
   private Graphics2D g2;
 
   ImageProcessor image;
@@ -79,15 +85,15 @@ public class ImageProcessorGUI extends JFrame
 
   public ImageProcessorGUI(String title, ImageProcessingSocket inSocket)
   {
-//    super(title);
-    if (title == null )
+    // super(title);
+    if( title == null )
     {
-       title = "Insta-Paint";
+      title = "Insta-Paint";
     }
     setTitle(title);
     // setResizable(false);
     socket = inSocket;
-    
+
     JPanel EditPalette = new JPanel();
     JPanel ColorBlock = new JPanel();
     JPanel InstaFilter = new JPanel();
@@ -131,102 +137,67 @@ public class ImageProcessorGUI extends JFrame
     // JButton FilterB = new JButton("Filter B");
     // EditPalette.add(FilterA);
     // EditPalette.add(FilterB);
-   /* JPanel ColorTop = new JPanel();
-    Color3 = new JRadioButton("3 Color Image");
-    Color5 = new JRadioButton("5 Color Image");
-    Color7 = new JRadioButton("7 Color Image");
-    ButtonGroup ColorNumber = new ButtonGroup();
-
-
-    ColorNumber.add(Color3);
-    Color3.setActionCommand("three");
-    ColorNumber.add(Color5);
-    Color5.setActionCommand("five");
-    ColorNumber.add(Color7);
-    Color7.setActionCommand("seven");
-    Color3.addActionListener(new ColorNumSelect());
-    Color5.addActionListener(new ColorNumSelect());
-    Color7.addActionListener(new ColorNumSelect());
-    ColorTop.add(Color3);
-    ColorTop.add(Color5);
-    ColorTop.add(Color7);
-    ColorMiddle = new JPanel();
-    ColorMiddle.setLayout(new BoxLayout(ColorMiddle, BoxLayout.PAGE_AXIS));
-    JPanel ColorMiddleR1 = new JPanel();
-    ColorMiddleR2 = new JPanel();
-    ColorMiddleR3 = new JPanel();
-    TitledBorder Hex = new TitledBorder("Enter Hex Color Values");
-    A = new JLabel("A: ");
-    A.setEnabled(false);
-    B = new JLabel("B: ");
-    B.setEnabled(false);
-    C = new JLabel("C: ");
-    C.setEnabled(false);
-    JLabel D = new JLabel("D: ");
-    JLabel E = new JLabel("E: ");
-    JLabel F = new JLabel("F: ");
-    JLabel G = new JLabel("G: ");
-    ColorA = new JTextField(7);
-    ColorA.setEnabled(false);
-    ColorB = new JTextField(7);
-    ColorB.setEnabled(false);
-    ColorC = new JTextField(7);
-    ColorC.setEnabled(false);
-    ColorD = new JTextField(7);
-    // ColorD.setVisible(false);
-    ColorE = new JTextField(7);
-    // ColorE.setVisible(false);
-    ColorF = new JTextField(7);
-    ColorG = new JTextField(7);
-    ColorMiddleR1.add(A);
-    ColorMiddleR1.add(ColorA);
-    ColorMiddleR1.add(B);
-    ColorMiddleR1.add(ColorB);
-    ColorMiddleR1.add(C);
-    ColorMiddleR1.add(ColorC);
-    ColorMiddleR2.add(D);
-    ColorMiddleR2.add(ColorD);
-    ColorMiddleR2.add(E);
-    ColorMiddleR2.add(ColorE);
-    ColorMiddleR2.setVisible(false);
-    ColorMiddleR3.add(F);
-    ColorMiddleR3.add(ColorF);
-    ColorMiddleR3.add(G);
-    ColorMiddleR3.add(ColorG);
-    ColorMiddleR3.setVisible(false);
-    ColorMiddle.setBorder(Hex);
-    ColorMiddle.add(ColorMiddleR1);
-    ColorMiddle.add(ColorMiddleR2);
-    ColorMiddle.add(ColorMiddleR3);
-    ColorMiddle.setEnabled(false);
-    JPanel ColorBottom = new JPanel();
-    Apply = new JButton("Apply");
-    Apply.addActionListener(new binColorApply());
-    ClearFields = new JButton("Clear Fields");
-    Apply.setEnabled(false);
-    ClearFields.setEnabled(false);
-    ColorBottom.add(Apply);
-    ColorBottom.add(ClearFields);
-    */
+    /*
+     * JPanel ColorTop = new JPanel(); Color3 = new
+     * JRadioButton("3 Color Image"); Color5 = new
+     * JRadioButton("5 Color Image"); Color7 = new
+     * JRadioButton("7 Color Image"); ButtonGroup ColorNumber = new
+     * ButtonGroup();
+     * 
+     * 
+     * ColorNumber.add(Color3); Color3.setActionCommand("three");
+     * ColorNumber.add(Color5); Color5.setActionCommand("five");
+     * ColorNumber.add(Color7); Color7.setActionCommand("seven");
+     * Color3.addActionListener(new ColorNumSelect());
+     * Color5.addActionListener(new ColorNumSelect());
+     * Color7.addActionListener(new ColorNumSelect()); ColorTop.add(Color3);
+     * ColorTop.add(Color5); ColorTop.add(Color7); ColorMiddle = new JPanel();
+     * ColorMiddle.setLayout(new BoxLayout(ColorMiddle, BoxLayout.PAGE_AXIS));
+     * JPanel ColorMiddleR1 = new JPanel(); ColorMiddleR2 = new JPanel();
+     * ColorMiddleR3 = new JPanel(); TitledBorder Hex = new
+     * TitledBorder("Enter Hex Color Values"); A = new JLabel("A: ");
+     * A.setEnabled(false); B = new JLabel("B: "); B.setEnabled(false); C = new
+     * JLabel("C: "); C.setEnabled(false); JLabel D = new JLabel("D: "); JLabel
+     * E = new JLabel("E: "); JLabel F = new JLabel("F: "); JLabel G = new
+     * JLabel("G: "); ColorA = new JTextField(7); ColorA.setEnabled(false);
+     * ColorB = new JTextField(7); ColorB.setEnabled(false); ColorC = new
+     * JTextField(7); ColorC.setEnabled(false); ColorD = new JTextField(7); //
+     * ColorD.setVisible(false); ColorE = new JTextField(7); //
+     * ColorE.setVisible(false); ColorF = new JTextField(7); ColorG = new
+     * JTextField(7); ColorMiddleR1.add(A); ColorMiddleR1.add(ColorA);
+     * ColorMiddleR1.add(B); ColorMiddleR1.add(ColorB); ColorMiddleR1.add(C);
+     * ColorMiddleR1.add(ColorC); ColorMiddleR2.add(D);
+     * ColorMiddleR2.add(ColorD); ColorMiddleR2.add(E);
+     * ColorMiddleR2.add(ColorE); ColorMiddleR2.setVisible(false);
+     * ColorMiddleR3.add(F); ColorMiddleR3.add(ColorF); ColorMiddleR3.add(G);
+     * ColorMiddleR3.add(ColorG); ColorMiddleR3.setVisible(false);
+     * ColorMiddle.setBorder(Hex); ColorMiddle.add(ColorMiddleR1);
+     * ColorMiddle.add(ColorMiddleR2); ColorMiddle.add(ColorMiddleR3);
+     * ColorMiddle.setEnabled(false); JPanel ColorBottom = new JPanel(); Apply =
+     * new JButton("Apply"); Apply.addActionListener(new binColorApply());
+     * ClearFields = new JButton("Clear Fields"); Apply.setEnabled(false);
+     * ClearFields.setEnabled(false); ColorBottom.add(Apply);
+     * ColorBottom.add(ClearFields);
+     */
     JPanel ColorTop = new JPanel();
     JPanel ColorMiddle = new JPanel();
-    
-    
+
+
     JLabel blockLabel = new JLabel("Enter Number of Colors:");
     ColorTop.add(blockLabel);
-    
+
     JTextField numColors = new JTextField(4);
     JButton Enter = new JButton("Enter");
     ColorTop.add(numColors);
     ColorTop.add(Enter);
-    
-    
+
+
     TitledBorder ColorTitle = new TitledBorder("Color Block Palette");
     ColorBlock.setBorder(ColorTitle);
     ColorBlock.setLayout(new BoxLayout(ColorBlock, BoxLayout.PAGE_AXIS));
     ColorBlock.add(ColorTop);
     ColorBlock.add(ColorMiddle);
-    //ColorBlock.add(ColorBottom);
+    // ColorBlock.add(ColorBottom);
 
     // FUCKKKK
     BufferedImage myPicture = null;
@@ -242,7 +213,7 @@ public class ImageProcessorGUI extends JFrame
     JPanel palettePanel = new JPanel();
     palettePanel.setLayout(new BorderLayout(100, 100));
     palettePanel.add(picLabel);
-    
+
     JPanel paletteText = new JPanel();
     JLabel red = new JLabel("R: ");
     final JTextField redPal = new JTextField(5);
@@ -259,11 +230,12 @@ public class ImageProcessorGUI extends JFrame
     paletteText.add(greenPal);
     paletteText.add(blue);
     paletteText.add(bluePal);
-    
+
     palettePanel.addMouseListener(new MouseAdapter()
     {
       @Override
-      public void mouseClicked(MouseEvent e){
+      public void mouseClicked(MouseEvent e)
+      {
         PointerInfo a = MouseInfo.getPointerInfo();
         Point b = a.getLocation();
         int x = (int) b.getX();
@@ -283,7 +255,7 @@ public class ImageProcessorGUI extends JFrame
         {
           System.out.println("You aren't supposed to be here, LEAVE!");
         }
-        if(getRed != 234 && getGreen != 234 && getBlue != 234)
+        if( getRed != 234 && getGreen != 234 && getBlue != 234 )
         {
           redPal.setText(String.valueOf(getRed));
           greenPal.setText(String.valueOf(getGreen));
@@ -293,7 +265,6 @@ public class ImageProcessorGUI extends JFrame
     });
 
 
-
     Filter = new JComboBox<String>();
     Filter.addItem("None");
     Filter.addItem("Sharpen");
@@ -301,7 +272,7 @@ public class ImageProcessorGUI extends JFrame
     Filter.addItem("Invert");
     Filter.addItem("Posterize");
     Filter.addItem("Blue Invert");
-    Filter.addItem("Bins");
+    Filter.addItem("Obama");
     Filter.setEnabled(false);
     Filter.addActionListener(new Filter());
 
@@ -340,7 +311,7 @@ public class ImageProcessorGUI extends JFrame
 
     // add(apply);
 
-    
+
     setMinimumSize(new Dimension(1120, 650));
   }
 
@@ -370,8 +341,8 @@ public class ImageProcessorGUI extends JFrame
     
     image = new ImageProcessor(mBufferedImage);
     image.saveOriginal(mBufferedImage);
-   
-    
+
+
     Graphics2D g2 = mBufferedImage.createGraphics();
     g2.drawImage(grabimage, null, ImageDisplay);
     ImageIcon disp = new ImageIcon(mBufferedImage);
@@ -383,17 +354,76 @@ public class ImageProcessorGUI extends JFrame
     // adjustToImageSize();
     // center();
     // ImageDisplay.validate();
-    // ImageDisplay.repaint();   
+    // ImageDisplay.repaint();
 
     // setTitle(kBanner + ": " + fileName);
     resizeToScale();
-    if (socket != null) {
-       socket.loadOccurred(mBufferedImage);
+    if( socket != null )
+    {
+      socket.loadOccurred(mBufferedImage);
     }
   }
-  
-  //overloaded so that the other player can load the image directly from an 
-  //Image rather than a pathname
+
+  // IF YOU WANNA MESS AROUND WITH COLOR SELECT, USE THIS CODE!
+
+  class binColorApply implements ActionListener
+  {
+    public void actionPerformed(ActionEvent e)
+    {
+      Color firstColor;
+      Color secondColor;
+      Color thirdColor;
+      if( isLoaded == false )
+      {
+        // TODO: write JDialogOption "Load an Image PLS"
+        return;
+      }
+      try
+      {
+        new isEmpty(ColorA.getText());
+        new isEmpty(ColorB.getText());
+        new isEmpty(ColorC.getText());
+      }
+      catch( EmptyTextFieldException excep1 )
+      {
+
+        JOptionPane
+            .showMessageDialog(new JDialog(), "Text Fields Cannot Be Empty!",
+                "Error!", JOptionPane.ERROR_MESSAGE);
+
+      }
+      if( Color3.isSelected() )
+      {
+        String stringA = ColorA.getText();
+        String stringB = ColorB.getText();
+        String stringC = ColorC.getText();
+
+        // Need to write Exception for when inputs are incorrect
+        // also should extend colorbin() with some nulls to have more colors???
+        // TODO:write text field input exceptions
+
+        firstColor = new Color(Integer.decode("#" + stringA));
+        secondColor = new Color(Integer.decode("#" + stringB));
+        thirdColor = new Color(Integer.decode("#" + stringC));
+        // firstColor = Color.decode("EEEEEE");
+        // secondColor = Color.decode("4F4F7B");
+        // thirdColor = Color.decode("2C003A");
+        mBufferedImage = image.getOriginal();
+
+        BufferedImage binimage = deepCopy(mBufferedImage);
+        colorBin(binimage, firstColor, secondColor, thirdColor);
+        ImageDisplay.removeAll();
+        ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
+        pack();
+
+      }
+
+    }
+
+  }
+
+  // overloaded so that the other player can load the image directly from an
+  // Image rather than a pathname
   public void loadImage(Image grabimage)
   {
     // Use a MediaTracker to fully load the image.
@@ -421,19 +451,18 @@ public class ImageProcessorGUI extends JFrame
 
     g2 = mBufferedImage.createGraphics();
     // resize grabimage if it's too big
-   /* if( mBufferedImage.getWidth() > ImageDisplay.getWidth()
-        || mBufferedImage.getHeight() > ImageDisplay.getWidth() )
-    {
-      g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-          RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-      g2.drawImage(mBufferedImage, 0, 0, mBufferedImage.getWidth() / 2,
-          mBufferedImage.getHeight() / 2, ImageDisplay);
-
-    }
-    else
-    {*/
-      g2.drawImage(grabimage, null, ImageDisplay);
-    //}
+    /*
+     * if( mBufferedImage.getWidth() > ImageDisplay.getWidth() ||
+     * mBufferedImage.getHeight() > ImageDisplay.getWidth() ) {
+     * g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+     * RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+     * g2.drawImage(mBufferedImage, 0, 0, mBufferedImage.getWidth() / 2,
+     * mBufferedImage.getHeight() / 2, ImageDisplay);
+     * 
+     * } else {
+     */
+    g2.drawImage(grabimage, null, ImageDisplay);
+    // }
     ImageIcon disp = new ImageIcon(mBufferedImage);
     display = new JLabel(disp);
     // display.setIcon(new ImageIcon(mBufferedImage));
@@ -448,7 +477,7 @@ public class ImageProcessorGUI extends JFrame
 
     // setTitle(kBanner + ": " + fileName);
   }
-  
+
   public class isEmpty
   {
     public isEmpty(String s) throws EmptyTextFieldException
@@ -459,59 +488,53 @@ public class ImageProcessorGUI extends JFrame
       }
     }
   }
-  
-  class binColorApply implements ActionListener
+
+
+  // color binning code 2.0
+  // add numbins param later
+  // WILL FIX BUT IT WORKS OMG YAYYYYYYY
+  void colorBinTwoPointOh(BufferedImage binimage, int numBins, Color colors[])
   {
-    public void actionPerformed(ActionEvent e)
+    // TODO: make an exception for if numBins == 0
+    int binEdges = 256 / numBins;
+    for( int i = 0; i < binimage.getWidth(); ++i )
     {
-      Color firstColor;
-      Color secondColor;
-      Color thirdColor;
-      if(isLoaded == false){
-        //TODO: write JDialogOption "Load an Image PLS"
-        return;
-      }
-      try
+      for( int j = 0; j < binimage.getHeight(); ++j )
       {
-        new isEmpty(ColorA.getText());
-        new isEmpty(ColorB.getText());
-        new isEmpty(ColorC.getText());
+        int argb = binimage.getRGB(i, j);
+        int red = (argb >> 16) & 0xff; // red
+        int green = (argb >> 8) & 0xff; // green
+        int blue = (argb) & 0xff; // blue
+        int currentBrightness = calculateBrightness(red, green, blue);
+        for( int k = 0; k < numBins; ++k )
+        {
+          if( currentBrightness < binEdges * (k + 1) )
+          {
+            binimage.setRGB(i, j, colors[k].getRGB());
+            k = numBins;
+          }
+        }
       }
-      catch( EmptyTextFieldException excep1 )
-      {
-        
-          JOptionPane.showMessageDialog(new JDialog(),
-              "Text Fields Cannot Be Empty!", "Error!",
-              JOptionPane.ERROR_MESSAGE);
-        
-      }
-      if(Color3.isSelected()){
-        String stringA = ColorA.getText();
-        String stringB = ColorB.getText();
-        String stringC = ColorC.getText();
-        
-        //Need to write Exception for when inputs are incorrect
-        //also should extend colorbin() with some nulls to have more colors???
-        //TODO:write text field input exceptions
-        
-        firstColor = new Color(Integer.decode("#" + stringA));
-        secondColor = new Color(Integer.decode("#" + stringB));
-        thirdColor = new Color(Integer.decode("#" + stringC));
-        //firstColor = Color.decode("EEEEEE");
-        //secondColor = Color.decode("4F4F7B");
-        //thirdColor = Color.decode("2C003A");
-        mBufferedImage = image.getOriginal();
-
-        BufferedImage binimage = deepCopy(mBufferedImage);
-        colorBin(binimage, firstColor, secondColor, thirdColor);
-        ImageDisplay.removeAll();
-        ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
-        pack();
-
-      }
-      
     }
-    
+  }
+
+  // NOT DONE
+  public void obama()
+  {
+    Color darkBlue = new Color(29, 82, 97);
+    Color red = new Color(161, 30, 34);
+    Color teal = new Color(86, 151, 163);
+    Color beige = new Color(245, 255, 201);
+    selectedColors[0] = darkBlue;
+    selectedColors[1] = red;
+    selectedColors[2] = teal;
+    selectedColors[3] = beige;
+    mBufferedImage = image.getOriginal();
+    BufferedImage binimage = deepCopy(mBufferedImage);
+    colorBinTwoPointOh(binimage, 4, selectedColors);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
+    pack();
   }
 
   class Filter implements ActionListener
@@ -519,151 +542,172 @@ public class ImageProcessorGUI extends JFrame
     public void actionPerformed(ActionEvent e)
     {
       JComboBox<String> Filter = (JComboBox<String>) e.getSource();
-      if( Filter.getSelectedItem().equals("None") ) {
+      if( Filter.getSelectedItem().equals("None") )
+      {
         noFilter();
-      }else if( Filter.getSelectedItem().equals("Sharpen")){
+      }
+      else if( Filter.getSelectedItem().equals("Sharpen") )
+      {
         sharpen();
-      }else if( Filter.getSelectedItem().equals("Edge Detector")){
+      }
+      else if( Filter.getSelectedItem().equals("Edge Detector") )
+      {
         edgeDetector();
-      }else if( Filter.getSelectedItem().equals("Invert")){
+      }
+      else if( Filter.getSelectedItem().equals("Invert") )
+      {
         invert();
-      }else if( Filter.getSelectedItem().equals("Posterize")){
+      }
+      else if( Filter.getSelectedItem().equals("Posterize") )
+      {
         posterize();
-      }else if( Filter.getSelectedItem().equals("Blue Invert")){
+      }
+      else if( Filter.getSelectedItem().equals("Blue Invert") )
+      {
         blueInvert();
       }
-      else if (Filter.getSelectedItem().equals("Bins")){
-        bins();
+      else if( Filter.getSelectedItem().equals("Obama") )
+      {
+        obama();
       }
-        
-     if (socket != null)
+
+      if( socket != null )
         socket.eventOccurred(Filter.getSelectedItem().toString());
     }
   }
-  
-  
+
+
   public void bins()
   {
-     mBufferedImage = image.getOriginal();
-     BufferedImage binimage = deepCopy(mBufferedImage);
-     //colorBin(binimage);
-     ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
-     pack();
+    mBufferedImage = image.getOriginal();
+    BufferedImage binimage = deepCopy(mBufferedImage);
+    // colorBin(binimage);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
+    pack();
   }
-  
-  
-  static BufferedImage deepCopy(BufferedImage bi) {
+
+
+  static BufferedImage deepCopy(BufferedImage bi)
+  {
     ColorModel cm = bi.getColorModel();
     boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
     WritableRaster raster = bi.copyData(null);
     return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-   }
+  }
 
   int calculateBrightness(Color c1)
   {
     return (int) Math.sqrt(.241 * c1.getRed() * c1.getRed() + .691
         * c1.getGreen() * c1.getGreen() + .068 * c1.getBlue() * c1.getBlue());
   }
-  
-  int calculateBrightness(int r, int g, int b){
-    return (int) Math.sqrt(.241 * r*r + .691
-        * g*g + .068 * b*b);
-    
+
+  int calculateBrightness(int r, int g, int b)
+  {
+    return (int) Math.sqrt(.241 * r * r + .691 * g * g + .068 * b * b);
+
   }
 
   // color binning code
-  //add numbins param later
-  //WILL FIX BUT IT WORKS OMG YAYYYYYYY
-  void colorBin(BufferedImage binimage, Color colorA, Color colorB, Color colorC){
-    int binEdges[] = {0,0,0}; //based on brightness
-    //for now, assume using 3 colors:
-   // Color bColor = Color.decode("FF0096");
-    //Color darkBlue = new Color(53, 3, 78);
-    //Color limeGreen = new Color(43, 206, 96);
-    //Color beige = new Color(251, 224, 155); 
-      binEdges[2] = calculateBrightness(colorA);
-      binEdges[1] = calculateBrightness(colorB);
-      binEdges[0] = calculateBrightness(colorC);
-      
-      for(int i = 0; i <binimage.getWidth(); ++i){
-        for(int j = 0; j < binimage.getHeight(); ++j){
-          int argb = binimage.getRGB(i, j);
-          int red = (argb >> 16) & 0xff; //red
-          int green = (argb >>  8) & 0xff; //green
-          int blue = (argb      ) & 0xff;  //blue
-          int currentBrightness = calculateBrightness(red, green, blue);
-          if(0 <= currentBrightness && currentBrightness < 85){
-            binimage.setRGB(i, j, colorA.getRGB());
-          }
-          else if ( 85 <= currentBrightness && currentBrightness <170){
-            binimage.setRGB(i, j, colorB.getRGB());
-          }
-          else{
-            binimage.setRGB(i, j, colorC.getRGB());
-            
-          }
+  // add numbins param later
+  // WILL FIX BUT IT WORKS OMG YAYYYYYYY
+  void colorBin(BufferedImage binimage, Color colorA, Color colorB, Color colorC)
+  {
+    int binEdges[] = { 0, 0, 0 }; // based on brightness
+    // for now, assume using 3 colors:
+    // Color bColor = Color.decode("FF0096");
+    // Color darkBlue = new Color(53, 3, 78);
+    // Color limeGreen = new Color(43, 206, 96);
+    // Color beige = new Color(251, 224, 155);
+    binEdges[2] = calculateBrightness(colorA);
+    binEdges[1] = calculateBrightness(colorB);
+    binEdges[0] = calculateBrightness(colorC);
+
+    for( int i = 0; i < binimage.getWidth(); ++i )
+    {
+      for( int j = 0; j < binimage.getHeight(); ++j )
+      {
+        int argb = binimage.getRGB(i, j);
+        int red = (argb >> 16) & 0xff; // red
+        int green = (argb >> 8) & 0xff; // green
+        int blue = (argb) & 0xff; // blue
+        int currentBrightness = calculateBrightness(red, green, blue);
+        if( 0 <= currentBrightness && currentBrightness < 85 )
+        {
+          binimage.setRGB(i, j, colorA.getRGB());
+        }
+        else if( 85 <= currentBrightness && currentBrightness < 170 )
+        {
+          binimage.setRGB(i, j, colorB.getRGB());
+        }
+        else
+        {
+          binimage.setRGB(i, j, colorC.getRGB());
+
         }
       }
+    }
   }
 
-  
-  public void noFilter() 
+
+  public void noFilter()
   {
-     mBufferedImage = image.getOriginal();
-     ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-     pack();
+    mBufferedImage = image.getOriginal();
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+    pack();
   }
-  
-  
+
+
   public void sharpen()
   {
-     mBufferedImage = image.getOriginal();
-     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Sharpen");
-     mBufferedImage = op.filter(mBufferedImage, null);
-     ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-     pack();
+    mBufferedImage = image.getOriginal();
+    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Sharpen");
+    mBufferedImage = op.filter(mBufferedImage, null);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+    pack();
   }
-  
-  public void edgeDetector() {
-     mBufferedImage = image.getOriginal();
-     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Edge detector");
-     mBufferedImage = op.filter(mBufferedImage, null);
-     ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-     pack();
+
+  public void edgeDetector()
+  {
+    mBufferedImage = image.getOriginal();
+    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Edge detector");
+    mBufferedImage = op.filter(mBufferedImage, null);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+    pack();
   }
-  
-  public void invert() {
-     mBufferedImage = image.getOriginal();
-     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert");
-     mBufferedImage = op.filter(mBufferedImage, null);
-     ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-     pack();
+
+  public void invert()
+  {
+    mBufferedImage = image.getOriginal();
+    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert");
+    mBufferedImage = op.filter(mBufferedImage, null);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+    pack();
   }
-  
-  public void posterize() {
-     mBufferedImage = image.getOriginal();
-     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Posterize");
-     mBufferedImage = op.filter(mBufferedImage, null);
-     ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-     pack();
+
+  public void posterize()
+  {
+    mBufferedImage = image.getOriginal();
+    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Posterize");
+    mBufferedImage = op.filter(mBufferedImage, null);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+    pack();
   }
-  
-  public void blueInvert() {
-     mBufferedImage = image.getOriginal();
-     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert blue");
-     mBufferedImage = op.filter(mBufferedImage, null);
-     ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-     pack();
+
+  public void blueInvert()
+  {
+    mBufferedImage = image.getOriginal();
+    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert blue");
+    mBufferedImage = op.filter(mBufferedImage, null);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+    pack();
   }
-  
-  
   
   public final int displayImageWidth = 800;
   public final int displayImageHeight = 800;
