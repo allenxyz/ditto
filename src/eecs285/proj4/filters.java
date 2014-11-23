@@ -1,5 +1,6 @@
 package eecs285.proj4;
 import eecs285.proj4.pixelTypes.*;
+import java.lang.Math.*;
 
 public class filters{
 
@@ -28,16 +29,16 @@ public class filters{
     int rPrime = val.getR()/255;
     int gPrime = val.getG()/255;
     int bPrime = val.getB()/255;
-    int max = max(rPrime, max(gPrime, bPrime));
-    int min = min(rPrime, min(gPrime, bPrime));
+    int max = Math.max(rPrime, Math.max(gPrime, bPrime));
+    int min = Math.min(rPrime, Math.min(gPrime, bPrime));
     int delta = max - min;
     
-    int hue;
-    int saturation;
+    int hue = 0;
+    int saturation = 0;
     int lightness = (max + min)/2;
     
     if(max == rPrime){
-      hue = 60*((gPrime - bPrime)/delta)%6);
+      hue = 60*((gPrime - bPrime)/delta) % 6;
     }
     else if(max == gPrime){
       hue = 60*((bPrime - rPrime)/delta + 2);
@@ -50,26 +51,68 @@ public class filters{
       saturation = 0;
     }
     else{
-      saturation = delta/(1 - abs(2 * lightness - 1));
-  
-    return hsl(hue, saturation, lightness);
-  }
+      saturation = delta/(1 - Math.abs(2 * lightness - 1));
+    }
+    
+      return new hsl(hue, saturation, lightness);
+    }
   
   public rgb hsl2rgb(hsl val){
+    int c = (1 - Math.abs(2 * val.getL())) * val.getS();
+    int x = c * (1 - Math.abs((val.getH()/60) % 2 - 1));
+    int m = val.getL() - c/2;
+    
+    int red = 0;
+    int green = 0;
+    int blue = 0;
+    
+    int whatTheHBobby = val.getH();
+    
+    if(whatTheHBobby >= 0 && whatTheHBobby < 60){
+      red = c + m;
+      green = x + m;
+      blue = m;
+    }
+    else if(whatTheHBobby >= 60 && whatTheHBobby < 120){
+      red = x + m;
+      green = c + m;
+      blue = m;
+    }
+    else if(whatTheHBobby >= 120 && whatTheHBobby < 180){
+      red = m;
+      green = c + m;
+      blue = x + m;
+    }
+    else if(whatTheHBobby >= 180 && whatTheHBobby < 240){
+      red = m;
+      green = x + m;
+      blue = c + m;
+    }
+    else if(whatTheHBobby >= 240 && whatTheHBobby < 300){
+      red = x + m;
+      green = m;
+      blue = c + m;
+    }
+    else if(whatTheHBobby >= 300 && whatTheHBobby < 360){
+      red = c + m;
+      green = m;
+      blue = x + m;
+    }
   
-  
-  
-  
-  
+    return new rgb(red, green, blue);
   }
   
   public cmyk rgb2cmyk(rgb val){
-  
-  
-  
-  
-  
+    int rPrime = val.getR()/255;
+    int gPrime = val.getG()/255;
+    int bPrime = val.getB()/255;
+    
+    int key = 1 - Math.max(rPrime, Math.max(gPrime, bPrime));
+    
+    int cyan = (1 - rPrime - key)/(1 - key);
+    int magneta = (1 - gPrime - key)/(1 - key);
+    int yellow = (1 - bPrime - key)/(1 - key);
+    
+    return new cmyk(cyan, magneta, yellow, key);
   }
 }
-
-
