@@ -166,12 +166,6 @@ System.out.println("ipaddr: " + ipAddr + " portNum: " + portNum);
          win.blueInvert();
       else if (receivedString == "Bins")
          win.bins();
-      else if (receivedString == "three")
-         win.colorNumSelectThree();
-      else if (receivedString == "five")
-         win.colorNumSelectFive();
-      else if (receivedString == "seven")
-         win.colorNumSelectSeven();
       else
          System.out.println("Unrecognized command when recieving Event");
    }
