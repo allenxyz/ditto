@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
+import java.awt.color.*;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -14,6 +15,7 @@ import javax.imageio.ImageIO;
 
 import java.io.*;
 
+import eecs285.proj4.Exceptions.EmptyTextFieldException;
 import eecs285.proj4.ImageProcessor;
 
 
@@ -26,6 +28,8 @@ public class ImageProcessorGUI extends JFrame
   private JMenuItem Exit;
   private JMenuItem Undo;
   private JMenuItem Redo;
+  
+  boolean isLoaded  = false;
 
   JPanel ImageDisplay = new JPanel();
   JPanel DisplayImage = new JPanel();
@@ -47,6 +51,10 @@ public class ImageProcessorGUI extends JFrame
   JTextField ColorE;
   JTextField ColorF;
   JTextField ColorG;
+  
+  JRadioButton Color3;
+  JRadioButton Color5;
+  JRadioButton Color7;
 
   JComboBox<String> Filter;
 
@@ -117,9 +125,9 @@ public class ImageProcessorGUI extends JFrame
     // EditPalette.add(FilterA);
     // EditPalette.add(FilterB);
     JPanel ColorTop = new JPanel();
-    JRadioButton Color3 = new JRadioButton("3 Color Image");
-    JRadioButton Color5 = new JRadioButton("5 Color Image");
-    JRadioButton Color7 = new JRadioButton("7 Color Image");
+    Color3 = new JRadioButton("3 Color Image");
+    Color5 = new JRadioButton("5 Color Image");
+    Color7 = new JRadioButton("7 Color Image");
     ButtonGroup ColorNumber = new ButtonGroup();
 
 
@@ -186,6 +194,7 @@ public class ImageProcessorGUI extends JFrame
     ColorMiddle.setEnabled(false);
     JPanel ColorBottom = new JPanel();
     Apply = new JButton("Apply");
+    Apply.addActionListener(new binColorApply());
     ClearFields = new JButton("Clear Fields");
     Apply.setEnabled(false);
     ClearFields.setEnabled(false);
@@ -312,12 +321,84 @@ public class ImageProcessorGUI extends JFrame
 
     ImageDisplay.add(display);
     pack();
+    isLoaded = true;
     // adjustToImageSize();
     // center();
     // ImageDisplay.validate();
     // ImageDisplay.repaint();
 
     // setTitle(kBanner + ": " + fileName);
+  }
+  
+  public class isEmpty
+  {
+
+    public isEmpty(String s) throws EmptyTextFieldException
+    {
+
+      if( s.isEmpty() )
+      {
+        throw new EmptyTextFieldException();
+      }
+
+    }
+
+  }
+  
+  class binColorApply implements ActionListener
+  {
+
+    
+    public void actionPerformed(ActionEvent e)
+    {
+      Color firstColor;
+      Color secondColor;
+      Color thirdColor;
+      if(isLoaded == false){
+        //TODO: write JDialogOption "Load an Image PLS"
+        return;
+      }
+      try
+      {
+        new isEmpty(ColorA.getText());
+        new isEmpty(ColorB.getText());
+        new isEmpty(ColorC.getText());
+      }
+      catch( EmptyTextFieldException excep1 )
+      {
+        
+          JOptionPane.showMessageDialog(new JDialog(),
+              "Text Fields Cannot Be Empty!", "Error!",
+              JOptionPane.ERROR_MESSAGE);
+        
+      }
+      if(Color3.isSelected()){
+        String stringA = ColorA.getText();
+        String stringB = ColorB.getText();
+        String stringC = ColorC.getText();
+        
+        //Need to write Exception for when inputs are incorrect
+        //also should extend colorbin() with some nulls to have more colors???
+        //TODO:write text field input exceptions
+        
+        firstColor = new Color(Integer.decode("#" + stringA));
+        secondColor = new Color(Integer.decode("#" + stringB));
+        thirdColor = new Color(Integer.decode("#" + stringC));
+        //firstColor = Color.decode("EEEEEE");
+        //secondColor = Color.decode("4F4F7B");
+        //thirdColor = Color.decode("2C003A");
+        mBufferedImage = image.getOriginal();
+
+        BufferedImage binimage = deepCopy(mBufferedImage);
+        colorBin(binimage, firstColor, secondColor, thirdColor);
+        ImageDisplay.removeAll();
+        ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
+        pack();
+
+      }
+      
+    }
+    
   }
 
   class Filter implements ActionListener
@@ -382,7 +463,7 @@ public class ImageProcessorGUI extends JFrame
       else if (Filter.getSelectedItem().equals("Bins")){
         mBufferedImage = image.getOriginal();
         BufferedImage binimage = deepCopy(mBufferedImage);
-        colorBin(binimage);
+        //colorBin(binimage);
         ImageDisplay.removeAll();
         ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
         pack();
@@ -414,15 +495,16 @@ public class ImageProcessorGUI extends JFrame
   // color binning code
   //add numbins param later
   //WILL FIX BUT IT WORKS OMG YAYYYYYYY
-  void colorBin(BufferedImage binimage){
+  void colorBin(BufferedImage binimage, Color colorA, Color colorB, Color colorC){
     int binEdges[] = {0,0,0}; //based on brightness
     //for now, assume using 3 colors:
-    Color darkBlue = new Color(53, 3, 78);
-    Color limeGreen = new Color(43, 206, 96);
-    Color beige = new Color(251, 224, 155); 
-      binEdges[2] = calculateBrightness(darkBlue);
-      binEdges[1] = calculateBrightness(limeGreen);
-      binEdges[0] = calculateBrightness(beige);
+   // Color bColor = Color.decode("FF0096");
+    //Color darkBlue = new Color(53, 3, 78);
+    //Color limeGreen = new Color(43, 206, 96);
+    //Color beige = new Color(251, 224, 155); 
+      binEdges[2] = calculateBrightness(colorA);
+      binEdges[1] = calculateBrightness(colorB);
+      binEdges[0] = calculateBrightness(colorC);
       
       for(int i = 0; i <binimage.getWidth(); ++i){
         for(int j = 0; j < binimage.getHeight(); ++j){
@@ -432,13 +514,13 @@ public class ImageProcessorGUI extends JFrame
           int blue = (argb      ) & 0xff;  //blue
           int currentBrightness = calculateBrightness(red, green, blue);
           if(0 <= currentBrightness && currentBrightness < 85){
-            binimage.setRGB(i, j, darkBlue.getRGB());
+            binimage.setRGB(i, j, colorA.getRGB());
           }
           else if ( 85 <= currentBrightness && currentBrightness <170){
-            binimage.setRGB(i, j, limeGreen.getRGB());
+            binimage.setRGB(i, j, colorB.getRGB());
           }
           else{
-            binimage.setRGB(i, j, beige.getRGB());
+            binimage.setRGB(i, j, colorC.getRGB());
             
           }
         }
