@@ -38,12 +38,6 @@ public class ImageProcessorGUI extends JFrame
 
   JPanel ImageDisplay = new JPanel();
   JPanel DisplayImage = new JPanel();
-<<<<<<< HEAD
-  
-=======
-
-
->>>>>>> d968f9daec3bf0b1fb16a0e707ca9c730e777700
   private JPanel ColorBottom;
   private JLabel A;
   private JLabel B;
