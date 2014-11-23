@@ -36,10 +36,10 @@ public class ImageProcessorGUI extends JFrame
 
   JPanel ImageDisplay = new JPanel();
   JPanel DisplayImage = new JPanel();
+  
+  
 
-  private JPanel ColorMiddleR2;
-  private JPanel ColorMiddleR3;
-  private JPanel ColorMiddle;
+  private JPanel ColorBottom;
   private JLabel A;
   private JLabel B;
   private JLabel C;
@@ -130,7 +130,7 @@ public class ImageProcessorGUI extends JFrame
     // JButton FilterB = new JButton("Filter B");
     // EditPalette.add(FilterA);
     // EditPalette.add(FilterB);
-    JPanel ColorTop = new JPanel();
+   /* JPanel ColorTop = new JPanel();
     Color3 = new JRadioButton("3 Color Image");
     Color5 = new JRadioButton("5 Color Image");
     Color7 = new JRadioButton("7 Color Image");
@@ -206,13 +206,26 @@ public class ImageProcessorGUI extends JFrame
     ClearFields.setEnabled(false);
     ColorBottom.add(Apply);
     ColorBottom.add(ClearFields);
-
+    */
+    JPanel ColorTop = new JPanel();
+    JPanel ColorMiddle = new JPanel();
+    
+    
+    JLabel blockLabel = new JLabel("Enter Number of Colors:");
+    ColorTop.add(blockLabel);
+    
+    JTextField numColors = new JTextField(4);
+    JButton Enter = new JButton("Enter");
+    ColorTop.add(numColors);
+    ColorTop.add(Enter);
+    
+    
     TitledBorder ColorTitle = new TitledBorder("Color Block Palette");
     ColorBlock.setBorder(ColorTitle);
     ColorBlock.setLayout(new BoxLayout(ColorBlock, BoxLayout.PAGE_AXIS));
     ColorBlock.add(ColorTop);
     ColorBlock.add(ColorMiddle);
-    ColorBlock.add(ColorBottom);
+    //ColorBlock.add(ColorBottom);
 
     // FUCKKKK
     BufferedImage myPicture = null;
@@ -615,71 +628,5 @@ public class ImageProcessorGUI extends JFrame
   }
   
   
-  class ColorNumSelect implements ActionListener
-  {
-
-    public void actionPerformed(ActionEvent e)
-    {
-
-      if( e.getActionCommand() == "three" )
-      {
-         colorNumSelectThree();
-      }
-      else if( e.getActionCommand() == "five" )
-      {
-         colorNumSelectFive();
-      }
-      else if( e.getActionCommand() == "seven" )
-      {
-         colorNumSelectSeven();
-      }
-      if (socket != null)
-         socket.eventOccurred(e.getActionCommand().toString());
-    }
-  }
   
-  public void colorNumSelectThree()
-  {
-     Apply.setEnabled(true);
-     ClearFields.setEnabled(true);
-     ColorMiddle.setEnabled(true);
-     ColorA.setEnabled(true);
-     ColorB.setEnabled(true);
-     ColorC.setEnabled(true);
-     A.setEnabled(true);
-     B.setEnabled(true);
-     C.setEnabled(true);
-     ColorMiddleR2.setVisible(false);
-     ColorMiddleR3.setVisible(false);
-  }
-  
-  public void colorNumSelectFive()
-  {
-     Apply.setEnabled(true);
-     ClearFields.setEnabled(true);
-     ColorMiddle.setEnabled(true);
-     ColorA.setEnabled(true);
-     ColorB.setEnabled(true);
-     ColorC.setEnabled(true);
-     A.setEnabled(true);
-     B.setEnabled(true);
-     C.setEnabled(true);
-     ColorMiddleR2.setVisible(true);
-     ColorMiddleR3.setVisible(false);
-  }
-  public void colorNumSelectSeven()
-  {
-     Apply.setEnabled(true);
-     ClearFields.setEnabled(true);
-     ColorMiddle.setEnabled(true);
-     ColorA.setEnabled(true);
-     ColorB.setEnabled(true);
-     ColorC.setEnabled(true);
-     A.setEnabled(true);
-     B.setEnabled(true);
-     C.setEnabled(true);
-     ColorMiddleR2.setVisible(true);
-     ColorMiddleR3.setVisible(true);
-     
-  }
 }
