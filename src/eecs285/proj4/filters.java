@@ -1,7 +1,7 @@
 package eecs285.proj4;
 import eecs285.proj4.pixelTypes.*;
 
-public class filter{
+public class filters{
 
   void valencia(rgb val){
     hsl hslLayer = rgb2hsl(val);

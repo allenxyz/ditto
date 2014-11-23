@@ -23,6 +23,7 @@ public class MainFile {
       JFrame win = new JFrame("Welcome");
       win.setLayout(new FlowLayout());
       win.setVisible(true);
+      win.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       
       JButton hostButton = new JButton("Host");
       JButton joinButton = new JButton("Join");
@@ -38,7 +39,6 @@ public class MainFile {
          {
             try {
                Server serverWindow = new Server(Inet4Address.getLocalHost().getHostAddress());
-               
             }
             catch (Exception except) {
                System.out.println("exception occurred");
@@ -54,7 +54,6 @@ public class MainFile {
          {
             try {
                Client clientWindow = new Client(Inet4Address.getLocalHost().getHostAddress());
-               
             }
             catch (Exception except) {
                System.out.println("exception occurred");
@@ -62,6 +61,5 @@ public class MainFile {
             }
          }
       });
-      
    }
 }

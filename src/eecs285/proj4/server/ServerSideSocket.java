@@ -120,7 +120,7 @@ System.out.println("ipaddr: " + ipAddr + " portNum: " + portNum);
       
       if ((int)recByte == 1)
          eventRecieve();
-      else if ((int) recByte == 2)
+      else if ((int)recByte == 2)
          loadRecieve();
    }
    
