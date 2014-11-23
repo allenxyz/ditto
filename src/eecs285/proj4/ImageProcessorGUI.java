@@ -394,6 +394,69 @@ public class ImageProcessorGUI extends JFrame
     }
   }
   
+  //IF YOU WANNA MESS AROUND WITH COLOR SELECT, USE THIS CODE!
+  class binColorApply implements ActionListener
+  {
+    public void actionPerformed(ActionEvent e)
+    {
+      Color firstColor;
+      Color secondColor;
+      Color thirdColor;
+      /*
+       * if(isLoaded == false){ //TODO: write JDialogOption "Load an Image PLS"
+       * System.out.println("RUH ROH"); return; }
+       */
+      try
+      {
+        new isEmpty(ColorA.getText());
+        new isEmpty(ColorB.getText());
+        new isEmpty(ColorC.getText());
+      }
+      catch( EmptyTextFieldException excep1 )
+      {
+
+        JOptionPane
+            .showMessageDialog(new JDialog(), "Text Fields Cannot Be Empty!",
+                "Error!", JOptionPane.ERROR_MESSAGE);
+
+      }
+      if( Color3.isSelected() )
+      {
+        String stringA = ColorA.getText();
+        String stringB = ColorB.getText();
+        String stringC = ColorC.getText();
+
+        // Need to write Exception for when inputs are incorrect
+        // also should extend colorbin() with some nulls to have more colors???
+        // TODO:write text field input exceptions
+
+      //  firstColor = new Color(Integer.decode("#" + stringA));
+       // secondColor = new Color(Integer.decode("#" + stringB));
+       // thirdColor = new Color(Integer.decode("#" + stringC));
+        System.out.println("WHYYY");
+        selectedColors[0] = (Color.decode(("#" + stringA)));
+        System.out.println("color one worked");
+        selectedColors[1] = new Color(Integer.decode("#" + stringB));
+        selectedColors[2] = new Color(Integer.decode("#" + stringC));
+        // firstColor = Color.decode("EEEEEE");
+        // secondColor = Color.decode("4F4F7B");
+        // thirdColor = Color.decode("2C003A");
+        mBufferedImage = image.getOriginal();
+
+        BufferedImage binimage = deepCopy(mBufferedImage);
+       // colorBin(binimage, firstColor, secondColor, thirdColor);
+        colorBinTwoPointOh(binimage, 3, selectedColors);
+        System.out.println("Got here");
+        ImageDisplay.removeAll();
+        ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
+        pack();
+
+      }
+
+    }
+
+  }
+  
   //overloaded so that the other player can load the image directly from an 
   //Image rather than a pathname
   public void loadImage(Image grabimage)
@@ -460,6 +523,51 @@ public class ImageProcessorGUI extends JFrame
         throw new EmptyTextFieldException();
       }
     }
+  }
+  
+  
+
+  // color binning code 2.0
+  // add numbins param later
+  // WILL FIX BUT IT WORKS OMG YAYYYYYYY
+  void colorBinTwoPointOh(BufferedImage binimage, int numBins, Color colors[])
+  {
+    // TODO: make an exception for if numBins == 0
+    int binEdges = 256 / numBins;
+    for( int i = 0; i < binimage.getWidth(); ++i )
+    {
+      for( int j = 0; j < binimage.getHeight(); ++j )
+      {
+        int argb = binimage.getRGB(i, j);
+        int red = (argb >> 16) & 0xff; // red
+        int green = (argb >> 8) & 0xff; // green
+        int blue = (argb) & 0xff; // blue
+        int currentBrightness = calculateBrightness(red, green, blue);
+        for( int k = 0; k < numBins; ++k )
+        {
+          if( currentBrightness < binEdges * (k + 1) )
+          {
+            binimage.setRGB(i, j, colors[k].getRGB());
+            k = numBins;
+          }
+        }
+      }
+    }
+  }
+
+//NOT DONE
+  public void obama()
+  {
+
+    Color darkBlue = new Color(53, 3, 78);
+    Color limeGreen = new Color(43, 206, 96);
+    Color beige = new Color(251, 224, 155);
+    mBufferedImage = image.getOriginal();
+    BufferedImage binimage = deepCopy(mBufferedImage);
+    colorBin(binimage, darkBlue, limeGreen, beige);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
+    pack();
   }
   
   class binColorApply implements ActionListener
