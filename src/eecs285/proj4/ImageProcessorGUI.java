@@ -23,7 +23,6 @@ import eecs285.proj4.server.*;
 public class ImageProcessorGUI extends JFrame
 {
   private final ImageProcessingSocket socket;
-  
   public static ImageProcessorGUI win;
 
   private JMenuItem Open;
@@ -43,7 +42,8 @@ public class ImageProcessorGUI extends JFrame
   private JLabel A;
   private JLabel B;
   private JLabel C;
-
+  private JLabel display;
+  
   private JButton Apply;
   private JButton ClearFields;
 
@@ -292,7 +292,7 @@ public class ImageProcessorGUI extends JFrame
 
     // add(apply);
 
-
+    
     setMinimumSize(new Dimension(1120, 650));
   }
 
@@ -338,6 +338,7 @@ public class ImageProcessorGUI extends JFrame
     // ImageDisplay.repaint();   
 
     // setTitle(kBanner + ": " + fileName);
+    resizeToScale();
     if (socket != null) {
        socket.loadOccurred(mBufferedImage);
     }
@@ -386,7 +387,7 @@ public class ImageProcessorGUI extends JFrame
       g2.drawImage(grabimage, null, ImageDisplay);
     //}
     ImageIcon disp = new ImageIcon(mBufferedImage);
-    JLabel display = new JLabel(disp);
+    display = new JLabel(disp);
     // display.setIcon(new ImageIcon(mBufferedImage));
 
     ImageDisplay.add(display);
@@ -682,4 +683,30 @@ public class ImageProcessorGUI extends JFrame
      ColorMiddleR3.setVisible(true);
      
   }
+  
+  
+  public final int displayImageWidth = 650;
+  public final int displayImageHeight = 650;
+  public void resizeToScale()
+  {
+     int height = mBufferedImage.getHeight();
+     int width = mBufferedImage.getWidth();
+     double hwRatio = (double)height/(double)width;
+     if (height > displayImageHeight) 
+     {
+        height = displayImageHeight;
+        width = (int) (height / hwRatio);
+     }
+     if (width > displayImageWidth)
+     {
+        width = displayImageWidth;
+        height = (int) (width * hwRatio);
+     }
+     
+     Image tmp = mBufferedImage.getScaledInstance(width, height, BufferedImage.SCALE_FAST);
+     BufferedImage buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+     buffered.getGraphics().drawImage(tmp, 0, 0, null);
+     mBufferedImage = buffered;
+  }
+  
 }
