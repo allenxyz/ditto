@@ -39,8 +39,6 @@ public class ImageProcessorGUI extends JFrame
   JPanel ImageDisplay = new JPanel();
   JPanel DisplayImage = new JPanel();
   
-  
-
   private JPanel ColorBottom;
   private JLabel A;
   private JLabel B;
@@ -370,7 +368,7 @@ public class ImageProcessorGUI extends JFrame
                                        grabimage.getHeight(null), 
                                        BufferedImage.TYPE_INT_RGB);
     
-    image = new ImageProcessor();
+    image = new ImageProcessor(mBufferedImage);
     image.saveOriginal(mBufferedImage);
    
     
@@ -417,7 +415,7 @@ public class ImageProcessorGUI extends JFrame
         grabimage.getHeight(null), BufferedImage.TYPE_INT_RGB);
 
 
-    image = new ImageProcessor();
+    image = new ImageProcessor(mBufferedImage);
     image.saveOriginal(mBufferedImage);
 
 
@@ -667,13 +665,14 @@ public class ImageProcessorGUI extends JFrame
   
   
   
-  public final int displayImageWidth = 650;
-  public final int displayImageHeight = 650;
+  public final int displayImageWidth = 800;
+  public final int displayImageHeight = 800;
   public void resizeToScale()
   {
      int height = mBufferedImage.getHeight();
      int width = mBufferedImage.getWidth();
      double hwRatio = (double)height/(double)width;
+     
      if (height > displayImageHeight) 
      {
         height = displayImageHeight;
@@ -684,10 +683,28 @@ public class ImageProcessorGUI extends JFrame
         width = displayImageWidth;
         height = (int) (width * hwRatio);
      }
+  
+     
+     
      
      Image tmp = mBufferedImage.getScaledInstance(width, height, BufferedImage.SCALE_FAST);
      BufferedImage buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
      buffered.getGraphics().drawImage(tmp, 0, 0, null);
      mBufferedImage = buffered;
+     image = new ImageProcessor(mBufferedImage);
+     
+     ImageDisplay.removeAll();
+     display = new JLabel(new ImageIcon(mBufferedImage));
+     ImageDisplay.add(display);
+     
+     pack();
+     System.out.println(mBufferedImage.getHeight());
+     System.out.println(mBufferedImage.getWidth());
+  }
+  
+  public void filterValencia() {
+     
+     
   }
 }
+ 

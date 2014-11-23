@@ -16,7 +16,11 @@ public class filters{
     hslLayer = rgb2hsl(rgbLayer);
     hslLayer.changeS(hslLayer.getS() - 20);
     //then somehow add noise, what the fuk
-  }
+    rgb temp = hsl2rgb(hslLayer);
+    val.changeR(temp.getR());
+    val.changeG(temp.getG());
+    val.changeB(temp.getB());
+}
   
   void greyscale(rgb val){
     cmyk cmykLayer = rgb2cmyk(val);

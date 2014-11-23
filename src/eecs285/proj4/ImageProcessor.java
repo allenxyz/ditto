@@ -24,6 +24,7 @@ package eecs285.proj4;
  **/
 
 import java.awt.*;
+import eecs285.proj4.pixelTypes.*;
 import java.awt.event.*;
 import java.awt.image.*;
 import java.util.*;
@@ -31,35 +32,59 @@ import java.util.*;
 
 public class ImageProcessor extends Frame
 {
-
-  /**
-   * Instantiates an ImageDicer with an image file name. If no image file name
-   * is specified on the command line, "default" is used.
-   **/
-/*  public static void main(String[] args)
-  {
-    String fileName = "default.jpg";
-    if( args.length > 0 )
-      fileName = args[0];
-    new ImageProcessor(fileName);
-  }
-*/
   /**
    * kBanner holds the application title which is used in the window title.
    **/
   private static final String kBanner = "ImageDicer v1.0";
-
-  /**
-   * ImageDicer's constructor creates a set of image processing operations,
-   * creates user controls, and loads the named image.
-   **/
-  public ImageProcessor()
+  private int width;
+  private int height;
+  private rgb[][] result;
+  
+  public ImageProcessor(BufferedImage im)
   {
    // super(kBanner);
     createOps();
    // createUI();
    // loadImage(fileName);
-   // setVisible(true);
+   // setVisible(true);    
+//    DataBufferByte type = ((DataBufferByte) im.getRaster().getDataBuffer());
+//    final byte[] pixels = type.getData();
+//    width = im.getWidth();
+//    height = im.getHeight();
+//    boolean hasAlphaChannel = im.getAlphaRaster() != null;
+//    result = new rgb[height][width];
+//    if (hasAlphaChannel) {
+//       final int pixelLength = 4;
+//       for (int pixel = 0, row = 0, col = 0; pixel < pixels.length; pixel += pixelLength) {
+//          int blue = ((int) pixels[pixel + 1] & 0xff); // blue
+//          int green = (((int) pixels[pixel + 2] & 0xff) << 8); // green
+//          int red = (((int) pixels[pixel + 3] & 0xff) << 16); // red
+//          rgb temp = new rgb(red, green, blue);
+//          result[row][col] = temp;
+//          col++;
+//          if (col == width) {
+//             col = 0;
+//             row++;
+//          }
+//       }
+//    } else {
+//       final int pixelLength = 3;
+//       for (int pixel = 0, row = 0, col = 0; pixel < pixels.length; pixel += pixelLength) {
+//          int blue = ((int) pixels[pixel + 1] & 0xff); // blue
+//          int green = (((int) pixels[pixel + 2] & 0xff) << 8); // green
+//          int red = (((int) pixels[pixel + 3] & 0xff) << 16); // red
+//          rgb temp = new rgb(red, green, blue);
+//          result[row][col] = temp;
+//          col++;
+//          if (col == width) {
+//             col = 0;
+//             row++;
+//          }
+//       }
+//    }
+    
+    
+    
   }
 
   /**
@@ -305,9 +330,7 @@ public class ImageProcessor extends Frame
       return;
     Insets insets = getInsets();
     g.drawImage(mBufferedImage, insets.left, insets.top, null);
-    
-    
-    
-    
   }
+  
+  
 }
