@@ -39,8 +39,10 @@ public class ImageProcessorGUI extends JFrame
   JPanel ImageDisplay = new JPanel();
   JPanel DisplayImage = new JPanel();
   
-  
+  JPanel palettePanel;
 
+  JDialog ColorPickerDialog;
+  
   private JPanel ColorBottom;
   private JLabel A;
   private JLabel B;
@@ -58,6 +60,8 @@ public class ImageProcessorGUI extends JFrame
   JTextField ColorF;
   JTextField ColorG;
   
+  private JTextField numColors;
+  
   JRadioButton Color3;
   JRadioButton Color5;
   JRadioButton Color7;
@@ -66,6 +70,7 @@ public class ImageProcessorGUI extends JFrame
 
   private BufferedImage mBufferedImage;
   private Color selectedColors[] = new Color[256];
+  private int numBins = 0;
   private Graphics2D g2;
 
   ImageProcessor image;
@@ -214,12 +219,12 @@ public class ImageProcessorGUI extends JFrame
     JPanel ColorTop = new JPanel();
     JPanel ColorMiddle = new JPanel();
     
-    
     JLabel blockLabel = new JLabel("Enter Number of Colors:");
     ColorTop.add(blockLabel);
     
-    JTextField numColors = new JTextField(4);
+    numColors = new JTextField(4);
     JButton Enter = new JButton("Enter");
+    Enter.addActionListener(new EnterAction());
     ColorTop.add(numColors);
     ColorTop.add(Enter);
     
@@ -242,9 +247,10 @@ public class ImageProcessorGUI extends JFrame
       System.out.println("rip\n");
     }
     JLabel picLabel = new JLabel(new ImageIcon(myPicture));
-    JPanel palettePanel = new JPanel();
+    palettePanel = new JPanel();
     palettePanel.setLayout(new BorderLayout(100, 100));
     palettePanel.add(picLabel);
+    palettePanel.setEnabled(false);
     
     JPanel paletteText = new JPanel();
     JLabel red = new JLabel("R: ");
@@ -278,6 +284,8 @@ public class ImageProcessorGUI extends JFrame
         {
           Robot r = new Robot();
           Color color = r.getPixelColor(x, y);
+          //private Color selectedColors[] = new Color[256];
+          
           getRed = color.getRed();
           getGreen = color.getGreen();
           getBlue = color.getBlue();
@@ -401,46 +409,24 @@ public class ImageProcessorGUI extends JFrame
   {
     public void actionPerformed(ActionEvent e)
     {
-      Color firstColor;
-      Color secondColor;
-      Color thirdColor;
-      if(isLoaded == false){
+      /*if(isLoaded == false){
         //TODO: write JDialogOption "Load an Image PLS"
         return;
-      }
-      try
-      {
-        new isEmpty(ColorA.getText());
-        new isEmpty(ColorB.getText());
-        new isEmpty(ColorC.getText());
-      }
-      catch( EmptyTextFieldException excep1 )
-      {
-        
-          JOptionPane.showMessageDialog(new JDialog(),
-              "Text Fields Cannot Be Empty!", "Error!",
-              JOptionPane.ERROR_MESSAGE);
-        
-      }
-      if(Color3.isSelected()){
-        String stringA = ColorA.getText();
-        String stringB = ColorB.getText();
-        String stringC = ColorC.getText();
+      }*/
+
+//get num bins
+       //val from jdialog
+      
+      //array colors already set
         
         //Need to write Exception for when inputs are incorrect
         //also should extend colorbin() with some nulls to have more colors???
         //TODO:write text field input exceptions
-        
-        firstColor = new Color(Integer.decode("#" + stringA));
-        secondColor = new Color(Integer.decode("#" + stringB));
-        thirdColor = new Color(Integer.decode("#" + stringC));
-        //firstColor = Color.decode("EEEEEE");
-        //secondColor = Color.decode("4F4F7B");
-        //thirdColor = Color.decode("2C003A");
+       
         mBufferedImage = image.getOriginal();
 
         BufferedImage binimage = deepCopy(mBufferedImage);
-        colorBin(binimage, firstColor, secondColor, thirdColor);
+        colorBinTwoPointOh(binimage, numBins, selectedColors);
         ImageDisplay.removeAll();
         ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
         pack();
@@ -449,7 +435,7 @@ public class ImageProcessorGUI extends JFrame
       
     }
     
-  }
+  
 
   //overloaded so that the other player can load the image directly from an 
   //Image rather than a pathname
@@ -519,7 +505,143 @@ public class ImageProcessorGUI extends JFrame
     }
   }
   
+  class EnterAction implements ActionListener{
+
+    public void actionPerformed(ActionEvent e)
+    {
+      int number;
+      try{
+        
+        new isEmpty(numColors.getText());
+        
+      }catch(EmptyTextFieldException excep){
+        JOptionPane.showMessageDialog(null,
+            "Text Fields Cannot Be Empty!", "Error!",
+            JOptionPane.ERROR_MESSAGE);
+            return;
+      }
+      try{
+        number = Integer.parseInt(numColors.getText());
+        numBins = number;
+      }catch(NumberFormatException excep1){
+        JOptionPane.showMessageDialog(null,
+            "Text Field Must be a number!", "Error!",
+            JOptionPane.ERROR_MESSAGE);
+            return;
+      }
+      ColorPickerDialog = new ColorPicker(number);
+      //palettePanel.setEnabled(true); 
+    }   
+  }
   
+  public class ColorPicker extends JDialog
+  {
+
+    int clicks;
+
+    public ColorPicker(final int numColors)
+    {
+      super(ImageProcessorGUI.this, "Pick your Color Block colors", true);
+
+      System.out.println("HERE");
+      JPanel apply = new JPanel();
+
+      BufferedImage myPicture = null;
+      try
+      {
+        myPicture = ImageIO.read(new File("wheel.png"));
+      }
+      catch( IOException e )
+      {
+        System.out.println("rip\n");
+      }
+      JLabel picLabel = new JLabel(new ImageIcon(myPicture));
+      palettePanel = new JPanel();
+      palettePanel.setLayout(new BorderLayout(100, 100));
+      palettePanel.add(picLabel);
+      palettePanel.setEnabled(false);
+      
+      JPanel paletteText = new JPanel();
+      JLabel red = new JLabel("R: ");
+      final JTextField redPal = new JTextField(5);
+      JLabel green = new JLabel("G: ");
+      final JTextField greenPal = new JTextField(5);
+      JLabel blue = new JLabel("B: ");
+      final JTextField bluePal = new JTextField(5);
+      JButton Apply = new JButton("Apply");
+      Apply.addActionListener(new binColorApply());
+      /*if(clicks  == numBins ){
+        Apply.setEnabled(true);
+      }
+      else{
+        Apply.setEnabled(false);
+      }*/
+      redPal.setEditable(false);
+      greenPal.setEditable(false);
+      bluePal.setEditable(false);
+      paletteText.add(red);
+      paletteText.add(redPal);
+      paletteText.add(green);
+      paletteText.add(greenPal);
+      paletteText.add(blue);
+      paletteText.add(bluePal);
+      paletteText.add(Apply);
+      
+      palettePanel.addMouseListener(new MouseAdapter()
+      {
+        @Override
+        public void mouseClicked(MouseEvent e){
+          //TODO: EDIT THIS LISTENER
+          PointerInfo a = MouseInfo.getPointerInfo();
+          Point b = a.getLocation();
+          int x = (int) b.getX();
+          int y = (int) b.getY();
+          int getRed = 0;
+          int getGreen = 0;
+          int getBlue = 0;
+          try
+          {
+            Robot r = new Robot();
+            Color color = r.getPixelColor(x, y);
+            if(clicks >= numBins){
+              //THROW EXCEPTION
+              return;
+            }
+            else
+            {
+            //private Color selectedColors[] = new Color[256];
+              selectedColors[clicks] = color;
+              System.out.println(String.valueOf(selectedColors[clicks].getRGB()));
+              
+            }
+            getRed = color.getRed();
+            getGreen = color.getGreen();
+            getBlue = color.getBlue();
+            clicks = clicks + 1;
+          }
+          catch( AWTException e1 )
+          {
+            System.out.println("You aren't supposed to be here, LEAVE!");
+          }
+          if(getRed != 234 && getGreen != 234 && getBlue != 234)
+          {
+            redPal.setText(String.valueOf(getRed));
+            greenPal.setText(String.valueOf(getGreen));
+            bluePal.setText(String.valueOf(getBlue));
+          }
+        }
+      });
+      apply.add(palettePanel);
+      apply.add(paletteText);
+      add(apply);
+      
+      setModal(true);
+      setLayout(new FlowLayout());
+      pack();
+      setVisible(true);
+      
+    }
+  }
 
   // color binning code 2.0
   // add numbins param later
@@ -591,6 +713,9 @@ public class ImageProcessorGUI extends JFrame
     }
   }
   
+  public void setNumBins(int num){
+    numBins = num;
+  }
   
   public void bins()
   {
