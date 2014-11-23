@@ -247,11 +247,11 @@ public class ImageProcessorGUI extends JFrame
     
     JPanel paletteText = new JPanel();
     JLabel red = new JLabel("R: ");
-    JTextField redPal = new JTextField(5);
+    final JTextField redPal = new JTextField(5);
     JLabel green = new JLabel("G: ");
-    JTextField greenPal = new JTextField(5);
+    final JTextField greenPal = new JTextField(5);
     JLabel blue = new JLabel("B: ");
-    JTextField bluePal = new JTextField(5);
+    final JTextField bluePal = new JTextField(5);
     redPal.setEditable(false);
     greenPal.setEditable(false);
     bluePal.setEditable(false);
