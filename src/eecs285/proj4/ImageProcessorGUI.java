@@ -65,6 +65,7 @@ public class ImageProcessorGUI extends JFrame
   JComboBox<String> Filter;
 
   private BufferedImage mBufferedImage;
+  private Color selectedColors[] = new Color[256];
   private Graphics2D g2;
 
   ImageProcessor image;
@@ -395,6 +396,7 @@ public class ImageProcessorGUI extends JFrame
   }
   
   //IF YOU WANNA MESS AROUND WITH COLOR SELECT, USE THIS CODE!
+  
   class binColorApply implements ActionListener
   {
     public void actionPerformed(ActionEvent e)
@@ -402,10 +404,10 @@ public class ImageProcessorGUI extends JFrame
       Color firstColor;
       Color secondColor;
       Color thirdColor;
-      /*
-       * if(isLoaded == false){ //TODO: write JDialogOption "Load an Image PLS"
-       * System.out.println("RUH ROH"); return; }
-       */
+      if(isLoaded == false){
+        //TODO: write JDialogOption "Load an Image PLS"
+        return;
+      }
       try
       {
         new isEmpty(ColorA.getText());
@@ -414,49 +416,41 @@ public class ImageProcessorGUI extends JFrame
       }
       catch( EmptyTextFieldException excep1 )
       {
-
-        JOptionPane
-            .showMessageDialog(new JDialog(), "Text Fields Cannot Be Empty!",
-                "Error!", JOptionPane.ERROR_MESSAGE);
-
+        
+          JOptionPane.showMessageDialog(new JDialog(),
+              "Text Fields Cannot Be Empty!", "Error!",
+              JOptionPane.ERROR_MESSAGE);
+        
       }
-      if( Color3.isSelected() )
-      {
+      if(Color3.isSelected()){
         String stringA = ColorA.getText();
         String stringB = ColorB.getText();
         String stringC = ColorC.getText();
-
-        // Need to write Exception for when inputs are incorrect
-        // also should extend colorbin() with some nulls to have more colors???
-        // TODO:write text field input exceptions
-
-      //  firstColor = new Color(Integer.decode("#" + stringA));
-       // secondColor = new Color(Integer.decode("#" + stringB));
-       // thirdColor = new Color(Integer.decode("#" + stringC));
-        System.out.println("WHYYY");
-        selectedColors[0] = (Color.decode(("#" + stringA)));
-        System.out.println("color one worked");
-        selectedColors[1] = new Color(Integer.decode("#" + stringB));
-        selectedColors[2] = new Color(Integer.decode("#" + stringC));
-        // firstColor = Color.decode("EEEEEE");
-        // secondColor = Color.decode("4F4F7B");
-        // thirdColor = Color.decode("2C003A");
+        
+        //Need to write Exception for when inputs are incorrect
+        //also should extend colorbin() with some nulls to have more colors???
+        //TODO:write text field input exceptions
+        
+        firstColor = new Color(Integer.decode("#" + stringA));
+        secondColor = new Color(Integer.decode("#" + stringB));
+        thirdColor = new Color(Integer.decode("#" + stringC));
+        //firstColor = Color.decode("EEEEEE");
+        //secondColor = Color.decode("4F4F7B");
+        //thirdColor = Color.decode("2C003A");
         mBufferedImage = image.getOriginal();
 
         BufferedImage binimage = deepCopy(mBufferedImage);
-       // colorBin(binimage, firstColor, secondColor, thirdColor);
-        colorBinTwoPointOh(binimage, 3, selectedColors);
-        System.out.println("Got here");
+        colorBin(binimage, firstColor, secondColor, thirdColor);
         ImageDisplay.removeAll();
         ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
         pack();
 
       }
-
+      
     }
-
+    
   }
-  
+
   //overloaded so that the other player can load the image directly from an 
   //Image rather than a pathname
   public void loadImage(Image grabimage)
@@ -568,60 +562,6 @@ public class ImageProcessorGUI extends JFrame
     ImageDisplay.removeAll();
     ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
     pack();
-  }
-  
-  class binColorApply implements ActionListener
-  {
-    public void actionPerformed(ActionEvent e)
-    {
-      Color firstColor;
-      Color secondColor;
-      Color thirdColor;
-      if(isLoaded == false){
-        //TODO: write JDialogOption "Load an Image PLS"
-        return;
-      }
-      try
-      {
-        new isEmpty(ColorA.getText());
-        new isEmpty(ColorB.getText());
-        new isEmpty(ColorC.getText());
-      }
-      catch( EmptyTextFieldException excep1 )
-      {
-        
-          JOptionPane.showMessageDialog(new JDialog(),
-              "Text Fields Cannot Be Empty!", "Error!",
-              JOptionPane.ERROR_MESSAGE);
-        
-      }
-      if(Color3.isSelected()){
-        String stringA = ColorA.getText();
-        String stringB = ColorB.getText();
-        String stringC = ColorC.getText();
-        
-        //Need to write Exception for when inputs are incorrect
-        //also should extend colorbin() with some nulls to have more colors???
-        //TODO:write text field input exceptions
-        
-        firstColor = new Color(Integer.decode("#" + stringA));
-        secondColor = new Color(Integer.decode("#" + stringB));
-        thirdColor = new Color(Integer.decode("#" + stringC));
-        //firstColor = Color.decode("EEEEEE");
-        //secondColor = Color.decode("4F4F7B");
-        //thirdColor = Color.decode("2C003A");
-        mBufferedImage = image.getOriginal();
-
-        BufferedImage binimage = deepCopy(mBufferedImage);
-        colorBin(binimage, firstColor, secondColor, thirdColor);
-        ImageDisplay.removeAll();
-        ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
-        pack();
-
-      }
-      
-    }
-    
   }
 
   class Filter implements ActionListener
