@@ -57,6 +57,7 @@ public class ImageProcessorGUI extends JFrame
 
   private JButton Apply;
   private JButton ClearFields;
+  private JButton Enter;
 
   JTextField ColorA;
   JTextField ColorB;
@@ -203,8 +204,9 @@ public class ImageProcessorGUI extends JFrame
     
     numColors = new JTextField(4);
 
-    JButton Enter = new JButton("Enter");
+    Enter = new JButton("Enter");
     Enter.addActionListener(new EnterAction());
+    Enter.setEnabled(false);
     ColorTop.add(numColors);
     ColorTop.add(Enter);
 
@@ -338,6 +340,7 @@ public class ImageProcessorGUI extends JFrame
   {
     // Use a MediaTracker to fully load the image.
     Filter.setEnabled(true);
+    Enter.setEnabled(true);
     Image grabimage = Toolkit.getDefaultToolkit().getImage(fileName);
     MediaTracker mt = new MediaTracker(this);
     mt.addImage(grabimage, 0);
@@ -821,13 +824,13 @@ public class ImageProcessorGUI extends JFrame
 
   public void noFilter()
   {
-     //mBufferedImage = image.getOriginal();
-     BufferedImage binimage = deepCopy(mBufferedImage);
+     mBufferedImage = image.getOriginal();
+     //BufferedImage binimage = deepCopy(mBufferedImage);
 
      ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
+     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
      pack();
-     deepCopyerino(binimage);
+     deepCopyerino(mBufferedImage);
   }
 
 
