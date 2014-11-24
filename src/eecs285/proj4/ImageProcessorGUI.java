@@ -83,12 +83,10 @@ public class ImageProcessorGUI extends JFrame
   JComboBox<String> CustomFilters;
 
   private BufferedImage mBufferedImage;
-  private static BufferedImage binimage;
+  private static BufferedImage curImage;
   private Color selectedColors[] = new Color[256];
   private int numBins = 0;
   private Graphics2D g2;
-
-  private String storePath;
   private Vector<BufferedImage> queue = new Vector<BufferedImage>(5);
 
   private ImageProcessor image;
@@ -133,7 +131,6 @@ public class ImageProcessorGUI extends JFrame
         if( fd.getFile() == null )
           return;
         String path = fd.getDirectory() + fd.getFile();
-        storePath = path;
         ImageDisplay.removeAll();
         loadImage(path);
         // repaint();
@@ -185,7 +182,10 @@ public class ImageProcessorGUI extends JFrame
       {
         if( !queue.isEmpty() )
         {
-          loadImage((BufferedImage) queue.lastElement());
+          curImage = deepCopy(queue.elementAt(queue.size() - 2));
+          ImageDisplay.removeAll();
+          ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+          pack();
           queue.removeElementAt(queue.size() - 1);
         }
         System.out.println(queue.size());
@@ -198,7 +198,7 @@ public class ImageProcessorGUI extends JFrame
       public void actionPerformed(ActionEvent e)
       {
         ImageDisplay.removeAll();
-        loadImage(storePath);
+        ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
       }
     });
 
@@ -316,6 +316,7 @@ public class ImageProcessorGUI extends JFrame
     Filter.addItem("Neutral");
     Filter.addItem("Coffee");
     Filter.addItem("Greyscale");
+    Filter.addItem("tint");
     Filter.setEnabled(false);
     Filter.addActionListener(new Filter());
 
@@ -381,17 +382,15 @@ public class ImageProcessorGUI extends JFrame
 
     // Make a BufferedImage from the Image.
     mBufferedImage = new BufferedImage(grabimage.getWidth(null),
-        grabimage.getHeight(null), BufferedImage.TYPE_INT_RGB);
-
-
+                                       grabimage.getHeight(null), 
+                                       BufferedImage.TYPE_INT_RGB);
     Graphics2D g2 = mBufferedImage.createGraphics();
     g2.drawImage(grabimage, null, ImageDisplay);
     ImageIcon disp = new ImageIcon(mBufferedImage);
-    display.removeAll();
-    display = new JLabel(disp);
-    // display.setIcon(new ImageIcon(mBufferedImage));
-
-    ImageDisplay.add(display);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(disp));
+    curImage = deepCopy(mBufferedImage);
+    
     pack();
     // adjustToImageSize();
     // center();
@@ -400,8 +399,7 @@ public class ImageProcessorGUI extends JFrame
 
     // setTitle(kBanner + ": " + fileName);
     resizeToScale();
-    image = new ImageProcessor(mBufferedImage);
-    image.saveOriginal(mBufferedImage);
+    image = new ImageProcessor();
     Filter.setSelectedItem("None");
 
     if( socket != null )
@@ -411,29 +409,19 @@ public class ImageProcessorGUI extends JFrame
   }
 
   // IF YOU WANNA MESS AROUND WITH COLOR SELECT, USE THIS CODE!
-
   class binColorApply implements ActionListener
   {
     public void actionPerformed(ActionEvent e)
     {
 
-      // mBufferedImage = image.getOriginal();
-
-
-      binimage = deepCopy(mBufferedImage);
-
-      colorBinTwoPointOh(binimage, numBins, selectedColors);
-      ImageDisplay.removeAll();
-      ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
-      pack();
-      Apply.setEnabled(false);
-      // ColorPicker.this.dispose();
-
-    }
-
+        //mBufferedImage = image.getOriginal();
+        colorBinTwoPointOh(curImage, numBins, selectedColors);
+        ImageDisplay.removeAll();
+        ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+        pack();
+       // ColorPicker.this.dispose();
+      }
   }
-
-
   // overloaded so that the other player can load the image directly from an
   // Image rather than a pathname
   public void loadImage(Image grabimage)
@@ -455,33 +443,16 @@ public class ImageProcessorGUI extends JFrame
     // Make a BufferedImage from the Image.
     mBufferedImage = new BufferedImage(grabimage.getWidth(null),
         grabimage.getHeight(null), BufferedImage.TYPE_INT_RGB);
-
-
     g2 = mBufferedImage.createGraphics();
-    // resize grabimage if it's too big
-    /*
-     * if( mBufferedImage.getWidth() > ImageDisplay.getWidth() ||
-     * mBufferedImage.getHeight() > ImageDisplay.getWidth() ) {
-     * g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-     * RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-     * g2.drawImage(mBufferedImage, 0, 0, mBufferedImage.getWidth() / 2,
-     * mBufferedImage.getHeight() / 2, ImageDisplay);
-     * 
-     * } else {
-     */
     g2.drawImage(grabimage, null, ImageDisplay);
-    image = new ImageProcessor(mBufferedImage);
-    image.saveOriginal(mBufferedImage);
-    // }
+    image = new ImageProcessor();
     ImageIcon disp = new ImageIcon(mBufferedImage);
-    display = new JLabel(disp);
-    // display.setIcon(new ImageIcon(mBufferedImage));
-
-    ImageDisplay.add(display);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(disp));
     pack();
     isLoaded = true;
     resizeToScale();
-    image.saveOriginal(mBufferedImage);
+    curImage = deepCopy(mBufferedImage);
   }
 
 
@@ -493,11 +464,10 @@ public class ImageProcessorGUI extends JFrame
     }
     try
     {
-      // RenderedImage toSave = (RenderedImage)binimage;
       outputFile = new File(outputFile.getAbsolutePath() + ".jpg");
-      ImageIO.write(binimage, "jpg", outputFile);
-      JOptionPane.showMessageDialog(ImageProcessorGUI.win,
-          "Output Has Been Saved", "Saved Output", JOptionPane.PLAIN_MESSAGE);
+      ImageIO.write(curImage, "jpg", outputFile);
+      JOptionPane.showMessageDialog(ImageProcessorGUI.win, "Output Has Been Saved",
+          "Saved Output", JOptionPane.PLAIN_MESSAGE);
     }
     catch( IOException e )
     {
@@ -720,7 +690,7 @@ public class ImageProcessorGUI extends JFrame
   void colorBinTwoPointOh(BufferedImage binimage, int numBins, Color colors[])
   {
     // TODO: make an exception for if numBins == 0
-    deepCopyerino(mBufferedImage);
+    deepCopyerino(curImage);
     int binEdges = 256 / numBins;
     for( int i = 0; i < binimage.getWidth(); ++i )
     {
@@ -739,7 +709,7 @@ public class ImageProcessorGUI extends JFrame
             k = numBins;
           }
         }
-      }
+      }  
     }
   }
 
@@ -753,22 +723,18 @@ public class ImageProcessorGUI extends JFrame
     selectedColors[1] = red;
     selectedColors[2] = teal;
     selectedColors[3] = beige;
-    mBufferedImage = image.getOriginal();
-    binimage = deepCopy(mBufferedImage);
-    colorBinTwoPointOh(binimage, 4, selectedColors);
+    colorBinTwoPointOh(curImage, 4, selectedColors);
     ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
+    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
     pack();
   }
 
   public void colorScheme(String scheme)
   {
     ColorScheme.setColorScheme(scheme, selectedColors, numBins);
-    mBufferedImage = image.getOriginal();
-    binimage = deepCopy(mBufferedImage);
-    colorBinTwoPointOh(binimage, 4, selectedColors);
+    colorBinTwoPointOh(curImage, 4, selectedColors);
     ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
+    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
     pack();
 
   }
@@ -830,6 +796,15 @@ public class ImageProcessorGUI extends JFrame
       {
         greyscale();
       }
+      else if (Filter.getSelectedItem().equals("tint")){
+        mBufferedImage = image.getOriginal();
+        binimage = deepCopy(mBufferedImage);
+        Color temp = new Color(225, 161, 82);
+       binimage =  tint(binimage, temp.getRed(), temp.getGreen(), temp.getBlue());
+        ImageDisplay.removeAll();
+        ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
+        pack();
+      }
 
       if( socket != null )
         socket.eventOccurred(Filter.getSelectedItem().toString());
@@ -851,7 +826,19 @@ public class ImageProcessorGUI extends JFrame
     ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
     pack();
   }
+  
+  
 
+  public BufferedImage tint(BufferedImage loadImg, int red, int green, int blue) {
+    BufferedImage img = new BufferedImage(loadImg.getWidth(), loadImg.getHeight(),
+        BufferedImage.TRANSLUCENT);
+    Graphics2D graphics = img.createGraphics(); 
+    Color newColor = new Color(red, green, blue, 0 /* alpha needs to be zero */);
+    graphics.setXORMode(newColor);
+    graphics.drawImage(loadImg, null, 0, 0);
+    //graphics.dispose();
+    return img;
+}
 
   static BufferedImage deepCopy(BufferedImage bi)
   {
@@ -861,6 +848,7 @@ public class ImageProcessorGUI extends JFrame
     return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
   }
 
+  
   int calculateBrightness(Color c1)
   {
     return (int) Math.sqrt(.241 * c1.getRed() * c1.getRed() + .691
@@ -934,91 +922,77 @@ public class ImageProcessorGUI extends JFrame
 
   public void valencia()
   {
-    deepCopyerino(mBufferedImage);
-    rgb[][] temp = rgb.toRGB(mBufferedImage);
-    mBufferedImage = image.filterValencia();
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-    pack();
+     deepCopyerino(curImage);
+     curImage = ImageProcessor.filterValencia(curImage);
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+     pack();
   }
 
   public void greyscale()
   {
-    deepCopyerino(mBufferedImage);
-    //rgb[][] temp = rgb.toRGB(mBufferedImage);
-    mBufferedImage = image.filterGreyscale(mBufferedImage);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-    pack();
+     deepCopyerino(curImage);
+     curImage = ImageProcessor.filterGreyscale(curImage);
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+     pack();
   }
 
 
   public void noFilter()
   {
-    mBufferedImage = image.getOriginal();
-    // BufferedImage binimage = deepCopy(mBufferedImage);
-
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-    pack();
-    deepCopyerino(mBufferedImage);
+     deepCopyerino(curImage);
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+     curImage = deepCopy(mBufferedImage);
+     pack();
   }
 
 
   public void sharpen()
   {
-
-    deepCopyerino(mBufferedImage);
-    mBufferedImage = image.getOriginal();
+    deepCopyerino(curImage);
     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Sharpen");
-    mBufferedImage = op.filter(mBufferedImage, null);
+    curImage = op.filter(curImage, null);
     ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
     pack();
   }
-
-  public void edgeDetector()
-  {
-    deepCopyerino(mBufferedImage);
-    mBufferedImage = image.getOriginal();
-    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Edge detector");
-    mBufferedImage = op.filter(mBufferedImage, null);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-    pack();
+  
+  public void edgeDetector() {
+     deepCopyerino(curImage);
+     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Edge detector");
+     curImage = op.filter(curImage, null);
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+     pack();
   }
-
-  public void invert()
-  {
-    deepCopyerino(mBufferedImage);
-    mBufferedImage = image.getOriginal();
-    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert");
-    mBufferedImage = op.filter(mBufferedImage, null);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-    pack();
+  
+  public void invert() {
+     deepCopyerino(curImage);
+     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert");
+     curImage = op.filter(curImage, null);
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+     pack();
   }
-
-  public void posterize()
-  {
-    deepCopyerino(mBufferedImage);
-    mBufferedImage = image.getOriginal();
-    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Posterize");
-    mBufferedImage = op.filter(mBufferedImage, null);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-    pack();
+  
+  public void posterize() {
+     deepCopyerino(curImage);
+     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Posterize");
+     curImage = op.filter(curImage, null);
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+     pack();
   }
-
-  public void blueInvert()
-  {
-    deepCopyerino(mBufferedImage);
-    mBufferedImage = image.getOriginal();
-    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert blue");
-    mBufferedImage = op.filter(mBufferedImage, null);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-    pack();
+  
+  public void blueInvert() {
+     deepCopyerino(curImage);
+     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert blue");
+     curImage = op.filter(curImage, null);
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+     pack();
   }
 
   public final int displayImageWidth = 800;
@@ -1026,39 +1000,39 @@ public class ImageProcessorGUI extends JFrame
 
   public void resizeToScale()
   {
-    int height = mBufferedImage.getHeight();
-    int width = mBufferedImage.getWidth();
-    double hwRatio = (double) height / (double) width;
-
-    if( height > displayImageHeight )
-    {
-      height = displayImageHeight;
-      width = (int) (height / hwRatio);
-    }
-    if( width > displayImageWidth )
-    {
-      width = displayImageWidth;
-      height = (int) (width * hwRatio);
-    }
-
-
-    Image tmp = mBufferedImage.getScaledInstance(width, height,
-        BufferedImage.SCALE_FAST);
-    BufferedImage buffered = new BufferedImage(width, height,
-        BufferedImage.TYPE_INT_RGB);
-    buffered.getGraphics().drawImage(tmp, 0, 0, null);
-    mBufferedImage = buffered;
-
-
-    ImageDisplay.removeAll();
-    display = new JLabel(new ImageIcon(mBufferedImage));
-    ImageDisplay.add(display);
-
-    System.out.println(mBufferedImage.getHeight());
-    System.out.println(mBufferedImage.getWidth());
-    pack();
-    image = new ImageProcessor(mBufferedImage);
+     int height = mBufferedImage.getHeight();
+     int width = mBufferedImage.getWidth();
+     double hwRatio = (double)height/(double)width;
+     
+     if (height > displayImageHeight) 
+     {
+        height = displayImageHeight;
+        width = (int) (height / hwRatio);
+     }
+     if (width > displayImageWidth)
+     {
+        width = displayImageWidth;
+        height = (int) (width * hwRatio);
+     }
+  
+     
+     
+     
+     Image tmp = mBufferedImage.getScaledInstance(width, height, BufferedImage.SCALE_FAST);
+     BufferedImage buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+     buffered.getGraphics().drawImage(tmp, 0, 0, null);
+     mBufferedImage = buffered;
+     
+     
+     ImageDisplay.removeAll();
+     display = new JLabel(new ImageIcon(mBufferedImage));
+     ImageDisplay.add(display);
+     
+     System.out.println(mBufferedImage.getHeight());
+     System.out.println(mBufferedImage.getWidth());
+     pack();
+     image = new ImageProcessor();
   }
-
-
+  
+  
 }

@@ -84,7 +84,6 @@ System.out.println("ipaddr: " + ipAddr + " portNum: " + portNum);
    
    public boolean loadOccurred(BufferedImage im) 
    {
-
       boolean success = false;
       if (im == null)
          System.out.println("well thats embarassing..");
@@ -164,8 +163,6 @@ System.out.println("ipaddr: " + ipAddr + " portNum: " + portNum);
          win.posterize();
       else if (receivedString == "Blue Invert")
          win.blueInvert();
-      else if (receivedString == "Bins")
-         win.bins();
       else
          System.out.println("Unrecognized command when recieving Event");
    }
@@ -201,6 +198,27 @@ System.out.println("Load recieved!");
          System.out.println("ClientSocket Error: checkInput");
       }
       return false;
+   }
+   
+   public boolean sendInfo(BufferedImage im) 
+   {
+      boolean success = false;
+      if (im == null)
+         System.out.println("well thats embarassing..");
+      try 
+      {
+         outData.writeByte(3);
+         ImageIO.write((RenderedImage) im, "JPG", outData);
+         success = true;
+      }
+      catch (Exception except) 
+      {
+         System.out.println("Filed to load image TO the Server side");
+         System.exit(-1);
+      }
+      return success;
+      
+      
    }
 }
    
