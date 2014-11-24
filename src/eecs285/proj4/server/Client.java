@@ -14,23 +14,11 @@ public class Client
    
    public Client(String inIP)
    {
+      
       socket = new ClientSideSocket(inIP, 40000);
       socket.start();
-//      try {
-//      Thread.sleep(5000);
-//      }
-//      catch (Exception e)
-//      {
-//         System.out.println(1);
-//      }
       
-      
-//      socket.receiveInfo();
-//      
-//      while (true)
-//      {
-//         System.out.println(1);
-//         Client.socket.checkInput();
-//      }
+      ImageProcessingThread thread1 = new ImageProcessingThread(socket);
+      thread1.start();
    }
 }

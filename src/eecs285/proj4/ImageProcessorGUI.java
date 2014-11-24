@@ -41,6 +41,7 @@ public class ImageProcessorGUI extends JFrame
   private JMenuItem Redo;
   private JMenuItem Reset;
   private JMenuItem Send;
+  private JMenuItem START;
 
   boolean isLoaded = false;
 
@@ -483,6 +484,17 @@ public class ImageProcessorGUI extends JFrame
     // add(apply);
 
     setMinimumSize(new Dimension(1120, 650));
+    
+    
+    START = new JMenuItem("Start");
+    Menu.add(START);
+//    START.addActionListener(new ActionListener() {
+//       public void actionPerformered(ActionEvent e) {
+//       }
+//    });
+    
+    
+    
   }
 
   public void loadImage(String fileName)
@@ -530,11 +542,17 @@ public class ImageProcessorGUI extends JFrame
     CustomFilters.setSelectedItem("Pick one: ");
     queue.removeElementAt(queueSize);
     queueSize--;
+    
+    if (!isLoaded) {
+       queue.removeElementAt(queueSize);
+       queueSize--;
+       Undo.setEnabled(false);
+    }
+    
+    isLoaded = true;
 
     if( socket != null )
-    {
       socket.loadOccurred(mBufferedImage);
-    }
   }
 
   // overloaded so that the other player can load the image directly from an
@@ -970,9 +988,7 @@ public class ImageProcessorGUI extends JFrame
       }
 
       if( socket != null )
-      {
         socket.eventOccurred(Filter.getSelectedItem().toString());
-      }
       //make custom filter popup default back to orig
       //FIX THIS - issue is that it can set default but then won't apply filter
       //CustomFilters.setSelectedItem("Pick one: ");

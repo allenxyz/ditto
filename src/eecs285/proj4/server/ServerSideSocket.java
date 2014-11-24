@@ -23,10 +23,8 @@ public class ServerSideSocket extends ImageProcessingSocket {
    
    private Socket socket;
    private DataOutputStream outData;
-   private DataInputStream inData;
-   private ImageProcessorGUI win;
-   
-   
+   private DataInputStream inData;   
+   public ImageProcessorGUI win;
    public ServerSideSocket(String inIPAddr, int inPortNum)
    {
       super(inIPAddr, inPortNum);

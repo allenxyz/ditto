@@ -16,14 +16,12 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 
 import javax.imageio.ImageIO;
-import javax.swing.JLabel;
 
 public class ClientSideSocket extends ImageProcessingSocket {
    private Socket socket;
    private DataOutputStream outData;
    private DataInputStream inData;
-   private ImageProcessorGUI win;
-   
+   public ImageProcessorGUI win;
    public ClientSideSocket(String inIPAddr, int inPortNum)
    {
       super(inIPAddr, inPortNum);
