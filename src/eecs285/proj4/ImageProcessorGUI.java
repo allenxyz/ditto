@@ -526,6 +526,7 @@ public class ImageProcessorGUI extends JFrame
   {
 
     int clicks;
+    int numCustom;
     JTextField count;
 
     public ColorPicker(final int numColors)
@@ -577,7 +578,18 @@ public class ImageProcessorGUI extends JFrame
         @Override
         public void actionPerformed(ActionEvent e)
         {
-          // TODO Auto-generated method stub
+          /*String s = (String)JOptionPane.showInputDialog(
+              frame,
+              "Complete the sentence:\n"
+              + "\"Green eggs and...\"",
+              "Customized Dialog",
+              JOptionPane.PLAIN_MESSAGE,
+              icon,
+              possibilities,
+              "ham");*/
+          ColorScheme customscheme = new ColorScheme(selectedColors,numBins);
+
+          numCustom = numCustom + 1;
           
         }
         
@@ -645,7 +657,7 @@ public class ImageProcessorGUI extends JFrame
                 SaveSelection.setEnabled(true);
               }
               selectedColors[clicks] = color;
-              System.out.println(String.valueOf(selectedColors[clicks].getRGB()));
+              //System.out.println(String.valueOf(selectedColors[clicks].getRGB()));
 
             }
             count.setText(String.valueOf(clicks + 1));

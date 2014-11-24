@@ -4,8 +4,8 @@ import java.awt.Color;
 
 public class ColorScheme
 {
-  Color colors[];
-  int numbercolors;
+  static Color colors[];
+  static int numbercolors;
   
   public ColorScheme()
   {
