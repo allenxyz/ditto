@@ -42,6 +42,7 @@ public class ImageProcessor extends Frame
    * kBanner holds the application title which is used in the window title.
    **/
   private static final String kBanner = "ImageDicer v1.0";
+  private BufferedImage savedOriginal;
   
   public ImageProcessor(BufferedImage im)
   {
@@ -274,16 +275,16 @@ public class ImageProcessor extends Frame
   }
   */
  
-  
-  private BufferedImage savedOriginal;
+
   
   public void saveOriginal(BufferedImage original){
    
-    savedOriginal = original;
+    this.savedOriginal = original;
   }
   
   public BufferedImage getOriginal(){
-    return savedOriginal;
+System.out.println(this.savedOriginal.getWidth());
+    return this.savedOriginal;
   }
   
   
