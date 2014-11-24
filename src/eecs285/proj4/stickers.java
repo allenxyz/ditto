@@ -23,6 +23,13 @@ public class stickers{
     col = toRGB(mBufferedImage);
   }
   
+  stickers(BufferedImage bi){
+    path = null;
+    mBufferedImage = bi;
+    col = toRGB(bi);
+  }
+  
+  
   public String getPath(){
     return path;
   }

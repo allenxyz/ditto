@@ -116,6 +116,22 @@ public class ImageProcessorGUI extends JFrame
     // setResizable(false);
     socket = inSocket;
 
+    ImageDisplay.addMouseListener(new MouseAdapter()
+    {
+      @Override
+      public void mouseEntered(MouseEvent e)
+      {
+        PointerInfo a = MouseInfo.getPointerInfo();
+        Point b = a.getLocation();
+        int x = (int) b.getX();
+        int y = (int) b.getY();
+        stickers current = new stickers(mBufferedImage);
+        current.addSticker(currentSticker, x, y);
+      }
+    });
+
+    
+    
     JPanel EditPalette = new JPanel();
     JPanel ColorBlock = new JPanel();
     JPanel InstaFilter = new JPanel();
@@ -366,6 +382,7 @@ public class ImageProcessorGUI extends JFrame
     EditPalette.add(paletteText);
     EditPalette.add(InstaFilter);
     EditPalette.add(Custom);
+    EditPalette.add(stickerButton);
 
     JPanel EditWrap = new JPanel();
     EditWrap.add(EditPalette);
