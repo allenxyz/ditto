@@ -80,9 +80,9 @@ public class ImageProcessorGUI extends JFrame
   JRadioButton Color5;
   JRadioButton Color7;
 
-  JComboBox<String> Filter;
-
+  JComboBox<String> UtilityFilters;
   JComboBox<String> CustomFilters;
+  JComboBox<String> PresetFilters;
 
   private BufferedImage mBufferedImage;
   private static BufferedImage curImage;
@@ -340,23 +340,23 @@ public class ImageProcessorGUI extends JFrame
       }
     });
 
-    Filter = new JComboBox<String>();
-    Filter.addItem("None");
-    Filter.addItem("Sharpen");
-    Filter.addItem("Edge Detector");
-    Filter.addItem("Invert");
-    Filter.addItem("Posterize");
-    Filter.addItem("Blue Invert");
-    Filter.addItem("Obama");
-    Filter.addItem("Fire");
-    Filter.addItem("Morgana");
-    Filter.addItem("Rainbow");
-    Filter.addItem("Neutral");
-    Filter.addItem("Coffee");
-    Filter.addItem("Greyscale");
-    Filter.addItem("tint");
-    Filter.setEnabled(false);
-    Filter.addActionListener(new Filter());
+    UtilityFilters = new JComboBox<String>();
+    UtilityFilters.addItem("None");
+    UtilityFilters.addItem("Sharpen");
+    UtilityFilters.addItem("Edge Detector");
+    UtilityFilters.addItem("Invert");
+    UtilityFilters.addItem("Posterize");
+    UtilityFilters.addItem("Blue Invert");
+    UtilityFilters.addItem("Obama");
+    UtilityFilters.addItem("Fire");
+    UtilityFilters.addItem("Morgana");
+    UtilityFilters.addItem("Rainbow");
+    UtilityFilters.addItem("Neutral");
+    UtilityFilters.addItem("Coffee");
+    UtilityFilters.addItem("Greyscale");
+    UtilityFilters.addItem("tint");
+    UtilityFilters.setEnabled(false);
+    UtilityFilters.addActionListener(new Filter());
     
     stackFilter = new JCheckBox("Stack Filters");
     
@@ -364,7 +364,7 @@ public class ImageProcessorGUI extends JFrame
     JPanel Instawrap = new JPanel();
     TitledBorder FilterTitle = new TitledBorder("Filter Palette");
     InstaFilter.setBorder(FilterTitle);
-    Instawrap.add(Filter);
+    Instawrap.add(UtilityFilters);
     Instawrap.add(stackFilter);
 
     InstaFilter.add(Instawrap);
@@ -405,7 +405,7 @@ public class ImageProcessorGUI extends JFrame
   public void loadImage(String fileName)
   {
     // Use a MediaTracker to fully load the image.
-    Filter.setEnabled(true);
+    UtilityFilters.setEnabled(true);
 
     Enter.setEnabled(true);
     Image grabimage = Toolkit.getDefaultToolkit().getImage(fileName);
@@ -442,7 +442,7 @@ public class ImageProcessorGUI extends JFrame
     // setTitle(kBanner + ": " + fileName);
     resizeToScale();
     image = new ImageProcessor();
-    Filter.setSelectedItem("None");
+    UtilityFilters.setSelectedItem("None");
 
     if( socket != null )
     {
@@ -470,7 +470,7 @@ public class ImageProcessorGUI extends JFrame
   public void loadImage(Image grabimage)
   {
     // Use a MediaTracker to fully load the image.
-    Filter.setEnabled(true);
+    UtilityFilters.setEnabled(true);
     MediaTracker mt = new MediaTracker(this);
     mt.addImage(grabimage, 0);
     try
