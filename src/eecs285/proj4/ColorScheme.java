@@ -6,7 +6,6 @@ public class ColorScheme
 {
   static Color colors[] = new Color[256];
   static int numbercolors;
-
   static String name;
   
   public ColorScheme()
@@ -16,7 +15,6 @@ public class ColorScheme
 
   
   public ColorScheme(String s, Color colArr[], int numCols){
-
     System.arraycopy(colArr, 0, colors, 0, colArr.length);
     numbercolors = numCols;
     name = s;
