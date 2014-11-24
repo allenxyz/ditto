@@ -6,29 +6,36 @@ public class ColorScheme
 {
   static Color colors[] = new Color[256];
   static int numbercolors;
+
   static String name;
   
   public ColorScheme()
   {
     // TODO Auto-generated constructor stub
   }
+
   
   public ColorScheme(String s, Color colArr[], int numCols){
+
     System.arraycopy(colArr, 0, colors, 0, colArr.length);
     numbercolors = numCols;
     name = s;
   }
-  
-  public Color[] getColArr() {
+
+  public Color[] getColArr()
+  {
     return colors;
   }
-  
-  public int getnumber(){
+
+  public int getnumber()
+  {
     return numbercolors;
   }
-  
-  public static void setColorScheme(String scheme, Color colArr[], int numCols){
-    if(scheme.equals("Obama") ){
+
+  public static int setColorScheme(String scheme, Color colArr[], int numCols)
+  {
+    if( scheme.equals("Obama") )
+    {
       Color darkBlue = new Color(29, 82, 97);
       Color red = new Color(161, 30, 34);
       Color teal = new Color(86, 151, 163);
@@ -39,47 +46,52 @@ public class ColorScheme
       colArr[3] = beige;
       numCols = 4;
     }
-    else if(scheme.equals("Umich")){
-      Color blue = new Color(0,39,76);
+    else if( scheme.equals("Umich") )
+    {
+      Color blue = new Color(0, 39, 76);
       Color maize = new Color(255, 203, 5);
       colArr[0] = blue;
       colArr[1] = maize;
       numCols = 3;
     }
-    else if(scheme.equals("Morgana")){
-      Color darkPurp = new Color(0,0,5);
-      Color darkSkin = new Color(92,98,156);
+    else if( scheme.equals("Morgana") )
+    {
+      Color darkPurp = new Color(0, 0, 5);
+      Color darkSkin = new Color(92, 98, 156);
       Color lightSkin = new Color(185, 191, 203);
-      Color lightPurp = new Color(219,128,245);
+      Color lightPurp = new Color(219, 128, 245);
       colArr[0] = darkPurp;
       colArr[1] = darkSkin;
       colArr[2] = lightPurp;
       colArr[3] = lightSkin;
-      numCols = 4;      
+      numCols = 4;
     }
-    else if(scheme.equals("Fire")){
-      Color black = new Color(0,0,0);
-      Color red = new Color(254,23,17);
+    else if( scheme.equals("Fire") )
+    {
+      Color black = new Color(0, 0, 0);
+      Color red = new Color(254, 23, 17);
       Color yellow = new Color(252, 221, 8);
-      Color white = new Color(255,255,255);
+      Color white = new Color(255, 255, 255);
       colArr[0] = black;
       colArr[1] = red;
       colArr[2] = yellow;
       colArr[3] = white;
-      numCols = 4;      
+      numCols = 4;
     }
-    else if (scheme.equals("Neutral")){
+    else if( scheme.equals("Neutral") )
+    {
       Color darkest = new Color(57, 50, 42);
-      Color brown = new Color(127,109,87);
-      Color sand = new Color(227,209,173);
+      Color brown = new Color(127, 109, 87);
+      Color sand = new Color(227, 209, 173);
       Color beige = new Color(241, 235, 221);
       colArr[0] = darkest;
       colArr[1] = brown;
       colArr[2] = sand;
       colArr[3] = beige;
-      numCols = 4;      
+      numCols = 4;
     }
-    else if (scheme.equals("Coffee")){
+    else if( scheme.equals("Coffee") )
+    {
       Color darkBrown = new Color(86, 11, 14);
       Color regBrown = new Color(132, 63, 29);
       Color lightBrown = new Color(173, 134, 86);
@@ -88,9 +100,26 @@ public class ColorScheme
       colArr[1] = regBrown;
       colArr[2] = lightBrown;
       colArr[3] = highlight;
-      numCols = 4; 
+      numCols = 4;
     }
-  
+    else if( scheme.equals("Rainbow") )
+    {
+      Color violet = new Color(163, 73, 164);
+      Color indigo = new Color(63, 72, 204);
+      Color blue = new Color(0, 162, 232);
+      Color green = new Color(34, 177, 76);
+      Color yellow = new Color(255, 242, 0);
+      Color orange = new Color(255, 127, 39);
+      Color red = new Color(237, 28, 36);
+      colArr[0] = violet;
+      colArr[1] = indigo;
+      colArr[2] = blue;
+      colArr[3] = green;
+      colArr[4] = yellow;
+      colArr[5] = orange;
+      colArr[6] = red;
+      numCols = 7;
+    }
+    return numCols;
   }
-  
 }
