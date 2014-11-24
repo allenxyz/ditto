@@ -24,6 +24,7 @@ import eecs285.proj4.server.*;
 
 import java.awt.event.*;
 import java.awt.Robot;
+import java.util.Vector;
 
 
 public class ImageProcessorGUI extends JFrame
@@ -36,6 +37,7 @@ public class ImageProcessorGUI extends JFrame
   private JMenuItem Exit;
   private JMenuItem Undo;
   private JMenuItem Redo;
+  private JMenuItem Reset;
 
   boolean isLoaded = false;
 
@@ -78,7 +80,9 @@ public class ImageProcessorGUI extends JFrame
   private Color selectedColors[] = new Color[256];
   private int numBins = 0;
   private Graphics2D g2;
-
+  
+  private String storePath;
+  private Vector<BufferedImage> queue = new Vector<BufferedImage>(5);
 
   private ImageProcessor image;
   public static void main(String[] arg)
@@ -121,6 +125,7 @@ public class ImageProcessorGUI extends JFrame
         if( fd.getFile() == null )
           return;
         String path = fd.getDirectory() + fd.getFile();
+        storePath = path;
         ImageDisplay.removeAll();
         loadImage(path);
         // repaint();
@@ -157,12 +162,35 @@ public class ImageProcessorGUI extends JFrame
 
     Exit = new JMenuItem("Exit Program");
     Undo = new JMenuItem("Undo");
+    Undo.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        if(!queue.isEmpty())
+        {
+          loadImage((BufferedImage)queue.lastElement());
+          queue.removeElementAt(queue.size() - 1);
+        }
+        System.out.println(queue.size());
+      }
+    });
     Redo = new JMenuItem("Redo");
+    Reset = new JMenuItem("Reset");
+    Reset.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        ImageDisplay.removeAll();
+        loadImage(storePath);
+      }
+    });
+    
     File.add(Open);
     File.add(Save);
     File.add(Exit);
     Edit.add(Undo);
     Edit.add(Redo);
+    Edit.add(Reset);
     Menu.add(File);
     Menu.add(Edit);
     setJMenuBar(Menu);
@@ -729,6 +757,30 @@ public class ImageProcessorGUI extends JFrame
     return (int) Math.sqrt(.241 * r * r + .691 * g * g + .068 * b * b);
 
   }
+  
+  
+  
+  
+
+
+  void deepCopyerino(BufferedImage bi)
+  {
+    BufferedImage save = deepCopy(bi);
+    if(queue.size() != 5)
+    {
+      queue.add(save);
+      System.out.println(queue.size());
+    }
+    else
+    {
+      queue.remove(0);
+      queue.add(save);
+      System.out.println(queue.size());
+    }
+  }
+  
+  
+  
 
   // color binning code
   // add numbins param later
@@ -781,15 +833,17 @@ public class ImageProcessorGUI extends JFrame
 
   public void noFilter()
   {
-    mBufferedImage = image.getOriginal();
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-    pack();
+     deepCopyerino(mBufferedImage);
+     mBufferedImage = image.getOriginal();
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+     pack();
   }
 
 
   public void sharpen()
   {
+    deepCopyerino(mBufferedImage);
     mBufferedImage = image.getOriginal();
     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Sharpen");
     mBufferedImage = op.filter(mBufferedImage, null);
@@ -797,45 +851,45 @@ public class ImageProcessorGUI extends JFrame
     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
     pack();
   }
-
-  public void edgeDetector()
-  {
-    mBufferedImage = image.getOriginal();
-    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Edge detector");
-    mBufferedImage = op.filter(mBufferedImage, null);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-    pack();
+  
+  public void edgeDetector() {
+     deepCopyerino(mBufferedImage);
+     mBufferedImage = image.getOriginal();
+     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Edge detector");
+     mBufferedImage = op.filter(mBufferedImage, null);
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+     pack();
   }
-
-  public void invert()
-  {
-    mBufferedImage = image.getOriginal();
-    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert");
-    mBufferedImage = op.filter(mBufferedImage, null);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-    pack();
+  
+  public void invert() {
+     deepCopyerino(mBufferedImage);
+     mBufferedImage = image.getOriginal();
+     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert");
+     mBufferedImage = op.filter(mBufferedImage, null);
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+     pack();
   }
-
-  public void posterize()
-  {
-    mBufferedImage = image.getOriginal();
-    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Posterize");
-    mBufferedImage = op.filter(mBufferedImage, null);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-    pack();
+  
+  public void posterize() {
+     deepCopyerino(mBufferedImage);
+     mBufferedImage = image.getOriginal();
+     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Posterize");
+     mBufferedImage = op.filter(mBufferedImage, null);
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+     pack();
   }
-
-  public void blueInvert()
-  {
-    mBufferedImage = image.getOriginal();
-    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert blue");
-    mBufferedImage = op.filter(mBufferedImage, null);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-    pack();
+  
+  public void blueInvert() {
+     deepCopyerino(mBufferedImage);
+     mBufferedImage = image.getOriginal();
+     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert blue");
+     mBufferedImage = op.filter(mBufferedImage, null);
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+     pack();
   }
   
   public final int displayImageWidth = 800;
