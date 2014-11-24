@@ -21,6 +21,7 @@ import eecs285.proj4.server.*;
 
 import java.awt.event.*;
 import java.awt.Robot;
+import java.util.Vector;
 
 
 public class ImageProcessorGUI extends JFrame
@@ -573,6 +574,37 @@ public class ImageProcessorGUI extends JFrame
         * g*g + .068 * b*b);
     
   }
+  
+  
+  
+  
+  private Vector<BufferedImage> queue = new Vector<BufferedImage>(5);
+
+  void deepCopyerino(BufferedImage bi)
+  {
+    BufferedImage save = deepCopy(bi);
+    if(queue.size() != 5)
+    {
+      queue.add(save);
+    }
+    else
+    {
+      queue.remove(0);
+      queue.add(save);
+    }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
   // color binning code
   //add numbins param later
@@ -616,6 +648,7 @@ public class ImageProcessorGUI extends JFrame
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
      pack();
+     deepCopyerino(mBufferedImage);
   }
   
   
@@ -627,6 +660,7 @@ public class ImageProcessorGUI extends JFrame
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
      pack();
+     deepCopyerino(mBufferedImage);
   }
   
   public void edgeDetector() {
@@ -636,6 +670,7 @@ public class ImageProcessorGUI extends JFrame
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
      pack();
+     deepCopyerino(mBufferedImage);
   }
   
   public void invert() {
@@ -645,6 +680,7 @@ public class ImageProcessorGUI extends JFrame
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
      pack();
+     deepCopyerino(mBufferedImage);
   }
   
   public void posterize() {
@@ -654,6 +690,7 @@ public class ImageProcessorGUI extends JFrame
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
      pack();
+     deepCopyerino(mBufferedImage);
   }
   
   public void blueInvert() {
@@ -663,6 +700,7 @@ public class ImageProcessorGUI extends JFrame
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
      pack();
+     deepCopyerino(mBufferedImage);
   }
   
   
