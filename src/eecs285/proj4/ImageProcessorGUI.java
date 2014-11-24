@@ -72,6 +72,8 @@ public class ImageProcessorGUI extends JFrame
   JTextField ColorG;
 
   private JTextField numColors;
+  
+  private JCheckBox stackFilter;
 
 
   JRadioButton Color3;
@@ -114,6 +116,22 @@ public class ImageProcessorGUI extends JFrame
     // setResizable(false);
     socket = inSocket;
 
+    ImageDisplay.addMouseListener(new MouseAdapter()
+    {
+      @Override
+      public void mouseEntered(MouseEvent e)
+      {
+        PointerInfo a = MouseInfo.getPointerInfo();
+        Point b = a.getLocation();
+        int x = (int) b.getX();
+        int y = (int) b.getY();
+        stickers current = new stickers(mBufferedImage);
+        current.addSticker(currentSticker, x, y);
+      }
+    });
+
+    
+    
     JPanel EditPalette = new JPanel();
     JPanel ColorBlock = new JPanel();
     JPanel InstaFilter = new JPanel();
@@ -199,8 +217,10 @@ public class ImageProcessorGUI extends JFrame
     {
       public void actionPerformed(ActionEvent e)
       {
+        deepCopyerino(curImage);
         ImageDisplay.removeAll();
         ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+        pack();
       }
     });
 
@@ -337,12 +357,15 @@ public class ImageProcessorGUI extends JFrame
     Filter.addItem("tint");
     Filter.setEnabled(false);
     Filter.addActionListener(new Filter());
-
+    
+    stackFilter = new JCheckBox("Stack Filters");
+    
 
     JPanel Instawrap = new JPanel();
     TitledBorder FilterTitle = new TitledBorder("Filter Palette");
     InstaFilter.setBorder(FilterTitle);
     Instawrap.add(Filter);
+    Instawrap.add(stackFilter);
 
     InstaFilter.add(Instawrap);
 
@@ -360,6 +383,7 @@ public class ImageProcessorGUI extends JFrame
     EditPalette.add(paletteText);
     EditPalette.add(InstaFilter);
     EditPalette.add(Custom);
+    EditPalette.add(stickerButton);
 
     JPanel EditWrap = new JPanel();
     EditWrap.add(EditPalette);
@@ -431,14 +455,14 @@ public class ImageProcessorGUI extends JFrame
   {
     public void actionPerformed(ActionEvent e)
     {
-
-      // mBufferedImage = image.getOriginal();
-      colorBinTwoPointOh(curImage, numBins, selectedColors);
-      ImageDisplay.removeAll();
-      ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-      pack();
-      // ColorPicker.this.dispose();
-    }
+        if (!stackFilter.isSelected()) 
+           curImage = deepCopy(mBufferedImage);
+        colorBinTwoPointOh(curImage, numBins, selectedColors);
+        ImageDisplay.removeAll();
+        ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+        pack();
+       // ColorPicker.this.dispose();
+      }
   }
 
   // overloaded so that the other player can load the image directly from an
@@ -771,6 +795,11 @@ public class ImageProcessorGUI extends JFrame
     selectedColors[1] = red;
     selectedColors[2] = teal;
     selectedColors[3] = beige;
+    
+
+    if (!stackFilter.isSelected()) 
+       curImage = deepCopy(mBufferedImage);
+
     colorBinTwoPointOh(curImage, 4, selectedColors);
     ImageDisplay.removeAll();
     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
@@ -779,8 +808,10 @@ public class ImageProcessorGUI extends JFrame
 
   public void colorScheme(String scheme)
   {
+    if (!stackFilter.isSelected()) 
+       curImage = deepCopy(mBufferedImage);
+
     numBins = ColorScheme.setColorScheme(scheme, selectedColors, numBins);
-    System.out.println("NUMBER OF BINS:" + numBins);
     colorBinTwoPointOh(curImage, numBins, selectedColors);
     ImageDisplay.removeAll();
     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
@@ -971,20 +1002,26 @@ public class ImageProcessorGUI extends JFrame
 
   public void valencia()
   {
-    deepCopyerino(curImage);
-    curImage = ImageProcessor.filterValencia(curImage);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-    pack();
+     deepCopyerino(curImage);
+     if (stackFilter.isSelected())
+        curImage = ImageProcessor.filterValencia(curImage);
+     else
+        curImage = ImageProcessor.filterValencia(mBufferedImage); 
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+     pack();
   }
 
   public void greyscale()
   {
-    deepCopyerino(curImage);
-    curImage = ImageProcessor.filterGreyscale(curImage);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-    pack();
+     deepCopyerino(curImage);
+     if (stackFilter.isSelected())
+        curImage = ImageProcessor.filterGreyscale(curImage);
+     else
+        curImage = ImageProcessor.filterGreyscale(mBufferedImage);
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+     pack();
   }
 
 
@@ -1002,50 +1039,71 @@ public class ImageProcessorGUI extends JFrame
   {
     deepCopyerino(curImage);
     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Sharpen");
-    curImage = op.filter(curImage, null);
+
+    if (stackFilter.isSelected())
+       curImage = op.filter(curImage, null);
+    else
+       curImage = op.filter(mBufferedImage, null);
+    
     ImageDisplay.removeAll();
     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
     pack();
   }
+  
+  public void edgeDetector() {
+     deepCopyerino(curImage);
+     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Edge detector");
+     
+     if (stackFilter.isSelected())
+        curImage = op.filter(curImage, null);
+     else
+        curImage = op.filter(mBufferedImage, null);
 
-  public void edgeDetector()
-  {
-    deepCopyerino(curImage);
-    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Edge detector");
-    curImage = op.filter(curImage, null);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-    pack();
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+     pack();
   }
+  
+  public void invert() {
+     deepCopyerino(curImage);
+     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert");
+     
+     if (stackFilter.isSelected())
+        curImage = op.filter(curImage, null);
+     else
+        curImage = op.filter(mBufferedImage, null);
 
-  public void invert()
-  {
-    deepCopyerino(curImage);
-    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert");
-    curImage = op.filter(curImage, null);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-    pack();
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+     pack();
   }
+  
+  public void posterize() {
+     deepCopyerino(curImage);
+     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Posterize");
 
-  public void posterize()
-  {
-    deepCopyerino(curImage);
-    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Posterize");
-    curImage = op.filter(curImage, null);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-    pack();
+     if (stackFilter.isSelected())
+        curImage = op.filter(curImage, null);
+     else
+        curImage = op.filter(mBufferedImage, null);
+
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+     pack();
   }
+  
+  public void blueInvert() {
+     deepCopyerino(curImage);
+     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert blue");
+     
+     if (stackFilter.isSelected())
+        curImage = op.filter(curImage, null);
+     else
+        curImage = op.filter(mBufferedImage, null);
 
-  public void blueInvert()
-  {
-    deepCopyerino(curImage);
-    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert blue");
-    curImage = op.filter(curImage, null);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-    pack();
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+     pack();
   }
 
   public final int displayImageWidth = 800;

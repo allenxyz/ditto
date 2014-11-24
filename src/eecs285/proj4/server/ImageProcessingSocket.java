@@ -21,9 +21,4 @@ public abstract class ImageProcessingSocket {
    public abstract boolean loadOccurred(BufferedImage im);
    public abstract void receiveInput();
    public abstract void sendInfo(BufferedImage im);
-   
-   
-   
-   
-
 }

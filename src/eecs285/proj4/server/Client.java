@@ -1,5 +1,10 @@
 package eecs285.proj4.server;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 import eecs285.proj4.ImageProcessorGUI;
 import eecs285.proj4.server.ClientSideSocket;
 
@@ -20,10 +25,12 @@ public class Client
 //      }
       
       
-      while (true)
-      {
-         System.out.println(1);
-         Client.socket.checkInput();
-      }
+//      socket.receiveInfo();
+//      
+//      while (true)
+//      {
+//         System.out.println(1);
+//         Client.socket.checkInput();
+//      }
    }
 }
