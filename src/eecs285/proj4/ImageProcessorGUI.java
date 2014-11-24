@@ -117,7 +117,7 @@ public class ImageProcessorGUI extends JFrame
       public void actionPerformed(ActionEvent ae)
       {
         FileDialog fd = new FileDialog(ImageProcessorGUI.this);
-        fd.show();
+        fd.setVisible(true);
         if( fd.getFile() == null )
           return;
         String path = fd.getDirectory() + fd.getFile();

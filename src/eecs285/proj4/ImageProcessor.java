@@ -42,9 +42,6 @@ public class ImageProcessor extends Frame
    * kBanner holds the application title which is used in the window title.
    **/
   private static final String kBanner = "ImageDicer v1.0";
-  private int width;
-  private int height;
-  private rgb[][] result;
   private BufferedImage savedOriginal;
   
   public ImageProcessor(BufferedImage im)
@@ -55,16 +52,6 @@ public class ImageProcessor extends Frame
    // loadImage(fileName);
    // setVisible(true); 
   
-    width = im.getWidth();
-    height = im.getHeight();
-    result = new rgb[height][width];
-
-    for (int row = 0; row < Math.min(width, height); row++) {
-       for (int col = 0; col < Math.min(width, height); col++) {
-          System.out.println(row + "/" + im.getHeight() + " " + col + "/" + im.getWidth());
-          result[row][col] = new rgb(im.getRGB(row, col));
-       }
-    }
   }
 
   /**
@@ -75,7 +62,7 @@ public class ImageProcessor extends Frame
 
   /**
    * The createOps() method creates the image processing operations discussed in
-   * the column.
+   * the column.  
    **/
   private void createOps()
   {
@@ -300,18 +287,28 @@ System.out.println(this.savedOriginal.getWidth());
     return this.savedOriginal;
   }
   
+  
+  
+  
+  
+  public void filterValencia() {
+//     
+//     for (int i = 0; i < height; i += 1) {
+//        for (int j = 0; j < width; j += 1) {
+//           filters.valencia(pixVal(i, j));
+//        }
+//     }
+  }
+  
+  
   /**
    * All paint() has to do is show the current image.
    **/
-  
   public void paint(Graphics g)
   {
     if( mBufferedImage == null )
       return;
     Insets insets = getInsets();
     g.drawImage(mBufferedImage, insets.left, insets.top, null);
-  }
-  
-  public void filterValencia() {
   }
 }
