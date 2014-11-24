@@ -121,12 +121,17 @@ public class ImageProcessorGUI extends JFrame
       @Override
       public void mouseEntered(MouseEvent e)
       {
-        PointerInfo a = MouseInfo.getPointerInfo();
-        Point b = a.getLocation();
-        int x = (int) b.getX();
-        int y = (int) b.getY();
-        stickers current = new stickers(mBufferedImage);
-        current.addSticker(currentSticker, x, y);
+         try {
+           PointerInfo a = MouseInfo.getPointerInfo();
+           Point b = a.getLocation();
+           int x = (int) b.getX();
+           int y = (int) b.getY();
+           stickers current = new stickers(mBufferedImage);
+           current.addSticker(currentSticker, x, y);
+         }
+         catch (Exception except){
+            
+         }
       }
     });
 
@@ -428,12 +433,9 @@ public class ImageProcessorGUI extends JFrame
         grabimage.getHeight(null), BufferedImage.TYPE_INT_RGB);
     Graphics2D g2 = mBufferedImage.createGraphics();
     g2.drawImage(grabimage, null, ImageDisplay);
-    ImageIcon disp = new ImageIcon(mBufferedImage);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(disp));
-    curImage = deepCopy(mBufferedImage);
+    
 
-    pack();
+    
     // adjustToImageSize();
     // center();
     // ImageDisplay.validate();
@@ -441,6 +443,11 @@ public class ImageProcessorGUI extends JFrame
 
     // setTitle(kBanner + ": " + fileName);
     resizeToScale();
+    ImageIcon disp = new ImageIcon(mBufferedImage);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(disp));
+    curImage = deepCopy(mBufferedImage);
+    pack();
     image = new ImageProcessor();
     UtilityFilters.setSelectedItem("None");
 
@@ -448,21 +455,6 @@ public class ImageProcessorGUI extends JFrame
     {
       socket.loadOccurred(mBufferedImage);
     }
-  }
-
-  // IF YOU WANNA MESS AROUND WITH COLOR SELECT, USE THIS CODE!
-  class binColorApply implements ActionListener
-  {
-    public void actionPerformed(ActionEvent e)
-    {
-        if (!stackFilter.isSelected()) 
-           curImage = deepCopy(mBufferedImage);
-        colorBinTwoPointOh(curImage, numBins, selectedColors);
-        ImageDisplay.removeAll();
-        ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-        pack();
-       // ColorPicker.this.dispose();
-      }
   }
 
   // overloaded so that the other player can load the image directly from an
@@ -584,7 +576,8 @@ public class ImageProcessorGUI extends JFrame
 
     public ColorPicker(final int numColors)
     {
-      super(ImageProcessorGUI.this, "Pick your Color Block colors", true);
+      setTitle("Pick your Color Block Colors");
+      setModal(true);
 
       System.out.println("HERE");
       JPanel apply = new JPanel();
@@ -624,9 +617,22 @@ public class ImageProcessorGUI extends JFrame
       JLabel blue = new JLabel("B: ");
       final JTextField bluePal = new JTextField(5);
       Apply = new JButton("Apply");
-      Apply.addActionListener(new binColorApply());
+      Apply.addActionListener(new ActionListener()
+      {
+         public void actionPerformed(ActionEvent e)
+         {
+             if (!stackFilter.isSelected()) 
+                curImage = deepCopy(mBufferedImage);
+             colorBinTwoPointOh(curImage, numBins, selectedColors);
+             ImageDisplay.removeAll();
+             ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+             ImageProcessorGUI.win.pack();
+             dispose();
+         }
+      });
+      
+      
       SaveSelection = new JButton("Save Selection");
-    
       SaveSelection.setEnabled(false);
       SaveSelection.addActionListener(new ActionListener(){
 
