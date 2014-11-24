@@ -828,21 +828,19 @@ public class ImageProcessorGUI extends JFrame
      ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
      pack();
      deepCopyerino(binimage);
-
   }
 
 
   public void sharpen()
   {
-     //mBufferedImage = image.getOriginal();
-     BufferedImage binimage = deepCopy(mBufferedImage);
-     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Sharpen");
-     binimage = op.filter(binimage, null);
-     ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
-     pack();
-     deepCopyerino(binimage);
 
+    deepCopyerino(mBufferedImage);
+    mBufferedImage = image.getOriginal();
+    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Sharpen");
+    mBufferedImage = op.filter(mBufferedImage, null);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+    pack();
   }
   
   public void edgeDetector() {
