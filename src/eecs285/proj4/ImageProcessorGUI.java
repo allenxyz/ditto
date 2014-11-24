@@ -58,6 +58,7 @@ public class ImageProcessorGUI extends JFrame
 
   private JButton Apply;
   private JButton ClearFields;
+  private JButton Enter;
 
   JTextField ColorA;
   JTextField ColorB;
@@ -204,8 +205,9 @@ public class ImageProcessorGUI extends JFrame
     
     numColors = new JTextField(4);
 
-    JButton Enter = new JButton("Enter");
+    Enter = new JButton("Enter");
     Enter.addActionListener(new EnterAction());
+    Enter.setEnabled(false);
     ColorTop.add(numColors);
     ColorTop.add(Enter);
 
@@ -341,6 +343,7 @@ public class ImageProcessorGUI extends JFrame
   {
     // Use a MediaTracker to fully load the image.
     Filter.setEnabled(true);
+    Enter.setEnabled(true);
     Image grabimage = Toolkit.getDefaultToolkit().getImage(fileName);
     MediaTracker mt = new MediaTracker(this);
     mt.addImage(grabimage, 0);
@@ -403,6 +406,7 @@ public class ImageProcessorGUI extends JFrame
         ImageDisplay.removeAll();
         ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
         pack();
+       // ColorPicker.this.dispose();
 
       }
 
@@ -640,6 +644,7 @@ public class ImageProcessorGUI extends JFrame
   void colorBinTwoPointOh(BufferedImage binimage, int numBins, Color colors[])
   {
     // TODO: make an exception for if numBins == 0
+    deepCopyerino(mBufferedImage);
     int binEdges = 256 / numBins;
     for( int i = 0; i < binimage.getWidth(); ++i )
     {
@@ -734,7 +739,7 @@ public class ImageProcessorGUI extends JFrame
 
   public void bins()
   {
-    mBufferedImage = image.getOriginal();
+    //mBufferedImage = image.getOriginal();
     BufferedImage binimage = deepCopy(mBufferedImage);
     // colorBin(binimage);
     ImageDisplay.removeAll();
@@ -852,16 +857,19 @@ public class ImageProcessorGUI extends JFrame
 
   public void noFilter()
   {
-     deepCopyerino(mBufferedImage);
      mBufferedImage = image.getOriginal();
+     //BufferedImage binimage = deepCopy(mBufferedImage);
+
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
      pack();
+     deepCopyerino(mBufferedImage);
   }
 
 
   public void sharpen()
   {
+
     deepCopyerino(mBufferedImage);
     mBufferedImage = image.getOriginal();
     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Sharpen");
