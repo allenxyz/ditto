@@ -27,6 +27,7 @@ import java.awt.*;
 
 import eecs285.proj4.pixelTypes.*;
 
+import java.awt.color.ColorSpace;
 import java.awt.event.*;
 import java.awt.image.*;
 import java.util.*;
@@ -43,15 +44,15 @@ public class ImageProcessor extends Frame
    **/
   private static final String kBanner = "ImageDicer v1.0";
   private BufferedImage savedOriginal;
-  
+
   public ImageProcessor(BufferedImage im)
   {
-   // super(kBanner);
+    // super(kBanner);
     createOps();
-   // createUI();
-   // loadImage(fileName);
-   // setVisible(true); 
-  
+    // createUI();
+    // loadImage(fileName);
+    // setVisible(true);
+
   }
 
   /**
@@ -62,7 +63,7 @@ public class ImageProcessor extends Frame
 
   /**
    * The createOps() method creates the image processing operations discussed in
-   * the column.  
+   * the column.
    **/
   private void createOps()
   {
@@ -185,7 +186,7 @@ public class ImageProcessor extends Frame
         if( fd.getFile() == null )
           return;
         String path = fd.getDirectory() + fd.getFile();
-        //loadImage(path);
+        // loadImage(path);
       }
     });
 
@@ -245,80 +246,71 @@ public class ImageProcessor extends Frame
    * Finally, it adjusts the window size and placement based on the new image
    * size.
    **/
- /*
-  private void loadImage())
-  {
-    // Use a MediaTracker to fully load the image.
-    Image image = Toolkit.getDefaultToolkit().getImage(fileName);
-    MediaTracker mt = new MediaTracker(this);
-    mt.addImage(image, 0);
-    try
-    {
-      mt.waitForID(0);
-    }
-    catch( InterruptedException ie )
-    {
-      return;
-    }
-    if( mt.isErrorID(0) )
-      return;
-    // Make a BufferedImage from the Image.
-    mBufferedImage = new BufferedImage(image.getWidth(null),
-        image.getHeight(null), BufferedImage.TYPE_INT_RGB);
-    Graphics2D g2 = mBufferedImage.createGraphics();
-    g2.drawImage(image, null, null);
-    adjustToImageSize();
-    center();
-    validate();
-    repaint();
-    setTitle(kBanner + ": " + fileName);
-  }
-  */
- 
+  /*
+   * private void loadImage()) { // Use a MediaTracker to fully load the image.
+   * Image image = Toolkit.getDefaultToolkit().getImage(fileName); MediaTracker
+   * mt = new MediaTracker(this); mt.addImage(image, 0); try { mt.waitForID(0);
+   * } catch( InterruptedException ie ) { return; } if( mt.isErrorID(0) )
+   * return; // Make a BufferedImage from the Image. mBufferedImage = new
+   * BufferedImage(image.getWidth(null), image.getHeight(null),
+   * BufferedImage.TYPE_INT_RGB); Graphics2D g2 =
+   * mBufferedImage.createGraphics(); g2.drawImage(image, null, null);
+   * adjustToImageSize(); center(); validate(); repaint(); setTitle(kBanner +
+   * ": " + fileName); }
+   */
 
-  
-  public void saveOriginal(BufferedImage original){
+
+  public void saveOriginal(BufferedImage original)
+  {
     this.savedOriginal = original;
   }
-  
-  public BufferedImage getOriginal(){
+
+  public BufferedImage getOriginal()
+  {
     return this.savedOriginal;
   }
-  
-  
-  
-  
-  
-  public BufferedImage filterValencia() {
-     rgb[][] rgbs = rgb.toRGB(savedOriginal);
-     
-//     for (int i = 0 ; i < rgbs.length ; i += 1) 
-//        for (int j = 0 ; j < rgbs[0].length ; j += 1)
-//           System.out.println(rgbs[i][j].toString());
-//
-//     
-     for (int i = 0 ; i < rgbs.length ; i += 1) 
-        for (int j = 0 ; j < rgbs[0].length ; j += 1)
-           filters.valencia(rgbs[i][j]);
-     
-//     for (int i = 0 ; i < rgbs.length ; i += 1) 
-//        for (int j = 0 ; j < rgbs[0].length ; j += 1)
-//           System.out.println(rgbs[i][j].toString());
-//     
-     return rgb.toImage(rgbs);
-  }
-  
-  public BufferedImage filterGreyscale() {
-     rgb[][] rgbs = rgb.toRGB(savedOriginal);
 
-     for (int i = 0 ; i < rgbs.length ; i += 1) 
-      for (int j = 0 ; j < rgbs[0].length ; j += 1)
-         filters.greyscale(rgbs[i][j]);
-     
-     return rgb.toImage(rgbs);
+
+  public BufferedImage filterValencia()
+  {
+    rgb[][] rgbs = rgb.toRGB(savedOriginal);
+
+    // for (int i = 0 ; i < rgbs.length ; i += 1)
+    // for (int j = 0 ; j < rgbs[0].length ; j += 1)
+    // System.out.println(rgbs[i][j].toString());
+    //
+    //
+    for( int i = 0; i < rgbs.length; i += 1 )
+      for( int j = 0; j < rgbs[0].length; j += 1 )
+        filters.valencia(rgbs[i][j]);
+
+    // for (int i = 0 ; i < rgbs.length ; i += 1)
+    // for (int j = 0 ; j < rgbs[0].length ; j += 1)
+    // System.out.println(rgbs[i][j].toString());
+    //
+    return rgb.toImage(rgbs);
   }
-  
-  
+
+  public BufferedImage filterGreyscale()
+  {
+    rgb[][] rgbs = rgb.toRGB(savedOriginal);
+
+    for( int i = 0; i < rgbs.length; i += 1 )
+      for( int j = 0; j < rgbs[0].length; j += 1 )
+        filters.greyscale(rgbs[i][j]);
+
+    return rgb.toImage(rgbs);
+  }
+
+  public BufferedImage filterGreyscale(BufferedImage sourceImage)
+  {
+    BufferedImage dstImage = null;
+    ColorSpace colorSpace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
+    ColorConvertOp op = new ColorConvertOp(colorSpace, null);
+    dstImage = op.filter(sourceImage, null);
+    return dstImage;
+  }
+
   /**
    * All paint() has to do is show the current image.
    **/

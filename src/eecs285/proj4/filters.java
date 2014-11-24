@@ -7,7 +7,7 @@ public class filters
 
   static void valencia(rgb val)
   {
-    hsl hslLayer = rgb2hsl(val);
+    hsl hslLayer = rgb2hsl(val);//struct - h, s, l 3 ints
     hslLayer.changeL(hslLayer.getL() + 12);
     //should I do a soft light blend? I could :^) but it'd be hella hard
     //then I have to somehow convert the midtones @__@?
