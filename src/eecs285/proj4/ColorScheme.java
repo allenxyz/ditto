@@ -4,9 +4,9 @@ import java.awt.Color;
 
 public class ColorScheme
 {
-  static Color colors[] = new Color[256];
-  static int numbercolors;
-  static String name;
+  private Color colors[] = new Color[256];
+  private int numbercolors;
+  private String name;
   
   public ColorScheme()
   {
@@ -28,6 +28,11 @@ public class ColorScheme
   public int getnumber()
   {
     return numbercolors;
+  }
+  
+  public String getName()
+  {
+     return name;
   }
 
   public static int setColorScheme(String scheme, Color colArr[], int numCols)
