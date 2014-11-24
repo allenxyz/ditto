@@ -343,6 +343,7 @@ public class ImageProcessorGUI extends JFrame
   {
     // Use a MediaTracker to fully load the image.
     Filter.setEnabled(true);
+    
     Enter.setEnabled(true);
     Image grabimage = Toolkit.getDefaultToolkit().getImage(fileName);
     MediaTracker mt = new MediaTracker(this);
@@ -384,6 +385,7 @@ public class ImageProcessorGUI extends JFrame
     resizeToScale();
     image = new ImageProcessor(mBufferedImage);
     image.saveOriginal(mBufferedImage);
+    Filter.setSelectedItem("None");
 
     if( socket != null )
     {
