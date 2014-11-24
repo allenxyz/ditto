@@ -6,12 +6,15 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ColorModel;
+import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.awt.color.*;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.imageio.ImageIO;
+
+import sun.java2d.loops.RenderCache;
 
 import java.io.*;
 
@@ -71,12 +74,13 @@ public class ImageProcessorGUI extends JFrame
   JComboBox<String> Filter;
 
   private BufferedImage mBufferedImage;
+  private static BufferedImage binimage;
   private Color selectedColors[] = new Color[256];
   private int numBins = 0;
   private Graphics2D g2;
 
-  private ImageProcessor image;
 
+  private ImageProcessor image;
   public static void main(String[] arg)
   {
     win = new ImageProcessorGUI("Insta-Paint", null);
@@ -125,6 +129,32 @@ public class ImageProcessorGUI extends JFrame
       }
     });
     Save = new JMenuItem("Save Image");
+    Save.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        JFileChooser chooser = new JFileChooser();
+        int chooserReturn;
+        File chosenFile;
+        chooserReturn = chooser.showSaveDialog(ImageProcessorGUI.this);
+        if( chooserReturn == JFileChooser.APPROVE_OPTION )
+        {
+          try
+          {
+            chosenFile = chooser.getSelectedFile();
+            saveImage(chooser.getSelectedFile());
+          }
+          catch( IOException e1 )
+          {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+          }
+        }
+
+      }
+    });
+
+
     Exit = new JMenuItem("Exit Program");
     Undo = new JMenuItem("Undo");
     Redo = new JMenuItem("Redo");
@@ -137,52 +167,6 @@ public class ImageProcessorGUI extends JFrame
     Menu.add(Edit);
     setJMenuBar(Menu);
 
-    // JButton FilterA = new JButton("Filter A");
-    // JButton FilterB = new JButton("Filter B");
-    // EditPalette.add(FilterA);
-    // EditPalette.add(FilterB);
-    /*
-     * JPanel ColorTop = new JPanel(); Color3 = new
-     * JRadioButton("3 Color Image"); Color5 = new
-     * JRadioButton("5 Color Image"); Color7 = new
-     * JRadioButton("7 Color Image"); ButtonGroup ColorNumber = new
-     * ButtonGroup();
-     * 
-     * 
-     * ColorNumber.add(Color3); Color3.setActionCommand("three");
-     * ColorNumber.add(Color5); Color5.setActionCommand("five");
-     * ColorNumber.add(Color7); Color7.setActionCommand("seven");
-     * Color3.addActionListener(new ColorNumSelect());
-     * Color5.addActionListener(new ColorNumSelect());
-     * Color7.addActionListener(new ColorNumSelect()); ColorTop.add(Color3);
-     * ColorTop.add(Color5); ColorTop.add(Color7); ColorMiddle = new JPanel();
-     * ColorMiddle.setLayout(new BoxLayout(ColorMiddle, BoxLayout.PAGE_AXIS));
-     * JPanel ColorMiddleR1 = new JPanel(); ColorMiddleR2 = new JPanel();
-     * ColorMiddleR3 = new JPanel(); TitledBorder Hex = new
-     * TitledBorder("Enter Hex Color Values"); A = new JLabel("A: ");
-     * A.setEnabled(false); B = new JLabel("B: "); B.setEnabled(false); C = new
-     * JLabel("C: "); C.setEnabled(false); JLabel D = new JLabel("D: "); JLabel
-     * E = new JLabel("E: "); JLabel F = new JLabel("F: "); JLabel G = new
-     * JLabel("G: "); ColorA = new JTextField(7); ColorA.setEnabled(false);
-     * ColorB = new JTextField(7); ColorB.setEnabled(false); ColorC = new
-     * JTextField(7); ColorC.setEnabled(false); ColorD = new JTextField(7); //
-     * ColorD.setVisible(false); ColorE = new JTextField(7); //
-     * ColorE.setVisible(false); ColorF = new JTextField(7); ColorG = new
-     * JTextField(7); ColorMiddleR1.add(A); ColorMiddleR1.add(ColorA);
-     * ColorMiddleR1.add(B); ColorMiddleR1.add(ColorB); ColorMiddleR1.add(C);
-     * ColorMiddleR1.add(ColorC); ColorMiddleR2.add(D);
-     * ColorMiddleR2.add(ColorD); ColorMiddleR2.add(E);
-     * ColorMiddleR2.add(ColorE); ColorMiddleR2.setVisible(false);
-     * ColorMiddleR3.add(F); ColorMiddleR3.add(ColorF); ColorMiddleR3.add(G);
-     * ColorMiddleR3.add(ColorG); ColorMiddleR3.setVisible(false);
-     * ColorMiddle.setBorder(Hex); ColorMiddle.add(ColorMiddleR1);
-     * ColorMiddle.add(ColorMiddleR2); ColorMiddle.add(ColorMiddleR3);
-     * ColorMiddle.setEnabled(false); JPanel ColorBottom = new JPanel(); Apply =
-     * new JButton("Apply"); Apply.addActionListener(new binColorApply());
-     * ClearFields = new JButton("Clear Fields"); Apply.setEnabled(false);
-     * ClearFields.setEnabled(false); ColorBottom.add(Apply);
-     * ColorBottom.add(ClearFields);
-     */
     JPanel ColorTop = new JPanel();
     JPanel ColorMiddle = new JPanel();
     
@@ -382,7 +366,8 @@ public class ImageProcessorGUI extends JFrame
 
         //mBufferedImage = image.getOriginal();
 
-        BufferedImage binimage = deepCopy(mBufferedImage);
+        binimage = deepCopy(mBufferedImage);
+
         colorBinTwoPointOh(binimage, numBins, selectedColors);
         ImageDisplay.removeAll();
         ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
@@ -444,6 +429,29 @@ public class ImageProcessorGUI extends JFrame
     resizeToScale();
     image.saveOriginal(mBufferedImage);
   }
+
+
+  public static void saveImage(File outputFile) throws IOException
+  {
+    if( outputFile == null )
+    {
+      return;
+    }
+    try
+    {
+     // RenderedImage toSave = (RenderedImage)binimage;
+      outputFile = new File(outputFile.getAbsolutePath() + ".jpg");
+      ImageIO.write(binimage, "jpg", outputFile);
+      JOptionPane.showMessageDialog(ImageProcessorGUI.win, "Output Has Been Saved",
+          "Saved Output", JOptionPane.PLAIN_MESSAGE);
+    }
+    catch( IOException e )
+    {
+      throw new IOException(String.format("Error writing to file. Error: %s\n",
+          e.getMessage()));
+    }
+  }
+
 
   public class isEmpty
   {
@@ -635,7 +643,7 @@ public class ImageProcessorGUI extends JFrame
     selectedColors[2] = teal;
     selectedColors[3] = beige;
     mBufferedImage = image.getOriginal();
-    BufferedImage binimage = deepCopy(mBufferedImage);
+    binimage = deepCopy(mBufferedImage);
     colorBinTwoPointOh(binimage, 4, selectedColors);
     ImageDisplay.removeAll();
     ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
