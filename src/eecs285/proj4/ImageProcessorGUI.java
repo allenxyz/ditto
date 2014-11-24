@@ -349,6 +349,7 @@ public class ImageProcessorGUI extends JFrame
     TitledBorder CustomFilter = new TitledBorder("Custom Filter");
     Custom.setBorder(CustomFilter);
     CustomFilters = new JComboBox<String>();
+    
     Custom.add(CustomFilters);
     // Custom.setVisible(false);
     // CustomFilters.addActionListener(new CustomFilter());
