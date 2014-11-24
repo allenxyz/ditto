@@ -19,11 +19,11 @@ public class Client
 //         System.out.println(1);
 //      }
       
-//      
-//      while (true)
-//      {
-//         System.out.println(1);
-//         Client.socket.checkInput();
-//      }
+      
+      while (true)
+      {
+         System.out.println(1);
+         Client.socket.checkInput();
+      }
    }
 }

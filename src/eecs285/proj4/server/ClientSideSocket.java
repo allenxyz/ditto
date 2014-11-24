@@ -16,7 +16,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
@@ -145,8 +144,6 @@ System.out.println("ipaddr: " + ipAddr + " portNum: " + portNum);
          win.posterize();
       else if (receivedString == "Blue Invert")
          win.blueInvert();
-      else if (receivedString == "Bins")
-         win.bins();
       else
          System.out.println("Unrecognized command when recieving Event");
    }
@@ -191,4 +188,17 @@ System.out.println("Load recieved!");
       return false;
    }
    
+   
+   private void receiveInfo() {
+      BufferedImage img = null;
+      try {
+          img = ImageIO.read(ImageIO.createImageInputStream(inData));
+          System.out.println("Image received!!!!");
+      } catch (IOException ex) {
+          System.out.println("Error al abrir el socket" + ex);
+      }
+      win.loadImage(img);
+      win.repaint();
+   }
+
 }
