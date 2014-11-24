@@ -197,6 +197,16 @@ public class ImageProcessorGUI extends JFrame
       }
     });
     Exit = new JMenuItem("Exit Program");
+    Exit.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        System.exit(0);
+      }
+      
+      
+      
+    });
 
     Undo = new JMenuItem("Undo");
     Undo.addActionListener(new ActionListener()
