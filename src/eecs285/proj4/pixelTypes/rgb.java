@@ -10,6 +10,12 @@ public class rgb{
     g = 0;
     b = 0;
   }
+  public rgb(int pixelColor) 
+  {
+     r = (int)pixelColor >> 16 & 0xfff;
+     g = (int)pixelColor >> 8 & 0xfff;
+     b = (int)pixelColor & 0xfff;
+  }
   public rgb(int rIn, int gIn, int bIn){
     r = rIn;
     g = gIn;

@@ -42,7 +42,7 @@ public class ImageProcessorGUI extends JFrame
   private JLabel A;
   private JLabel B;
   private JLabel C;
-  private JLabel display;
+  private JLabel display = new JLabel();
 
   private JButton Apply;
   private JButton ClearFields;
@@ -333,14 +333,13 @@ public class ImageProcessorGUI extends JFrame
                                        grabimage.getHeight(null), 
                                        BufferedImage.TYPE_INT_RGB);
     
-    image = new ImageProcessor(mBufferedImage);
-    image.saveOriginal(mBufferedImage);
-
+    
 
     Graphics2D g2 = mBufferedImage.createGraphics();
     g2.drawImage(grabimage, null, ImageDisplay);
     ImageIcon disp = new ImageIcon(mBufferedImage);
-    JLabel display = new JLabel(disp);
+    display.removeAll();
+    display = new JLabel(disp);
     // display.setIcon(new ImageIcon(mBufferedImage));
 
     ImageDisplay.add(display);
@@ -352,6 +351,9 @@ public class ImageProcessorGUI extends JFrame
 
     // setTitle(kBanner + ": " + fileName);
     resizeToScale();
+    image = new ImageProcessor(mBufferedImage);
+    image.saveOriginal(mBufferedImage);
+
     if( socket != null )
     {
       socket.loadOccurred(mBufferedImage);
@@ -439,10 +441,6 @@ public class ImageProcessorGUI extends JFrame
         grabimage.getHeight(null), BufferedImage.TYPE_INT_RGB);
 
 
-    image = new ImageProcessor(mBufferedImage);
-    image.saveOriginal(mBufferedImage);
-
-
     g2 = mBufferedImage.createGraphics();
     // resize grabimage if it's too big
     /*
@@ -464,12 +462,8 @@ public class ImageProcessorGUI extends JFrame
     ImageDisplay.add(display);
     pack();
     isLoaded = true;
-    // adjustToImageSize();
-    // center();
-    // ImageDisplay.validate();
-    // ImageDisplay.repaint();
-
-    // setTitle(kBanner + ": " + fileName);
+    resizeToScale();
+    image.saveOriginal(mBufferedImage);
   }
 
   public class isEmpty
@@ -729,20 +723,17 @@ public class ImageProcessorGUI extends JFrame
      BufferedImage buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
      buffered.getGraphics().drawImage(tmp, 0, 0, null);
      mBufferedImage = buffered;
-     image = new ImageProcessor(mBufferedImage);
+     
      
      ImageDisplay.removeAll();
      display = new JLabel(new ImageIcon(mBufferedImage));
      ImageDisplay.add(display);
      
-     pack();
      System.out.println(mBufferedImage.getHeight());
      System.out.println(mBufferedImage.getWidth());
+     pack();
+     image = new ImageProcessor(mBufferedImage);
   }
   
-  public void filterValencia() {
-     
-     
-  }
+  
 }
- 

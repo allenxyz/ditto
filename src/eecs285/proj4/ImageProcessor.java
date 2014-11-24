@@ -24,10 +24,16 @@ package eecs285.proj4;
  **/
 
 import java.awt.*;
+
 import eecs285.proj4.pixelTypes.*;
+
 import java.awt.event.*;
 import java.awt.image.*;
 import java.util.*;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 
 public class ImageProcessor extends Frame
@@ -46,45 +52,18 @@ public class ImageProcessor extends Frame
     createOps();
    // createUI();
    // loadImage(fileName);
-   // setVisible(true);    
-//    DataBufferByte type = ((DataBufferByte) im.getRaster().getDataBuffer());
-//    final byte[] pixels = type.getData();
-//    width = im.getWidth();
-//    height = im.getHeight();
-//    boolean hasAlphaChannel = im.getAlphaRaster() != null;
-//    result = new rgb[height][width];
-//    if (hasAlphaChannel) {
-//       final int pixelLength = 4;
-//       for (int pixel = 0, row = 0, col = 0; pixel < pixels.length; pixel += pixelLength) {
-//          int blue = ((int) pixels[pixel + 1] & 0xff); // blue
-//          int green = (((int) pixels[pixel + 2] & 0xff) << 8); // green
-//          int red = (((int) pixels[pixel + 3] & 0xff) << 16); // red
-//          rgb temp = new rgb(red, green, blue);
-//          result[row][col] = temp;
-//          col++;
-//          if (col == width) {
-//             col = 0;
-//             row++;
-//          }
-//       }
-//    } else {
-//       final int pixelLength = 3;
-//       for (int pixel = 0, row = 0, col = 0; pixel < pixels.length; pixel += pixelLength) {
-//          int blue = ((int) pixels[pixel + 1] & 0xff); // blue
-//          int green = (((int) pixels[pixel + 2] & 0xff) << 8); // green
-//          int red = (((int) pixels[pixel + 3] & 0xff) << 16); // red
-//          rgb temp = new rgb(red, green, blue);
-//          result[row][col] = temp;
-//          col++;
-//          if (col == width) {
-//             col = 0;
-//             row++;
-//          }
-//       }
-//    }
-    
-    
-    
+   // setVisible(true); 
+  
+    width = im.getWidth();
+    height = im.getHeight();
+    result = new rgb[height][width];
+
+    for (int row = 0; row < Math.min(width, height); row++) {
+       for (int col = 0; col < Math.min(width, height); col++) {
+          System.out.println(row + "/" + im.getHeight() + " " + col + "/" + im.getWidth());
+          result[row][col] = new rgb(im.getRGB(row, col));
+       }
+    }
   }
 
   /**
@@ -309,7 +288,7 @@ public class ImageProcessor extends Frame
   */
  
   
-  BufferedImage savedOriginal;
+  private BufferedImage savedOriginal;
   
   public void saveOriginal(BufferedImage original){
    
@@ -332,5 +311,6 @@ public class ImageProcessor extends Frame
     g.drawImage(mBufferedImage, insets.left, insets.top, null);
   }
   
-  
+  public void filterValencia() {
+  }
 }
