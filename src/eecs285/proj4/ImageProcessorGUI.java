@@ -60,6 +60,7 @@ public class ImageProcessorGUI extends JFrame
   private JButton Apply;
   private JButton ClearFields;
   private JButton Enter;
+  //private JButton Apply;
 
   JTextField ColorA;
   JTextField ColorB;
@@ -415,6 +416,7 @@ public class ImageProcessorGUI extends JFrame
 
       // mBufferedImage = image.getOriginal();
 
+
       binimage = deepCopy(mBufferedImage);
 
       colorBinTwoPointOh(binimage, numBins, selectedColors);
@@ -577,6 +579,7 @@ public class ImageProcessorGUI extends JFrame
       Textwrap.setLayout(new BoxLayout(Textwrap, BoxLayout.PAGE_AXIS));
       JPanel first = new JPanel();
       JPanel second = new JPanel();
+      JPanel third = new JPanel();
       JLabel labelcount = new JLabel("Number of Colors Selected: ");
       first.add(labelcount);
       count = new JTextField(3);
@@ -592,12 +595,26 @@ public class ImageProcessorGUI extends JFrame
       final JTextField greenPal = new JTextField(5);
       JLabel blue = new JLabel("B: ");
       final JTextField bluePal = new JTextField(5);
-      JButton Apply = new JButton("Apply");
+      Apply = new JButton("Apply");
       Apply.addActionListener(new binColorApply());
-      /*
-       * if(clicks == numBins ){ Apply.setEnabled(true); } else{
-       * Apply.setEnabled(false); }
-       */
+
+      JButton Close = new JButton("Close");
+      Close.addActionListener(new ActionListener(){
+
+        public void actionPerformed(ActionEvent e)
+        {
+          dispose();
+          
+        }
+        
+      });
+      Apply.setEnabled(false);
+      /*if(clicks  == numBins ){
+        Apply.setEnabled(true);
+      }
+      else{
+        Apply.setEnabled(false);
+      }*/
       redPal.setEditable(false);
       greenPal.setEditable(false);
       bluePal.setEditable(false);
@@ -609,6 +626,7 @@ public class ImageProcessorGUI extends JFrame
       paletteText.add(bluePal);
       paletteText.add(Apply);
       second.add(paletteText);
+      third.add(Close);
 
 
       palettePanel.addMouseListener(new MouseAdapter()
@@ -635,7 +653,10 @@ public class ImageProcessorGUI extends JFrame
             }
             else
             {
-              // private Color selectedColors[] = new Color[256];
+            //private Color selectedColors[] = new Color[256];
+              if(clicks == numBins - 1){
+                Apply.setEnabled(true);
+              }
               selectedColors[clicks] = color;
               System.out.println(String.valueOf(selectedColors[clicks].getRGB()));
 
@@ -660,10 +681,12 @@ public class ImageProcessorGUI extends JFrame
       });
       Textwrap.add(first);
       Textwrap.add(second);
+      Textwrap.add(third);
       apply.add(palettePanel);
       apply.add(Textwrap);
       // apply.add(paletteText);
       add(apply);
+
 
       setModal(true);
       setLayout(new FlowLayout());
