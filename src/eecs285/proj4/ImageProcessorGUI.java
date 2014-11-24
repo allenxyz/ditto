@@ -41,13 +41,17 @@ public class ImageProcessorGUI extends JFrame
 
   JPanel ImageDisplay = new JPanel();
   JPanel DisplayImage = new JPanel();
+  
+  JPanel palettePanel;
 
+  JDialog ColorPickerDialog;
+  
 
   private JPanel ColorBottom;
   private JLabel A;
   private JLabel B;
   private JLabel C;
-  private JLabel display;
+  private JLabel display = new JLabel();
 
   private JButton Apply;
   private JButton ClearFields;
@@ -59,6 +63,9 @@ public class ImageProcessorGUI extends JFrame
   JTextField ColorE;
   JTextField ColorF;
   JTextField ColorG;
+  
+  private JTextField numColors;
+  
 
   JRadioButton Color3;
   JRadioButton Color5;
@@ -69,10 +76,11 @@ public class ImageProcessorGUI extends JFrame
   private BufferedImage mBufferedImage;
   private static BufferedImage binimage;
   private Color selectedColors[] = new Color[256];
+  private int numBins = 0;
   private Graphics2D g2;
 
-  static ImageProcessor image;
 
+  private ImageProcessor image;
   public static void main(String[] arg)
   {
     win = new ImageProcessorGUI("Insta-Paint", null);
@@ -161,13 +169,14 @@ public class ImageProcessorGUI extends JFrame
 
     JPanel ColorTop = new JPanel();
     JPanel ColorMiddle = new JPanel();
-
-
+    
     JLabel blockLabel = new JLabel("Enter Number of Colors:");
     ColorTop.add(blockLabel);
+    
+    numColors = new JTextField(4);
 
-    JTextField numColors = new JTextField(4);
     JButton Enter = new JButton("Enter");
+    Enter.addActionListener(new EnterAction());
     ColorTop.add(numColors);
     ColorTop.add(Enter);
 
@@ -190,7 +199,7 @@ public class ImageProcessorGUI extends JFrame
       System.out.println("rip\n");
     }
     JLabel picLabel = new JLabel(new ImageIcon(myPicture));
-    JPanel palettePanel = new JPanel();
+    palettePanel = new JPanel();
     palettePanel.setLayout(new BorderLayout(100, 100));
     palettePanel.add(picLabel);
 
@@ -227,6 +236,8 @@ public class ImageProcessorGUI extends JFrame
         {
           Robot r = new Robot();
           Color color = r.getPixelColor(x, y);
+          //private Color selectedColors[] = new Color[256];
+          
           getRed = color.getRed();
           getGreen = color.getGreen();
           getBlue = color.getBlue();
@@ -316,16 +327,16 @@ public class ImageProcessorGUI extends JFrame
 
     // Make a BufferedImage from the Image.
     mBufferedImage = new BufferedImage(grabimage.getWidth(null),
-        grabimage.getHeight(null), BufferedImage.TYPE_INT_RGB);
-
-    image = new ImageProcessor();
-    image.saveOriginal(mBufferedImage);
-
+                                       grabimage.getHeight(null), 
+                                       BufferedImage.TYPE_INT_RGB);
+    
+    
 
     Graphics2D g2 = mBufferedImage.createGraphics();
     g2.drawImage(grabimage, null, ImageDisplay);
     ImageIcon disp = new ImageIcon(mBufferedImage);
-    JLabel display = new JLabel(disp);
+    display.removeAll();
+    display = new JLabel(disp);
     // display.setIcon(new ImageIcon(mBufferedImage));
 
     ImageDisplay.add(display);
@@ -337,6 +348,9 @@ public class ImageProcessorGUI extends JFrame
 
     // setTitle(kBanner + ": " + fileName);
     resizeToScale();
+    image = new ImageProcessor(mBufferedImage);
+    image.saveOriginal(mBufferedImage);
+
     if( socket != null )
     {
       socket.loadOccurred(mBufferedImage);
@@ -349,57 +363,22 @@ public class ImageProcessorGUI extends JFrame
   {
     public void actionPerformed(ActionEvent e)
     {
-      Color firstColor;
-      Color secondColor;
-      Color thirdColor;
-      if( isLoaded == false )
-      {
-        // TODO: write JDialogOption "Load an Image PLS"
-        return;
-      }
-      try
-      {
-        new isEmpty(ColorA.getText());
-        new isEmpty(ColorB.getText());
-        new isEmpty(ColorC.getText());
-      }
-      catch( EmptyTextFieldException excep1 )
-      {
 
-        JOptionPane
-            .showMessageDialog(new JDialog(), "Text Fields Cannot Be Empty!",
-                "Error!", JOptionPane.ERROR_MESSAGE);
-
-      }
-      if( Color3.isSelected() )
-      {
-        String stringA = ColorA.getText();
-        String stringB = ColorB.getText();
-        String stringC = ColorC.getText();
-
-        // Need to write Exception for when inputs are incorrect
-        // also should extend colorbin() with some nulls to have more colors???
-        // TODO:write text field input exceptions
-
-        firstColor = new Color(Integer.decode("#" + stringA));
-        secondColor = new Color(Integer.decode("#" + stringB));
-        thirdColor = new Color(Integer.decode("#" + stringC));
-        // firstColor = Color.decode("EEEEEE");
-        // secondColor = Color.decode("4F4F7B");
-        // thirdColor = Color.decode("2C003A");
-        mBufferedImage = image.getOriginal();
+        //mBufferedImage = image.getOriginal();
 
         binimage = deepCopy(mBufferedImage);
-        colorBin(binimage, firstColor, secondColor, thirdColor);
+
+        colorBinTwoPointOh(binimage, numBins, selectedColors);
         ImageDisplay.removeAll();
         ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
         pack();
 
       }
 
-    }
-
   }
+
+
+  
 
   // overloaded so that the other player can load the image directly from an
   // Image rather than a pathname
@@ -424,10 +403,6 @@ public class ImageProcessorGUI extends JFrame
         grabimage.getHeight(null), BufferedImage.TYPE_INT_RGB);
 
 
-    image = new ImageProcessor();
-    image.saveOriginal(mBufferedImage);
-
-
     g2 = mBufferedImage.createGraphics();
     // resize grabimage if it's too big
     /*
@@ -441,6 +416,8 @@ public class ImageProcessorGUI extends JFrame
      * } else {
      */
     g2.drawImage(grabimage, null, ImageDisplay);
+    image = new ImageProcessor(mBufferedImage);
+    image.saveOriginal(mBufferedImage);
     // }
     ImageIcon disp = new ImageIcon(mBufferedImage);
     display = new JLabel(disp);
@@ -449,12 +426,8 @@ public class ImageProcessorGUI extends JFrame
     ImageDisplay.add(display);
     pack();
     isLoaded = true;
-    // adjustToImageSize();
-    // center();
-    // ImageDisplay.validate();
-    // ImageDisplay.repaint();
-
-    // setTitle(kBanner + ": " + fileName);
+    resizeToScale();
+    image.saveOriginal(mBufferedImage);
   }
 
 
@@ -488,6 +461,144 @@ public class ImageProcessorGUI extends JFrame
       {
         throw new EmptyTextFieldException();
       }
+    }
+  }
+  
+  class EnterAction implements ActionListener{
+
+    public void actionPerformed(ActionEvent e)
+    {
+      int number;
+      try{
+        
+        new isEmpty(numColors.getText());
+        
+      }catch(EmptyTextFieldException excep){
+        JOptionPane.showMessageDialog(null,
+            "Text Fields Cannot Be Empty!", "Error!",
+            JOptionPane.ERROR_MESSAGE);
+            return;
+      }
+      try{
+        number = Integer.parseInt(numColors.getText());
+        numBins = number;
+      }catch(NumberFormatException excep1){
+        JOptionPane.showMessageDialog(null,
+            "Text Field Must be a number!", "Error!",
+            JOptionPane.ERROR_MESSAGE);
+            return;
+      }
+      ColorPickerDialog = new ColorPicker(number);
+      //palettePanel.setEnabled(true); 
+    }   
+  }
+  
+  public class ColorPicker extends JDialog
+  {
+
+    int clicks;
+
+    public ColorPicker(final int numColors)
+    {
+      super(ImageProcessorGUI.this, "Pick your Color Block colors", true);
+
+      System.out.println("HERE");
+      JPanel apply = new JPanel();
+
+      BufferedImage myPicture = null;
+      try
+      {
+        myPicture = ImageIO.read(new File("wheel.png"));
+      }
+      catch( IOException e )
+      {
+        System.out.println("rip\n");
+      }
+      JLabel picLabel = new JLabel(new ImageIcon(myPicture));
+      palettePanel = new JPanel();
+      palettePanel.setLayout(new BorderLayout(100, 100));
+      palettePanel.add(picLabel);
+      palettePanel.setEnabled(false);
+      
+      JPanel paletteText = new JPanel();
+      JLabel red = new JLabel("R: ");
+      final JTextField redPal = new JTextField(5);
+      JLabel green = new JLabel("G: ");
+      final JTextField greenPal = new JTextField(5);
+      JLabel blue = new JLabel("B: ");
+      final JTextField bluePal = new JTextField(5);
+      JButton Apply = new JButton("Apply");
+      Apply.addActionListener(new binColorApply());
+      /*if(clicks  == numBins ){
+        Apply.setEnabled(true);
+      }
+      else{
+        Apply.setEnabled(false);
+      }*/
+      redPal.setEditable(false);
+      greenPal.setEditable(false);
+      bluePal.setEditable(false);
+      paletteText.add(red);
+      paletteText.add(redPal);
+      paletteText.add(green);
+      paletteText.add(greenPal);
+      paletteText.add(blue);
+      paletteText.add(bluePal);
+      paletteText.add(Apply);
+      
+      palettePanel.addMouseListener(new MouseAdapter()
+      {
+        @Override
+        public void mouseClicked(MouseEvent e){
+          //TODO: EDIT THIS LISTENER
+          PointerInfo a = MouseInfo.getPointerInfo();
+          Point b = a.getLocation();
+          int x = (int) b.getX();
+          int y = (int) b.getY();
+          int getRed = 0;
+          int getGreen = 0;
+          int getBlue = 0;
+          try
+          {
+            Robot r = new Robot();
+            Color color = r.getPixelColor(x, y);
+            if(clicks >= numBins){
+              //THROW EXCEPTION
+              return;
+            }
+            else
+            {
+            //private Color selectedColors[] = new Color[256];
+              selectedColors[clicks] = color;
+              System.out.println(String.valueOf(selectedColors[clicks].getRGB()));
+              
+            }
+            getRed = color.getRed();
+            getGreen = color.getGreen();
+            getBlue = color.getBlue();
+            clicks = clicks + 1;
+          }
+          catch( AWTException e1 )
+          {
+            System.out.println("You aren't supposed to be here, LEAVE!");
+          }
+          if(getRed != 234 && getGreen != 234 && getBlue != 234)
+          {
+            redPal.setText(String.valueOf(getRed));
+            greenPal.setText(String.valueOf(getGreen));
+            bluePal.setText(String.valueOf(getBlue));
+          }
+        }
+      });
+      apply.add(palettePanel);
+      apply.add(paletteText);
+      add(apply);
+      
+      setModal(true);
+      setLayout(new FlowLayout());
+      pack();
+      setVisible(true);
+      
     }
   }
 
@@ -577,7 +688,11 @@ public class ImageProcessorGUI extends JFrame
         socket.eventOccurred(Filter.getSelectedItem().toString());
     }
   }
-
+  
+  public void setNumBins(int num){
+    numBins = num;
+  }
+  
 
   public void bins()
   {
@@ -710,32 +825,44 @@ public class ImageProcessorGUI extends JFrame
     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
     pack();
   }
-
-
-  public final int displayImageWidth = 650;
-  public final int displayImageHeight = 650;
-
+  
+  public final int displayImageWidth = 800;
+  public final int displayImageHeight = 800;
   public void resizeToScale()
   {
-    int height = mBufferedImage.getHeight();
-    int width = mBufferedImage.getWidth();
-    double hwRatio = (double) height / (double) width;
-    if( height > displayImageHeight )
-    {
-      height = displayImageHeight;
-      width = (int) (height / hwRatio);
-    }
-    if( width > displayImageWidth )
-    {
-      width = displayImageWidth;
-      height = (int) (width * hwRatio);
-    }
-
-    Image tmp = mBufferedImage.getScaledInstance(width, height,
-        BufferedImage.SCALE_FAST);
-    BufferedImage buffered = new BufferedImage(width, height,
-        BufferedImage.TYPE_INT_RGB);
-    buffered.getGraphics().drawImage(tmp, 0, 0, null);
-    mBufferedImage = buffered;
+     int height = mBufferedImage.getHeight();
+     int width = mBufferedImage.getWidth();
+     double hwRatio = (double)height/(double)width;
+     
+     if (height > displayImageHeight) 
+     {
+        height = displayImageHeight;
+        width = (int) (height / hwRatio);
+     }
+     if (width > displayImageWidth)
+     {
+        width = displayImageWidth;
+        height = (int) (width * hwRatio);
+     }
+  
+     
+     
+     
+     Image tmp = mBufferedImage.getScaledInstance(width, height, BufferedImage.SCALE_FAST);
+     BufferedImage buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+     buffered.getGraphics().drawImage(tmp, 0, 0, null);
+     mBufferedImage = buffered;
+     
+     
+     ImageDisplay.removeAll();
+     display = new JLabel(new ImageIcon(mBufferedImage));
+     ImageDisplay.add(display);
+     
+     System.out.println(mBufferedImage.getHeight());
+     System.out.println(mBufferedImage.getWidth());
+     pack();
+     image = new ImageProcessor(mBufferedImage);
   }
+  
+  
 }

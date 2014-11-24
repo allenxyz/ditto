@@ -24,42 +24,47 @@ package eecs285.proj4;
  **/
 
 import java.awt.*;
+
+import eecs285.proj4.pixelTypes.*;
+
 import java.awt.event.*;
 import java.awt.image.*;
 import java.util.*;
 
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
 
 public class ImageProcessor extends Frame
 {
-
-  /**
-   * Instantiates an ImageDicer with an image file name. If no image file name
-   * is specified on the command line, "default" is used.
-   **/
-/*  public static void main(String[] args)
-  {
-    String fileName = "default.jpg";
-    if( args.length > 0 )
-      fileName = args[0];
-    new ImageProcessor(fileName);
-  }
-*/
   /**
    * kBanner holds the application title which is used in the window title.
    **/
   private static final String kBanner = "ImageDicer v1.0";
-
-  /**
-   * ImageDicer's constructor creates a set of image processing operations,
-   * creates user controls, and loads the named image.
-   **/
-  public ImageProcessor()
+  private int width;
+  private int height;
+  private rgb[][] result;
+  private BufferedImage savedOriginal;
+  
+  public ImageProcessor(BufferedImage im)
   {
    // super(kBanner);
     createOps();
    // createUI();
    // loadImage(fileName);
-   // setVisible(true);
+   // setVisible(true); 
+  
+    width = im.getWidth();
+    height = im.getHeight();
+    result = new rgb[height][width];
+
+    for (int row = 0; row < Math.min(width, height); row++) {
+       for (int col = 0; col < Math.min(width, height); col++) {
+          System.out.println(row + "/" + im.getHeight() + " " + col + "/" + im.getWidth());
+          result[row][col] = new rgb(im.getRGB(row, col));
+       }
+    }
   }
 
   /**
@@ -283,16 +288,16 @@ public class ImageProcessor extends Frame
   }
   */
  
-  
-  BufferedImage savedOriginal;
+
   
   public void saveOriginal(BufferedImage original){
    
-    savedOriginal = original;
+    this.savedOriginal = original;
   }
   
   public BufferedImage getOriginal(){
-    return savedOriginal;
+System.out.println(this.savedOriginal.getWidth());
+    return this.savedOriginal;
   }
   
   /**
@@ -305,9 +310,8 @@ public class ImageProcessor extends Frame
       return;
     Insets insets = getInsets();
     g.drawImage(mBufferedImage, insets.left, insets.top, null);
-    
-    
-    
-    
+  }
+  
+  public void filterValencia() {
   }
 }
