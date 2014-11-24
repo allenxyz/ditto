@@ -650,7 +650,7 @@ public class ImageProcessorGUI extends JFrame
             k = numBins;
           }
         }
-      }
+      }  
     }
   }
 
