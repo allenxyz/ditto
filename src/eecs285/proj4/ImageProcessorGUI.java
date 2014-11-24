@@ -184,31 +184,30 @@ public class ImageProcessorGUI extends JFrame {
          public void actionPerformed(ActionEvent e) {
 System.out.println("q: " + queueSize);            
             if (!queue.isEmpty()) {
+               queueSize--;
                curImage = deepCopy(queue.elementAt(queueSize));
                ImageDisplay.removeAll();
                ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
                pack();
-               queueSize--;
             }
             if (queueSize == 0)
                Undo.setEnabled(false);
-            System.out.println(queue.size());
             Redo.setEnabled(true);
          }
       });
       Redo = new JMenuItem("Redo");
       Redo.addActionListener(new ActionListener() {
          public void actionPerformed(ActionEvent e) {
+            queueSize++;
             curImage = deepCopy(queue.elementAt(queueSize));
             ImageDisplay.removeAll();
             ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
             pack();
-            queueSize++;
             if (queueSize == queue.size())
                Redo.setEnabled(false);
+            Undo.setEnabled(true);
          }
       });
-      Redo.setEnabled(false);
       Reset = new JMenuItem("Reset");
       Reset.addActionListener(new ActionListener() {
          public void actionPerformed(ActionEvent e) {
@@ -218,6 +217,7 @@ System.out.println("q: " + queueSize);
             pack();
          }
       });
+      Reset.setEnabled(false);
 
       File.add(Open);
       File.add(Save);
@@ -229,7 +229,8 @@ System.out.println("q: " + queueSize);
       Menu.add(File);
       Menu.add(Edit);
       setJMenuBar(Menu);
-      
+
+      Redo.setEnabled(false);
       Undo.setEnabled(false);
 
       JPanel ColorTop = new JPanel();
@@ -453,8 +454,12 @@ System.out.println("q: " + queueSize);
       curImage = deepCopy(mBufferedImage);
       pack();
       image = new ImageProcessor();
+      
+      //these makes a call to noFilter -> screwing up UNDO
       UtilityFilters.setSelectedItem("None");
-System.out.println("queue: " + queueSize);      
+      CustomFilters.setSelectedItem("Pick one: ");
+      queue.removeElementAt(queueSize);
+      queueSize--;
 
       if (socket != null) {
          socket.loadOccurred(mBufferedImage);
@@ -725,7 +730,6 @@ System.out.println("queue: " + queueSize);
    // WILL FIX BUT IT WORKS OMG YAYYYYYYY
    void colorBinTwoPointOh(BufferedImage binimage, int numBins, Color colors[]) {
       // TODO: make an exception for if numBins == 0
-      deepCopyerino(curImage);
       int binEdges = 256 / numBins;
       for (int i = 0; i < binimage.getWidth(); ++i) {
          for (int j = 0; j < binimage.getHeight(); ++j) {
@@ -742,6 +746,7 @@ System.out.println("queue: " + queueSize);
             }
          }
       }
+      deepCopyerino(binimage);
    }
 
    public void obama() {
@@ -916,7 +921,6 @@ System.out.println("queue: " + queueSize);
    }
 
    public void valencia() {
-      deepCopyerino(curImage);
       if (stackFilter.isSelected())
          curImage = ImageProcessor.filterValencia(curImage);
       else
@@ -924,10 +928,10 @@ System.out.println("queue: " + queueSize);
       ImageDisplay.removeAll();
       ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
       pack();
+      deepCopyerino(curImage);
    }
 
    public void greyscale() {
-      deepCopyerino(curImage);
       if (stackFilter.isSelected())
          curImage = ImageProcessor.filterGreyscale(curImage);
       else
@@ -935,18 +939,18 @@ System.out.println("queue: " + queueSize);
       ImageDisplay.removeAll();
       ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
       pack();
+      deepCopyerino(curImage);
    }
 
    public void noFilter() {
-      deepCopyerino(curImage);
       ImageDisplay.removeAll();
       ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
       curImage = deepCopy(mBufferedImage);
       pack();
+      deepCopyerino(curImage);
    }
 
    public void sharpen() {
-      deepCopyerino(curImage);
       BufferedImageOp op = (BufferedImageOp) image.mOps.get("Sharpen");
 
       if (stackFilter.isSelected())
@@ -957,10 +961,10 @@ System.out.println("queue: " + queueSize);
       ImageDisplay.removeAll();
       ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
       pack();
+      deepCopyerino(curImage);
    }
 
    public void edgeDetector() {
-      deepCopyerino(curImage);
       BufferedImageOp op = (BufferedImageOp) image.mOps.get("Edge detector");
 
       if (stackFilter.isSelected())
@@ -971,10 +975,10 @@ System.out.println("queue: " + queueSize);
       ImageDisplay.removeAll();
       ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
       pack();
+      deepCopyerino(curImage);
    }
 
    public void invert() {
-      deepCopyerino(curImage);
       BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert");
 
       if (stackFilter.isSelected())
@@ -985,10 +989,10 @@ System.out.println("queue: " + queueSize);
       ImageDisplay.removeAll();
       ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
       pack();
+      deepCopyerino(curImage);
    }
 
    public void posterize() {
-      deepCopyerino(curImage);
       BufferedImageOp op = (BufferedImageOp) image.mOps.get("Posterize");
 
       if (stackFilter.isSelected())
@@ -999,10 +1003,10 @@ System.out.println("queue: " + queueSize);
       ImageDisplay.removeAll();
       ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
       pack();
+      deepCopyerino(curImage);
    }
 
    public void blueInvert() {
-      deepCopyerino(curImage);
       BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert blue");
 
       if (stackFilter.isSelected())
@@ -1013,6 +1017,7 @@ System.out.println("queue: " + queueSize);
       ImageDisplay.removeAll();
       ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
       pack();
+      deepCopyerino(curImage);
    }
 
    public final int displayImageWidth = 800;
@@ -1034,7 +1039,7 @@ System.out.println("queue: " + queueSize);
 
       Image tmp = mBufferedImage.getScaledInstance(width, height,
             BufferedImage.SCALE_FAST);
-      BufferedImage mBufferedImage = new BufferedImage(width, height,
+      mBufferedImage = new BufferedImage(width, height,
             BufferedImage.TYPE_INT_RGB);
       mBufferedImage.getGraphics().drawImage(tmp, 0, 0, null);
 
@@ -1046,6 +1051,8 @@ System.out.println("queue: " + queueSize);
       System.out.println(mBufferedImage.getWidth());
       pack();
       image = new ImageProcessor();
+      deepCopyerino(mBufferedImage);
+      Reset.setEnabled(true);
    }
 
 }
