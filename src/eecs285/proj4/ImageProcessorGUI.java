@@ -529,6 +529,7 @@ public class ImageProcessorGUI extends JFrame
   {
 
     int clicks;
+    JTextField count;
 
     public ColorPicker(final int numColors)
     {
@@ -551,6 +552,17 @@ public class ImageProcessorGUI extends JFrame
       palettePanel.setLayout(new BorderLayout(100, 100));
       palettePanel.add(picLabel);
       palettePanel.setEnabled(false);
+      JPanel Textwrap = new JPanel();
+      Textwrap.setLayout(new BoxLayout(Textwrap, BoxLayout.PAGE_AXIS));
+      JPanel first = new JPanel();
+      JPanel second = new JPanel();
+      JLabel labelcount = new JLabel("Number of Colors Selected: ");
+      first.add(labelcount);
+      count = new JTextField(3);
+      count.setText("0");
+      count.setEditable(false);
+      first.add(count);
+      
       
       JPanel paletteText = new JPanel();
       JLabel red = new JLabel("R: ");
@@ -577,7 +589,10 @@ public class ImageProcessorGUI extends JFrame
       paletteText.add(blue);
       paletteText.add(bluePal);
       paletteText.add(Apply);
+      second.add(paletteText);
+
       
+    
       palettePanel.addMouseListener(new MouseAdapter()
       {
         @Override
@@ -605,6 +620,7 @@ public class ImageProcessorGUI extends JFrame
               System.out.println(String.valueOf(selectedColors[clicks].getRGB()));
               
             }
+            count.setText(String.valueOf(clicks + 1));
             getRed = color.getRed();
             getGreen = color.getGreen();
             getBlue = color.getBlue();
@@ -622,8 +638,11 @@ public class ImageProcessorGUI extends JFrame
           }
         }
       });
+      Textwrap.add(first);
+      Textwrap.add(second);
       apply.add(palettePanel);
-      apply.add(paletteText);
+      apply.add(Textwrap);
+      //apply.add(paletteText);
       add(apply);
       
       setModal(true);
