@@ -166,7 +166,7 @@ public class ImageProcessorGUI extends JFrame
     {
       public void actionPerformed(ActionEvent e)
       {
-        // socket.sendInfo(curBufferedImage);
+        socket.sendInfo(curImage);
       }
     });
     Exit = new JMenuItem("Exit Program");
@@ -201,6 +201,7 @@ public class ImageProcessorGUI extends JFrame
 
     File.add(Open);
     File.add(Save);
+    File.add(Send);
     File.add(Exit);
     Edit.add(Undo);
     Edit.add(Redo);
@@ -780,12 +781,10 @@ public class ImageProcessorGUI extends JFrame
         greyscale();
       }
       else if (Filter.getSelectedItem().equals("tint")){
-        mBufferedImage = image.getOriginal();
-        binimage = deepCopy(mBufferedImage);
         Color temp = new Color(225, 161, 82);
-       binimage =  tint(binimage, temp.getRed(), temp.getGreen(), temp.getBlue());
+        curImage =  tint(curImage, temp.getRed(), temp.getGreen(), temp.getBlue());
         ImageDisplay.removeAll();
-        ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
+        ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
         pack();
       }
 

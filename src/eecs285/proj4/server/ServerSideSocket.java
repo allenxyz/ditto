@@ -200,7 +200,7 @@ System.out.println("Load recieved!");
       return false;
    }
    
-   public boolean sendInfo(BufferedImage im) 
+   public void sendInfo(BufferedImage im) 
    {
       boolean success = false;
       if (im == null)
@@ -215,9 +215,7 @@ System.out.println("Load recieved!");
       {
          System.out.println("Filed to load image TO the Server side");
          System.exit(-1);
-      }
-      return success;
-      
+      }      
       
    }
 }

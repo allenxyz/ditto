@@ -201,4 +201,24 @@ System.out.println("Load recieved!");
       win.repaint();
    }
 
+
+  public void sendInfo(BufferedImage im) 
+  {
+     boolean success = false;
+     if (im == null)
+        System.out.println("well thats embarassing..");
+     try 
+     {
+        outData.writeByte(3);
+        ImageIO.write((RenderedImage) im, "JPG", outData);
+        success = true;
+     }
+     catch (Exception except) 
+     {
+        System.out.println("Filed to load image TO the Server side");
+        System.exit(-1);
+     }      
+     
+  }
+
 }
