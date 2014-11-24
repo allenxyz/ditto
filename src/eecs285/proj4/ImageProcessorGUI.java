@@ -313,6 +313,7 @@ public class ImageProcessorGUI extends JFrame
     Filter.addItem("Neutral");
     Filter.addItem("Coffee");
     Filter.addItem("Greyscale");
+    Filter.addItem("tint");
     Filter.setEnabled(false);
     Filter.addActionListener(new Filter());
 
@@ -813,6 +814,15 @@ public class ImageProcessorGUI extends JFrame
       {
         greyscale();
       }
+      else if (Filter.getSelectedItem().equals("tint")){
+        mBufferedImage = image.getOriginal();
+        binimage = deepCopy(mBufferedImage);
+        Color temp = new Color(225, 161, 82);
+       binimage =  tint(binimage, temp.getRed(), temp.getGreen(), temp.getBlue());
+        ImageDisplay.removeAll();
+        ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
+        pack();
+      }
 
       if( socket != null )
         socket.eventOccurred(Filter.getSelectedItem().toString());
@@ -834,7 +844,19 @@ public class ImageProcessorGUI extends JFrame
     ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
     pack();
   }
+  
+  
 
+  public BufferedImage tint(BufferedImage loadImg, int red, int green, int blue) {
+    BufferedImage img = new BufferedImage(loadImg.getWidth(), loadImg.getHeight(),
+        BufferedImage.TRANSLUCENT);
+    Graphics2D graphics = img.createGraphics(); 
+    Color newColor = new Color(red, green, blue, 0 /* alpha needs to be zero */);
+    graphics.setXORMode(newColor);
+    graphics.drawImage(loadImg, null, 0, 0);
+    //graphics.dispose();
+    return img;
+}
 
   static BufferedImage deepCopy(BufferedImage bi)
   {
