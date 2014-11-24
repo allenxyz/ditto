@@ -59,6 +59,7 @@ public class ImageProcessorGUI extends JFrame
 
   private JButton Apply;
   private JButton ClearFields;
+  private JButton SaveSelection;
   private JButton Enter;
   //private JButton Apply;
 
@@ -78,6 +79,8 @@ public class ImageProcessorGUI extends JFrame
   JRadioButton Color7;
 
   JComboBox<String> Filter;
+  
+  JComboBox<String> CustomFilters;
 
   private BufferedImage mBufferedImage;
   private static BufferedImage curImage;
@@ -326,13 +329,13 @@ public class ImageProcessorGUI extends JFrame
 
     InstaFilter.add(Instawrap);
 
-    TitledBorder CustomTitle = new TitledBorder("Custom Settings");
-    JButton CustomBlock = new JButton("Custom Color Block");
-    JButton CustomFilter = new JButton("Custom Filter");
-    Custom.add(CustomBlock);
-    Custom.add(CustomFilter);
-    Custom.setBorder(CustomTitle);
-
+    TitledBorder CustomFilter = new TitledBorder("Custom Filter");
+    Custom.setBorder(CustomFilter);
+    CustomFilters = new JComboBox<String>();
+    Custom.add(CustomFilters);
+    //Custom.setVisible(false);
+    //CustomFilters.addActionListener(new CustomFilter());
+    
     EditPalette.setLayout(new BoxLayout(EditPalette, BoxLayout.PAGE_AXIS));
     EditPalette.add(ColorBlock);
     EditPalette.add(palettePanel);
@@ -411,6 +414,7 @@ public class ImageProcessorGUI extends JFrame
   {
     public void actionPerformed(ActionEvent e)
     {
+
         //mBufferedImage = image.getOriginal();
         colorBinTwoPointOh(curImage, numBins, selectedColors);
         ImageDisplay.removeAll();
@@ -523,6 +527,7 @@ public class ImageProcessorGUI extends JFrame
   {
 
     int clicks;
+    int numCustom;
     JTextField count;
 
     public ColorPicker(final int numColors)
@@ -568,7 +573,29 @@ public class ImageProcessorGUI extends JFrame
       final JTextField bluePal = new JTextField(5);
       Apply = new JButton("Apply");
       Apply.addActionListener(new binColorApply());
+      SaveSelection = new JButton("Save Selection");
+      SaveSelection.addActionListener(new ActionListener(){
 
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+          /*String s = (String)JOptionPane.showInputDialog(
+              frame,
+              "Complete the sentence:\n"
+              + "\"Green eggs and...\"",
+              "Customized Dialog",
+              JOptionPane.PLAIN_MESSAGE,
+              icon,
+              possibilities,
+              "ham");*/
+          ColorScheme customscheme = new ColorScheme(selectedColors,numBins);
+
+          numCustom = numCustom + 1;
+          
+        }
+        
+        
+      });
       JButton Close = new JButton("Close");
       Close.addActionListener(new ActionListener(){
 
@@ -597,6 +624,7 @@ public class ImageProcessorGUI extends JFrame
       paletteText.add(bluePal);
       paletteText.add(Apply);
       second.add(paletteText);
+      third.add(SaveSelection);
       third.add(Close);
 
 
@@ -627,9 +655,10 @@ public class ImageProcessorGUI extends JFrame
             //private Color selectedColors[] = new Color[256];
               if(clicks == numBins - 1){
                 Apply.setEnabled(true);
+                SaveSelection.setEnabled(true);
               }
               selectedColors[clicks] = color;
-              System.out.println(String.valueOf(selectedColors[clicks].getRGB()));
+              //System.out.println(String.valueOf(selectedColors[clicks].getRGB()));
 
             }
             count.setText(String.valueOf(clicks + 1));

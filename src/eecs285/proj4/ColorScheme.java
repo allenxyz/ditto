@@ -4,10 +4,25 @@ import java.awt.Color;
 
 public class ColorScheme
 {
+  static Color colors[];
+  static int numbercolors;
   
   public ColorScheme()
   {
     // TODO Auto-generated constructor stub
+  }
+  
+  public ColorScheme(Color colArr[], int numCols){
+    System.arraycopy(colArr, 0, colors, 0, colArr.length);
+    numbercolors = numCols;
+  }
+  
+  public Color[] getColArr() {
+    return colors;
+  }
+  
+  public int getnumber(){
+    return numbercolors;
   }
   
   public static void setColorScheme(String scheme, Color colArr[], int numCols){
