@@ -24,42 +24,34 @@ package eecs285.proj4;
  **/
 
 import java.awt.*;
+
+import eecs285.proj4.pixelTypes.*;
+
 import java.awt.event.*;
 import java.awt.image.*;
 import java.util.*;
 
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
 
 public class ImageProcessor extends Frame
 {
-
-  /**
-   * Instantiates an ImageDicer with an image file name. If no image file name
-   * is specified on the command line, "default" is used.
-   **/
-/*  public static void main(String[] args)
-  {
-    String fileName = "default.jpg";
-    if( args.length > 0 )
-      fileName = args[0];
-    new ImageProcessor(fileName);
-  }
-*/
   /**
    * kBanner holds the application title which is used in the window title.
    **/
   private static final String kBanner = "ImageDicer v1.0";
-
-  /**
-   * ImageDicer's constructor creates a set of image processing operations,
-   * creates user controls, and loads the named image.
-   **/
-  public ImageProcessor()
+  private BufferedImage savedOriginal;
+  
+  public ImageProcessor(BufferedImage im)
   {
    // super(kBanner);
     createOps();
    // createUI();
    // loadImage(fileName);
-   // setVisible(true);
+   // setVisible(true); 
+  
   }
 
   /**
@@ -70,7 +62,7 @@ public class ImageProcessor extends Frame
 
   /**
    * The createOps() method creates the image processing operations discussed in
-   * the column.
+   * the column.  
    **/
   private void createOps()
   {
@@ -283,31 +275,40 @@ public class ImageProcessor extends Frame
   }
   */
  
-  
-  BufferedImage savedOriginal;
+
   
   public void saveOriginal(BufferedImage original){
    
-    savedOriginal = original;
+    this.savedOriginal = original;
   }
   
   public BufferedImage getOriginal(){
-    return savedOriginal;
+System.out.println(this.savedOriginal.getWidth());
+    return this.savedOriginal;
   }
+  
+  
+  
+  
+  
+  public void filterValencia() {
+//     
+//     for (int i = 0; i < height; i += 1) {
+//        for (int j = 0; j < width; j += 1) {
+//           filters.valencia(pixVal(i, j));
+//        }
+//     }
+  }
+  
   
   /**
    * All paint() has to do is show the current image.
    **/
-  
   public void paint(Graphics g)
   {
     if( mBufferedImage == null )
       return;
     Insets insets = getInsets();
     g.drawImage(mBufferedImage, insets.left, insets.top, null);
-    
-    
-    
-    
   }
 }
