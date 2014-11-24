@@ -71,6 +71,8 @@ public class ImageProcessorGUI extends JFrame
   JTextField ColorG;
 
   private JTextField numColors;
+  
+  private JCheckBox stackFilter;
 
 
   JRadioButton Color3;
@@ -166,7 +168,7 @@ public class ImageProcessorGUI extends JFrame
     {
       public void actionPerformed(ActionEvent e)
       {
-        // socket.sendInfo(curBufferedImage);
+         socket.sendInfo(curImage);
       }
     });
     Exit = new JMenuItem("Exit Program");
@@ -194,13 +196,16 @@ public class ImageProcessorGUI extends JFrame
     {
       public void actionPerformed(ActionEvent e)
       {
+        deepCopyerino(curImage);
         ImageDisplay.removeAll();
         ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+        pack();
       }
     });
 
     File.add(Open);
     File.add(Save);
+    File.add(Send);
     File.add(Exit);
     Edit.add(Undo);
     Edit.add(Redo);
@@ -315,12 +320,15 @@ public class ImageProcessorGUI extends JFrame
     Filter.addItem("Greyscale");
     Filter.setEnabled(false);
     Filter.addActionListener(new Filter());
-
+    
+    stackFilter = new JCheckBox("Stack Filters");
+    
 
     JPanel Instawrap = new JPanel();
     TitledBorder FilterTitle = new TitledBorder("Filter Palette");
     InstaFilter.setBorder(FilterTitle);
     Instawrap.add(Filter);
+    Instawrap.add(stackFilter);
 
     InstaFilter.add(Instawrap);
 
@@ -409,7 +417,8 @@ public class ImageProcessorGUI extends JFrame
   {
     public void actionPerformed(ActionEvent e)
     {
-        //mBufferedImage = image.getOriginal();
+        if (!stackFilter.isSelected()) 
+           curImage = deepCopy(mBufferedImage);
         colorBinTwoPointOh(curImage, numBins, selectedColors);
         ImageDisplay.removeAll();
         ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
@@ -705,6 +714,11 @@ public class ImageProcessorGUI extends JFrame
     selectedColors[1] = red;
     selectedColors[2] = teal;
     selectedColors[3] = beige;
+    
+
+    if (!stackFilter.isSelected()) 
+       curImage = deepCopy(mBufferedImage);
+
     colorBinTwoPointOh(curImage, 4, selectedColors);
     ImageDisplay.removeAll();
     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
@@ -714,7 +728,11 @@ public class ImageProcessorGUI extends JFrame
   public void colorScheme(String scheme)
   {
     ColorScheme.setColorScheme(scheme, selectedColors, numBins);
-    colorBinTwoPointOh(curImage, 4, selectedColors);
+    
+    if (!stackFilter.isSelected()) 
+       curImage = deepCopy(mBufferedImage);
+
+    colorBinTwoPointOh(curImage, numBins, selectedColors);
     ImageDisplay.removeAll();
     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
     pack();
@@ -884,7 +902,10 @@ public class ImageProcessorGUI extends JFrame
   public void valencia()
   {
      deepCopyerino(curImage);
-     curImage = ImageProcessor.filterValencia(curImage);
+     if (stackFilter.isSelected())
+        curImage = ImageProcessor.filterValencia(curImage);
+     else
+        curImage = ImageProcessor.filterValencia(mBufferedImage); 
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
      pack();
@@ -893,7 +914,10 @@ public class ImageProcessorGUI extends JFrame
   public void greyscale()
   {
      deepCopyerino(curImage);
-     curImage = ImageProcessor.filterGreyscale(curImage);
+     if (stackFilter.isSelected())
+        curImage = ImageProcessor.filterGreyscale(curImage);
+     else
+        curImage = ImageProcessor.filterGreyscale(mBufferedImage);
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
      pack();
@@ -914,7 +938,12 @@ public class ImageProcessorGUI extends JFrame
   {
     deepCopyerino(curImage);
     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Sharpen");
-    curImage = op.filter(curImage, null);
+
+    if (stackFilter.isSelected())
+       curImage = op.filter(curImage, null);
+    else
+       curImage = op.filter(mBufferedImage, null);
+    
     ImageDisplay.removeAll();
     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
     pack();
@@ -923,7 +952,12 @@ public class ImageProcessorGUI extends JFrame
   public void edgeDetector() {
      deepCopyerino(curImage);
      BufferedImageOp op = (BufferedImageOp) image.mOps.get("Edge detector");
-     curImage = op.filter(curImage, null);
+     
+     if (stackFilter.isSelected())
+        curImage = op.filter(curImage, null);
+     else
+        curImage = op.filter(mBufferedImage, null);
+
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
      pack();
@@ -932,7 +966,12 @@ public class ImageProcessorGUI extends JFrame
   public void invert() {
      deepCopyerino(curImage);
      BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert");
-     curImage = op.filter(curImage, null);
+     
+     if (stackFilter.isSelected())
+        curImage = op.filter(curImage, null);
+     else
+        curImage = op.filter(mBufferedImage, null);
+
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
      pack();
@@ -941,7 +980,12 @@ public class ImageProcessorGUI extends JFrame
   public void posterize() {
      deepCopyerino(curImage);
      BufferedImageOp op = (BufferedImageOp) image.mOps.get("Posterize");
-     curImage = op.filter(curImage, null);
+
+     if (stackFilter.isSelected())
+        curImage = op.filter(curImage, null);
+     else
+        curImage = op.filter(mBufferedImage, null);
+
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
      pack();
@@ -950,7 +994,12 @@ public class ImageProcessorGUI extends JFrame
   public void blueInvert() {
      deepCopyerino(curImage);
      BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert blue");
-     curImage = op.filter(curImage, null);
+     
+     if (stackFilter.isSelected())
+        curImage = op.filter(curImage, null);
+     else
+        curImage = op.filter(mBufferedImage, null);
+
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
      pack();

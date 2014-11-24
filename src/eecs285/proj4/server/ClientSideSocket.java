@@ -16,7 +16,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 public class ClientSideSocket extends ImageProcessingSocket {
@@ -189,7 +188,7 @@ System.out.println("Load recieved!");
    }
    
    
-   private void receiveInfo() {
+   public void receiveInfo() {
       BufferedImage img = null;
       try {
           img = ImageIO.read(ImageIO.createImageInputStream(inData));
@@ -199,6 +198,22 @@ System.out.println("Load recieved!");
       }
       win.loadImage(img);
       win.repaint();
+   }
+   
+   public void sendInfo(BufferedImage im) 
+   {
+      if (im == null)
+         System.out.println("well thats embarassing..");
+      try 
+      {
+         outData.writeByte(3);
+         ImageIO.write((RenderedImage) im, "JPG", outData);
+      }
+      catch (Exception except) 
+      {
+         System.out.println("Filed to load image TO the Server side");
+         System.exit(-1);
+      }
    }
 
 }

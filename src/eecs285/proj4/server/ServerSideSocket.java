@@ -200,25 +200,32 @@ System.out.println("Load recieved!");
       return false;
    }
    
-   public boolean sendInfo(BufferedImage im) 
+   public void receiveInfo() {
+      BufferedImage img = null;
+      try {
+          img = ImageIO.read(ImageIO.createImageInputStream(inData));
+          System.out.println("Image received!!!!");
+      } catch (IOException ex) {
+          System.out.println("Error al abrir el socket" + ex);
+      }
+      win.loadImage(img);
+      win.repaint();
+   }
+   
+   public void sendInfo(BufferedImage im) 
    {
-      boolean success = false;
       if (im == null)
          System.out.println("well thats embarassing..");
       try 
       {
          outData.writeByte(3);
          ImageIO.write((RenderedImage) im, "JPG", outData);
-         success = true;
       }
       catch (Exception except) 
       {
          System.out.println("Filed to load image TO the Server side");
          System.exit(-1);
       }
-      return success;
-      
-      
    }
 }
    

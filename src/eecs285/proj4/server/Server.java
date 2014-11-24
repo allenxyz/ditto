@@ -21,9 +21,11 @@ public class Server
 //      }
       
       
-      while (true)
-      {
-         Server.socket.checkInput();
-      }
+      
+//      
+//      while (true)
+//      {
+//         Server.socket.checkInput();
+//      }
    }
 }
