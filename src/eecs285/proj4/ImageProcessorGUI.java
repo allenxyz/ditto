@@ -45,7 +45,6 @@ public class ImageProcessorGUI extends JFrame
   boolean isLoaded = false;
 
   JPanel ImageDisplay = new JPanel();
-  JPanel DisplayImage = new JPanel();
 
   JPanel palettePanel;
 
@@ -92,6 +91,8 @@ public class ImageProcessorGUI extends JFrame
 
   private ImageProcessor image;
 
+  private stickers currentSticker;
+  
   public static void main(String[] arg)
   {
     win = new ImageProcessorGUI("Insta-Paint", null);
@@ -303,6 +304,21 @@ public class ImageProcessorGUI extends JFrame
       }
     });
 
+    
+    JButton stickerButton = new JButton("Select Sticker (png)");
+    
+    stickerButton.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent ae)
+      {
+        FileDialog fd = new FileDialog(ImageProcessorGUI.this);
+        fd.setVisible(true);
+        if( fd.getFile() == null )
+          return;
+        String path = fd.getDirectory() + fd.getFile();
+        currentSticker = new stickers(path);
+      }
+    });
 
     Filter = new JComboBox<String>();
     Filter.addItem("None");
