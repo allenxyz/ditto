@@ -43,7 +43,7 @@ public class ImageProcessor extends Frame
    * kBanner holds the application title which is used in the window title.
    **/
   private static final String kBanner = "ImageDicer v1.0";
-  
+
   public ImageProcessor()
   {
     // super(kBanner);
@@ -59,7 +59,7 @@ public class ImageProcessor extends Frame
    * their names.
    **/
   public static Hashtable mOps;
-  
+
   /**
    * The createOps() method creates the image processing operations discussed in
    * the column.
@@ -128,17 +128,17 @@ public class ImageProcessor extends Frame
     return new LookupOp(new ShortLookupTable(0, thresholdArray), null);
   }
 
-//  /**
-//   * Center this window in the user's desktop.
-//   **/
-//  private void center()
-//  {
-//    Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-//    Dimension d = getSize();
-//    int x = (screen.width - d.width) / 2;
-//    int y = (screen.height - d.height) / 2;
-//    setLocation(x, y);
-//  }
+  // /**
+  // * Center this window in the user's desktop.
+  // **/
+  // private void center()
+  // {
+  // Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+  // Dimension d = getSize();
+  // int x = (screen.width - d.width) / 2;
+  // int y = (screen.height - d.height) / 2;
+  // setLocation(x, y);
+  // }
   private void center()
   {
     Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -151,44 +151,45 @@ public class ImageProcessor extends Frame
   /**
    * This member variable holds the currently displayed image.
    **/
-  public static BufferedImage filterValencia(BufferedImage img) {
-     rgb[][] rgbs = rgb.toRGB(img);
-     
-//     for (int i = 0 ; i < rgbs.length ; i += 1) 
-//        for (int j = 0 ; j < rgbs[0].length ; j += 1)
-//           System.out.println(rgbs[i][j].toString());
-//
-//     
-     for (int i = 0 ; i < rgbs.length ; i += 1) 
-        for (int j = 0 ; j < rgbs[0].length ; j += 1)
-           filters.valencia(rgbs[i][j]);
-     
-//     for (int i = 0 ; i < rgbs.length ; i += 1) 
-//        for (int j = 0 ; j < rgbs[0].length ; j += 1)
-//           System.out.println(rgbs[i][j].toString());
-//     
-     return rgb.toImage(rgbs);
-  }
-  
-  public static BufferedImage filterGreyscale(BufferedImage img) {
-     rgb[][] rgbs = rgb.toRGB(img);
+  public static BufferedImage filterValencia(BufferedImage img)
+  {
+    rgb[][] rgbs = rgb.toRGB(img);
 
-     for (int i = 0 ; i < rgbs.length ; i += 1) 
-      for (int j = 0 ; j < rgbs[0].length ; j += 1)
-         filters.greyscale(rgbs[i][j]);
-     
-     return rgb.toImage(rgbs);
+    // for (int i = 0 ; i < rgbs.length ; i += 1)
+    // for (int j = 0 ; j < rgbs[0].length ; j += 1)
+    // System.out.println(rgbs[i][j].toString());
+    //
+    //
+    for( int i = 0; i < rgbs.length; i += 1 )
+      for( int j = 0; j < rgbs[0].length; j += 1 )
+        filters.valencia(rgbs[i][j]);
+
+    // for (int i = 0 ; i < rgbs.length ; i += 1)
+    // for (int j = 0 ; j < rgbs[0].length ; j += 1)
+    // System.out.println(rgbs[i][j].toString());
+    //
+    return rgb.toImage(rgbs);
   }
-  
-  
-//  /**
-//   * All paint() has to do is show the current image.
-//   **/
-//  public void paint(Graphics g)
-//  {
-//    if( mBufferedImage == null )
-//      return;
-//    Insets insets = getInsets();
-//    g.drawImage(mBufferedImage, insets.left, insets.top, null);
-//  }
+
+  public static BufferedImage filterGreyscale(BufferedImage img)
+  {
+    BufferedImage dstImage = null;
+    ColorSpace colorSpace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
+    ColorConvertOp op = new ColorConvertOp(colorSpace, null);
+    dstImage = op.filter(img, null);
+
+    return dstImage;
+  }
+
+
+  // /**
+  // * All paint() has to do is show the current image.
+  // **/
+  // public void paint(Graphics g)
+  // {
+  // if( mBufferedImage == null )
+  // return;
+  // Insets insets = getInsets();
+  // g.drawImage(mBufferedImage, insets.left, insets.top, null);
+  // }
 }

@@ -19,6 +19,7 @@ import sun.java2d.loops.RenderCache;
 import java.io.*;
 
 import eecs285.proj4.Exceptions.EmptyTextFieldException;
+import eecs285.proj4.Exceptions.ZeroNumBinsException;
 import eecs285.proj4.ImageProcessor;
 import eecs285.proj4.pixelTypes.rgb;
 import eecs285.proj4.server.*;
@@ -61,7 +62,7 @@ public class ImageProcessorGUI extends JFrame
   private JButton ClearFields;
   private JButton SaveSelection;
   private JButton Enter;
-  //private JButton Apply;
+  // private JButton Apply;
 
   JTextField ColorA;
   JTextField ColorB;
@@ -79,7 +80,7 @@ public class ImageProcessorGUI extends JFrame
   JRadioButton Color7;
 
   JComboBox<String> Filter;
-  
+
   JComboBox<String> CustomFilters;
 
   private BufferedImage mBufferedImage;
@@ -313,7 +314,7 @@ public class ImageProcessorGUI extends JFrame
     Filter.addItem("Obama");
     Filter.addItem("Fire");
     Filter.addItem("Morgana");
-    Filter.addItem("Valencia");
+    Filter.addItem("Rainbow");
     Filter.addItem("Neutral");
     Filter.addItem("Coffee");
     Filter.addItem("Greyscale");
@@ -333,9 +334,9 @@ public class ImageProcessorGUI extends JFrame
     Custom.setBorder(CustomFilter);
     CustomFilters = new JComboBox<String>();
     Custom.add(CustomFilters);
-    //Custom.setVisible(false);
-    //CustomFilters.addActionListener(new CustomFilter());
-    
+    // Custom.setVisible(false);
+    // CustomFilters.addActionListener(new CustomFilter());
+
     EditPalette.setLayout(new BoxLayout(EditPalette, BoxLayout.PAGE_AXIS));
     EditPalette.add(ColorBlock);
     EditPalette.add(palettePanel);
@@ -383,15 +384,14 @@ public class ImageProcessorGUI extends JFrame
 
     // Make a BufferedImage from the Image.
     mBufferedImage = new BufferedImage(grabimage.getWidth(null),
-                                       grabimage.getHeight(null), 
-                                       BufferedImage.TYPE_INT_RGB);
+        grabimage.getHeight(null), BufferedImage.TYPE_INT_RGB);
     Graphics2D g2 = mBufferedImage.createGraphics();
     g2.drawImage(grabimage, null, ImageDisplay);
     ImageIcon disp = new ImageIcon(mBufferedImage);
     ImageDisplay.removeAll();
     ImageDisplay.add(new JLabel(disp));
     curImage = deepCopy(mBufferedImage);
-    
+
     pack();
     // adjustToImageSize();
     // center();
@@ -415,14 +415,15 @@ public class ImageProcessorGUI extends JFrame
     public void actionPerformed(ActionEvent e)
     {
 
-        //mBufferedImage = image.getOriginal();
-        colorBinTwoPointOh(curImage, numBins, selectedColors);
-        ImageDisplay.removeAll();
-        ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-        pack();
-       // ColorPicker.this.dispose();
-      }
+      // mBufferedImage = image.getOriginal();
+      colorBinTwoPointOh(curImage, numBins, selectedColors);
+      ImageDisplay.removeAll();
+      ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+      pack();
+      // ColorPicker.this.dispose();
+    }
   }
+
   // overloaded so that the other player can load the image directly from an
   // Image rather than a pathname
   public void loadImage(Image grabimage)
@@ -467,8 +468,8 @@ public class ImageProcessorGUI extends JFrame
     {
       outputFile = new File(outputFile.getAbsolutePath() + ".jpg");
       ImageIO.write(curImage, "jpg", outputFile);
-      JOptionPane.showMessageDialog(ImageProcessorGUI.win, "Output Has Been Saved",
-          "Saved Output", JOptionPane.PLAIN_MESSAGE);
+      JOptionPane.showMessageDialog(ImageProcessorGUI.win,
+          "Output Has Been Saved", "Saved Output", JOptionPane.PLAIN_MESSAGE);
     }
     catch( IOException e )
     {
@@ -484,7 +485,7 @@ public class ImageProcessorGUI extends JFrame
     {
       if( s.isEmpty() )
       {
-        throw new EmptyTextFieldException();
+        throw new EmptyTextFieldException("Text Fields Cannot Be Empty!");
       }
     }
   }
@@ -511,6 +512,10 @@ public class ImageProcessorGUI extends JFrame
       {
         number = Integer.parseInt(numColors.getText());
         numBins = number;
+        if( numBins == 0 )
+        {
+          throw (new ZeroNumBinsException("Number must be greater than zero!"));
+        }
       }
       catch( NumberFormatException excep1 )
       {
@@ -518,7 +523,13 @@ public class ImageProcessorGUI extends JFrame
             "Error!", JOptionPane.ERROR_MESSAGE);
         return;
       }
-      ColorPickerDialog = new ColorPicker(number);
+      catch( ZeroNumBinsException zEx )
+      {
+        JOptionPane.showMessageDialog(null, zEx.getMessage(), "Error!",
+            JOptionPane.ERROR_MESSAGE);
+        return;
+      }
+      ColorPickerDialog = new ColorPicker(numBins);
       // palettePanel.setEnabled(true);
     }
   }
@@ -574,45 +585,42 @@ public class ImageProcessorGUI extends JFrame
       Apply = new JButton("Apply");
       Apply.addActionListener(new binColorApply());
       SaveSelection = new JButton("Save Selection");
-      SaveSelection.addActionListener(new ActionListener(){
+      SaveSelection.addActionListener(new ActionListener()
+      {
 
         @Override
         public void actionPerformed(ActionEvent e)
         {
-          /*String s = (String)JOptionPane.showInputDialog(
-              frame,
-              "Complete the sentence:\n"
-              + "\"Green eggs and...\"",
-              "Customized Dialog",
-              JOptionPane.PLAIN_MESSAGE,
-              icon,
-              possibilities,
-              "ham");*/
-          ColorScheme customscheme = new ColorScheme(selectedColors,numBins);
+          /*
+           * String s = (String)JOptionPane.showInputDialog( frame,
+           * "Complete the sentence:\n" + "\"Green eggs and...\"",
+           * "Customized Dialog", JOptionPane.PLAIN_MESSAGE, icon,
+           * possibilities, "ham");
+           */
+          ColorScheme customscheme = new ColorScheme(selectedColors, numBins);
 
           numCustom = numCustom + 1;
-          
+
         }
-        
-        
+
+
       });
       JButton Close = new JButton("Close");
-      Close.addActionListener(new ActionListener(){
+      Close.addActionListener(new ActionListener()
+      {
 
         public void actionPerformed(ActionEvent e)
         {
           dispose();
-          
+
         }
-        
+
       });
       Apply.setEnabled(false);
-      /*if(clicks  == numBins ){
-        Apply.setEnabled(true);
-      }
-      else{
-        Apply.setEnabled(false);
-      }*/
+      /*
+       * if(clicks == numBins ){ Apply.setEnabled(true); } else{
+       * Apply.setEnabled(false); }
+       */
       redPal.setEditable(false);
       greenPal.setEditable(false);
       bluePal.setEditable(false);
@@ -652,13 +660,14 @@ public class ImageProcessorGUI extends JFrame
             }
             else
             {
-            //private Color selectedColors[] = new Color[256];
-              if(clicks == numBins - 1){
+              // private Color selectedColors[] = new Color[256];
+              if( clicks == numBins - 1 )
+              {
                 Apply.setEnabled(true);
                 SaveSelection.setEnabled(true);
               }
               selectedColors[clicks] = color;
-              //System.out.println(String.valueOf(selectedColors[clicks].getRGB()));
+              // System.out.println(String.valueOf(selectedColors[clicks].getRGB()));
 
             }
             count.setText(String.valueOf(clicks + 1));
@@ -722,7 +731,7 @@ public class ImageProcessorGUI extends JFrame
             k = numBins;
           }
         }
-      }  
+      }
     }
   }
 
@@ -744,8 +753,9 @@ public class ImageProcessorGUI extends JFrame
 
   public void colorScheme(String scheme)
   {
-    ColorScheme.setColorScheme(scheme, selectedColors, numBins);
-    colorBinTwoPointOh(curImage, 4, selectedColors);
+    numBins = ColorScheme.setColorScheme(scheme, selectedColors, numBins);
+    System.out.println("NUMBER OF BINS:" + numBins);
+    colorBinTwoPointOh(curImage, numBins, selectedColors);
     ImageDisplay.removeAll();
     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
     pack();
@@ -801,17 +811,19 @@ public class ImageProcessorGUI extends JFrame
       {
         colorScheme("Coffee");
       }
-      else if( Filter.getSelectedItem().equals("Valencia") )
+      else if( Filter.getSelectedItem().equals("Rainbow") )
       {
-        valencia();
+        colorScheme("Rainbow");
       }
       else if( Filter.getSelectedItem().equals("Greyscale") )
       {
         greyscale();
       }
-      else if (Filter.getSelectedItem().equals("tint")){
+      else if( Filter.getSelectedItem().equals("tint") )
+      {
         Color temp = new Color(225, 161, 82);
-        curImage =  tint(curImage, temp.getRed(), temp.getGreen(), temp.getBlue());
+        curImage = tint(curImage, temp.getRed(), temp.getGreen(),
+            temp.getBlue());
         ImageDisplay.removeAll();
         ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
         pack();
@@ -837,19 +849,19 @@ public class ImageProcessorGUI extends JFrame
     ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
     pack();
   }
-  
-  
 
-  public BufferedImage tint(BufferedImage loadImg, int red, int green, int blue) {
-    BufferedImage img = new BufferedImage(loadImg.getWidth(), loadImg.getHeight(),
-        BufferedImage.TRANSLUCENT);
-    Graphics2D graphics = img.createGraphics(); 
+
+  public BufferedImage tint(BufferedImage loadImg, int red, int green, int blue)
+  {
+    BufferedImage img = new BufferedImage(loadImg.getWidth(),
+        loadImg.getHeight(), BufferedImage.TRANSLUCENT);
+    Graphics2D graphics = img.createGraphics();
     Color newColor = new Color(red, green, blue, 0 /* alpha needs to be zero */);
     graphics.setXORMode(newColor);
     graphics.drawImage(loadImg, null, 0, 0);
-    //graphics.dispose();
+    // graphics.dispose();
     return img;
-}
+  }
 
   static BufferedImage deepCopy(BufferedImage bi)
   {
@@ -859,7 +871,7 @@ public class ImageProcessorGUI extends JFrame
     return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
   }
 
-  
+
   int calculateBrightness(Color c1)
   {
     return (int) Math.sqrt(.241 * c1.getRed() * c1.getRed() + .691
@@ -933,30 +945,30 @@ public class ImageProcessorGUI extends JFrame
 
   public void valencia()
   {
-     deepCopyerino(curImage);
-     curImage = ImageProcessor.filterValencia(curImage);
-     ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-     pack();
+    deepCopyerino(curImage);
+    curImage = ImageProcessor.filterValencia(curImage);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+    pack();
   }
 
   public void greyscale()
   {
-     deepCopyerino(curImage);
-     curImage = ImageProcessor.filterGreyscale(curImage);
-     ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-     pack();
+    deepCopyerino(curImage);
+    curImage = ImageProcessor.filterGreyscale(curImage);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+    pack();
   }
 
 
   public void noFilter()
   {
-     deepCopyerino(curImage);
-     ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-     curImage = deepCopy(mBufferedImage);
-     pack();
+    deepCopyerino(curImage);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+    curImage = deepCopy(mBufferedImage);
+    pack();
   }
 
 
@@ -969,41 +981,45 @@ public class ImageProcessorGUI extends JFrame
     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
     pack();
   }
-  
-  public void edgeDetector() {
-     deepCopyerino(curImage);
-     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Edge detector");
-     curImage = op.filter(curImage, null);
-     ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-     pack();
+
+  public void edgeDetector()
+  {
+    deepCopyerino(curImage);
+    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Edge detector");
+    curImage = op.filter(curImage, null);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+    pack();
   }
-  
-  public void invert() {
-     deepCopyerino(curImage);
-     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert");
-     curImage = op.filter(curImage, null);
-     ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-     pack();
+
+  public void invert()
+  {
+    deepCopyerino(curImage);
+    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert");
+    curImage = op.filter(curImage, null);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+    pack();
   }
-  
-  public void posterize() {
-     deepCopyerino(curImage);
-     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Posterize");
-     curImage = op.filter(curImage, null);
-     ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-     pack();
+
+  public void posterize()
+  {
+    deepCopyerino(curImage);
+    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Posterize");
+    curImage = op.filter(curImage, null);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+    pack();
   }
-  
-  public void blueInvert() {
-     deepCopyerino(curImage);
-     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert blue");
-     curImage = op.filter(curImage, null);
-     ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-     pack();
+
+  public void blueInvert()
+  {
+    deepCopyerino(curImage);
+    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert blue");
+    curImage = op.filter(curImage, null);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+    pack();
   }
 
   public final int displayImageWidth = 800;
@@ -1011,39 +1027,39 @@ public class ImageProcessorGUI extends JFrame
 
   public void resizeToScale()
   {
-     int height = mBufferedImage.getHeight();
-     int width = mBufferedImage.getWidth();
-     double hwRatio = (double)height/(double)width;
-     
-     if (height > displayImageHeight) 
-     {
-        height = displayImageHeight;
-        width = (int) (height / hwRatio);
-     }
-     if (width > displayImageWidth)
-     {
-        width = displayImageWidth;
-        height = (int) (width * hwRatio);
-     }
-  
-     
-     
-     
-     Image tmp = mBufferedImage.getScaledInstance(width, height, BufferedImage.SCALE_FAST);
-     BufferedImage buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-     buffered.getGraphics().drawImage(tmp, 0, 0, null);
-     mBufferedImage = buffered;
-     
-     
-     ImageDisplay.removeAll();
-     display = new JLabel(new ImageIcon(mBufferedImage));
-     ImageDisplay.add(display);
-     
-     System.out.println(mBufferedImage.getHeight());
-     System.out.println(mBufferedImage.getWidth());
-     pack();
-     image = new ImageProcessor();
+    int height = mBufferedImage.getHeight();
+    int width = mBufferedImage.getWidth();
+    double hwRatio = (double) height / (double) width;
+
+    if( height > displayImageHeight )
+    {
+      height = displayImageHeight;
+      width = (int) (height / hwRatio);
+    }
+    if( width > displayImageWidth )
+    {
+      width = displayImageWidth;
+      height = (int) (width * hwRatio);
+    }
+
+
+    Image tmp = mBufferedImage.getScaledInstance(width, height,
+        BufferedImage.SCALE_FAST);
+    BufferedImage buffered = new BufferedImage(width, height,
+        BufferedImage.TYPE_INT_RGB);
+    buffered.getGraphics().drawImage(tmp, 0, 0, null);
+    mBufferedImage = buffered;
+
+
+    ImageDisplay.removeAll();
+    display = new JLabel(new ImageIcon(mBufferedImage));
+    ImageDisplay.add(display);
+
+    System.out.println(mBufferedImage.getHeight());
+    System.out.println(mBufferedImage.getWidth());
+    pack();
+    image = new ImageProcessor();
   }
-  
-  
+
+
 }
