@@ -42,9 +42,8 @@ public class ImageProcessor extends Frame
    * kBanner holds the application title which is used in the window title.
    **/
   private static final String kBanner = "ImageDicer v1.0";
-  private BufferedImage savedOriginal;
   
-  public ImageProcessor(BufferedImage im)
+  public ImageProcessor()
   {
    // super(kBanner);
     createOps();
@@ -58,8 +57,8 @@ public class ImageProcessor extends Frame
    * A Hashtable member variable holds the image processing operations, keyed by
    * their names.
    **/
-  Hashtable mOps;
-
+  public static Hashtable mOps;
+  
   /**
    * The createOps() method creates the image processing operations discussed in
    * the column.  
@@ -128,169 +127,23 @@ public class ImageProcessor extends Frame
     return new LookupOp(new ShortLookupTable(0, thresholdArray), null);
   }
 
-  /**
-   * A member variable, mControlPanel, keeps track of the panel that contains
-   * the user controls. This panel's size has to be accounted for later when we
-   * size the window to fit the image.
-   **/
-  private Panel mControlPanel;
-
-  /**
-   * createUI() creates the user controls and lays out the window. It also
-   * creates the event handlers (as inner classes) for the user controls.
-   **/
-  private void createUI()
-  {
-    setFont(new Font("Serif", Font.PLAIN, 12));
-    // Use a BorderLayout. The image will occupy most of the window,
-    // with the user controls at the bottom.
-    setLayout(new BorderLayout());
-
-    // Use a Label to display status messages to the user.
-    final Label statusLabel = new Label("Welcome to " + kBanner + ".");
-
-    // Create a list of operations.
-    final Choice processChoice = new Choice();
-    Enumeration e = mOps.keys();
-    // Add all the operation names from the Hashtable.
-    while( e.hasMoreElements() )
-      processChoice.add((String) e.nextElement());
-    // Add an event listener. This is where the image processing
-    // actually occurs.
-    processChoice.addItemListener(new ItemListener()
-    {
-      public void itemStateChanged(ItemEvent ie)
-      {
-        if( ie.getStateChange() != ItemEvent.SELECTED )
-          return;
-        String key = processChoice.getSelectedItem();
-        statusLabel.setText("Working...");
-        BufferedImageOp op = (BufferedImageOp) mOps.get(key);
-        mBufferedImage = op.filter(mBufferedImage, null);
-        statusLabel.setText("");
-        repaint();
-      }
-    });
-
-    // Create a Button for loading a new image.
-    Button loadButton = new Button("Load...");
-    // Add a listener for the button. It pops up a file dialog
-    // and loads the selected image file.
-    loadButton.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent ae)
-      {
-        FileDialog fd = new FileDialog(ImageProcessor.this);
-        fd.show();
-        if( fd.getFile() == null )
-          return;
-        String path = fd.getDirectory() + fd.getFile();
-        //loadImage(path);
-      }
-    });
-
-    // Add the user controls at the bottom of the window.
-    mControlPanel = new Panel();
-    mControlPanel.add(loadButton);
-    mControlPanel.add(processChoice);
-    mControlPanel.add(statusLabel);
-    add(mControlPanel, BorderLayout.SOUTH);
-
-    // Terminate the application if the user closes the window.
-    addWindowListener(new WindowAdapter()
-    {
-      public void windowClosing(WindowEvent e)
-      {
-        dispose();
-        System.exit(0);
-      }
-    });
-  }
-
-  /**
-   * When an image is loaded, the window is resized to accomodate the image size
-   * and the user controls.
-   **/
-  private void adjustToImageSize()
-  {
-    if( !isDisplayable() )
-      addNotify(); // Do this to get valid Insets.
-    Insets insets = getInsets();
-    int w = mBufferedImage.getWidth() + insets.left + insets.right;
-    int h = mBufferedImage.getHeight() + insets.top + insets.bottom;
-    h += mControlPanel.getPreferredSize().height;
-    setSize(w, h);
-  }
-
-  /**
-   * Center this window in the user's desktop.
-   **/
-  private void center()
-  {
-    Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-    Dimension d = getSize();
-    int x = (screen.width - d.width) / 2;
-    int y = (screen.height - d.height) / 2;
-    setLocation(x, y);
-  }
+//  /**
+//   * Center this window in the user's desktop.
+//   **/
+//  private void center()
+//  {
+//    Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+//    Dimension d = getSize();
+//    int x = (screen.width - d.width) / 2;
+//    int y = (screen.height - d.height) / 2;
+//    setLocation(x, y);
+//  }
 
   /**
    * This member variable holds the currently displayed image.
    **/
-  private BufferedImage mBufferedImage;
-
-  /**
-   * loadImage() loads an image, using a MediaTracker to ensure that the image
-   * data is fully loaded. Then it converts the image to a BufferedImage.
-   * Finally, it adjusts the window size and placement based on the new image
-   * size.
-   **/
- /*
-  private void loadImage())
-  {
-    // Use a MediaTracker to fully load the image.
-    Image image = Toolkit.getDefaultToolkit().getImage(fileName);
-    MediaTracker mt = new MediaTracker(this);
-    mt.addImage(image, 0);
-    try
-    {
-      mt.waitForID(0);
-    }
-    catch( InterruptedException ie )
-    {
-      return;
-    }
-    if( mt.isErrorID(0) )
-      return;
-    // Make a BufferedImage from the Image.
-    mBufferedImage = new BufferedImage(image.getWidth(null),
-        image.getHeight(null), BufferedImage.TYPE_INT_RGB);
-    Graphics2D g2 = mBufferedImage.createGraphics();
-    g2.drawImage(image, null, null);
-    adjustToImageSize();
-    center();
-    validate();
-    repaint();
-    setTitle(kBanner + ": " + fileName);
-  }
-  */
- 
-
-  
-  public void saveOriginal(BufferedImage original){
-    this.savedOriginal = original;
-  }
-  
-  public BufferedImage getOriginal(){
-    return this.savedOriginal;
-  }
-  
-  
-  
-  
-  
-  public BufferedImage filterValencia() {
-     rgb[][] rgbs = rgb.toRGB(savedOriginal);
+  public static BufferedImage filterValencia(BufferedImage img) {
+     rgb[][] rgbs = rgb.toRGB(img);
      
 //     for (int i = 0 ; i < rgbs.length ; i += 1) 
 //        for (int j = 0 ; j < rgbs[0].length ; j += 1)
@@ -308,8 +161,8 @@ public class ImageProcessor extends Frame
      return rgb.toImage(rgbs);
   }
   
-  public BufferedImage filterGreyscale() {
-     rgb[][] rgbs = rgb.toRGB(savedOriginal);
+  public static BufferedImage filterGreyscale(BufferedImage img) {
+     rgb[][] rgbs = rgb.toRGB(img);
 
      for (int i = 0 ; i < rgbs.length ; i += 1) 
       for (int j = 0 ; j < rgbs[0].length ; j += 1)
@@ -319,14 +172,14 @@ public class ImageProcessor extends Frame
   }
   
   
-  /**
-   * All paint() has to do is show the current image.
-   **/
-  public void paint(Graphics g)
-  {
-    if( mBufferedImage == null )
-      return;
-    Insets insets = getInsets();
-    g.drawImage(mBufferedImage, insets.left, insets.top, null);
-  }
+//  /**
+//   * All paint() has to do is show the current image.
+//   **/
+//  public void paint(Graphics g)
+//  {
+//    if( mBufferedImage == null )
+//      return;
+//    Insets insets = getInsets();
+//    g.drawImage(mBufferedImage, insets.left, insets.top, null);
+//  }
 }
