@@ -264,6 +264,7 @@ public class ImageProcessorGUI extends JFrame
     Filter.addItem("Posterize");
     Filter.addItem("Blue Invert");
     Filter.addItem("Obama");
+    Filter.addItem("Valencia");
     Filter.setEnabled(false);
     Filter.addActionListener(new Filter());
 
@@ -683,6 +684,10 @@ public class ImageProcessorGUI extends JFrame
       {
         obama();
       }
+      else if (Filter.getSelectedItem().equals("Valencia"))
+      {
+         valencia();
+      }
 
       if( socket != null )
         socket.eventOccurred(Filter.getSelectedItem().toString());
@@ -766,6 +771,13 @@ public class ImageProcessorGUI extends JFrame
     }
   }
 
+  public void valencia()
+  {
+     BufferedImage img = image.filterValencia();
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+     pack();
+  }
 
   public void noFilter()
   {
