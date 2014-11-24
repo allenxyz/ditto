@@ -4,7 +4,7 @@ import java.awt.Color;
 
 public class ColorScheme
 {
-  static Color colors[];
+  static Color colors[] = new Color[256];
   static int numbercolors;
   static String name;
   

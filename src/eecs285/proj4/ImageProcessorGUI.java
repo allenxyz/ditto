@@ -604,7 +604,7 @@ public class ImageProcessorGUI extends JFrame
               
               null, null, null);
           ColorScheme customscheme = new ColorScheme(s, selectedColors,numBins);
-
+          System.out.println(s + "  " + String.valueOf(customscheme.getnumber()));
           numCustom = numCustom + 1;
           
         }
