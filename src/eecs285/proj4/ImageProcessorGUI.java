@@ -400,6 +400,7 @@ public class ImageProcessorGUI extends JFrame
         ImageDisplay.removeAll();
         ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
         pack();
+       // ColorPicker.this.dispose();
 
       }
 
@@ -637,6 +638,7 @@ public class ImageProcessorGUI extends JFrame
   void colorBinTwoPointOh(BufferedImage binimage, int numBins, Color colors[])
   {
     // TODO: make an exception for if numBins == 0
+    deepCopyerino(mBufferedImage);
     int binEdges = 256 / numBins;
     for( int i = 0; i < binimage.getWidth(); ++i )
     {
