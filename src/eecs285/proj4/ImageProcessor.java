@@ -278,12 +278,10 @@ public class ImageProcessor extends Frame
 
   
   public void saveOriginal(BufferedImage original){
-   
     this.savedOriginal = original;
   }
   
   public BufferedImage getOriginal(){
-System.out.println(this.savedOriginal.getWidth());
     return this.savedOriginal;
   }
   
@@ -291,13 +289,33 @@ System.out.println(this.savedOriginal.getWidth());
   
   
   
-  public void filterValencia() {
+  public BufferedImage filterValencia() {
+     rgb[][] rgbs = rgb.toRGB(savedOriginal);
+     
+//     for (int i = 0 ; i < rgbs.length ; i += 1) 
+//        for (int j = 0 ; j < rgbs[0].length ; j += 1)
+//           System.out.println(rgbs[i][j].toString());
+//
 //     
-//     for (int i = 0; i < height; i += 1) {
-//        for (int j = 0; j < width; j += 1) {
-//           filters.valencia(pixVal(i, j));
-//        }
-//     }
+     for (int i = 0 ; i < rgbs.length ; i += 1) 
+        for (int j = 0 ; j < rgbs[0].length ; j += 1)
+           filters.valencia(rgbs[i][j]);
+     
+//     for (int i = 0 ; i < rgbs.length ; i += 1) 
+//        for (int j = 0 ; j < rgbs[0].length ; j += 1)
+//           System.out.println(rgbs[i][j].toString());
+//     
+     return rgb.toImage(rgbs);
+  }
+  
+  public BufferedImage filterGreyscale() {
+     rgb[][] rgbs = rgb.toRGB(savedOriginal);
+
+     for (int i = 0 ; i < rgbs.length ; i += 1) 
+      for (int j = 0 ; j < rgbs[0].length ; j += 1)
+         filters.greyscale(rgbs[i][j]);
+     
+     return rgb.toImage(rgbs);
   }
   
   

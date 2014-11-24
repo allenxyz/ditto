@@ -22,6 +22,7 @@ public class filters
     val.changeR(temp.getR());
     val.changeG(temp.getG());
     val.changeB(temp.getB());
+    
   }
   
   static void greyscale(rgb val)
@@ -45,9 +46,19 @@ public class filters
     int min = Math.min(rPrime, Math.min(gPrime, bPrime));
     int delta = max - min;
     
+    if(delta == 0)
+    {
+       return new hsl(0, 0, 0);
+    }
+    
+    
     int hue = 0;
     int saturation = 0;
     int lightness = (max + min)/2;
+    
+    if(lightness == 0){
+       return new hsl(0, 0, 0);
+    }
     
     if(max == rPrime)
     {
