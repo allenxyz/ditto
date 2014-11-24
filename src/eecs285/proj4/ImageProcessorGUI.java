@@ -73,11 +73,6 @@ public class ImageProcessorGUI extends JFrame {
 
    private JCheckBox stackFilter;
 
-   private JComboBox<String> Filter;
-
-   private JComboBox<String> CustomFilters;
-   private ArrayList<ColorScheme> customColorSchemes = new ArrayList<ColorScheme>();
-
    private BufferedImage mBufferedImage;
    private static BufferedImage curImage;
    private Color selectedColors[] = new Color[256];
@@ -87,12 +82,17 @@ public class ImageProcessorGUI extends JFrame {
    final private static int UNDO_MAX = 10;
    private Vector<BufferedImage> queue = new Vector<BufferedImage>(UNDO_MAX);
    private static int queueSize = -1;
-   
 
    private ImageProcessor image;
 
    private stickers currentSticker;
 
+   private JComboBox<String> UtilityFilters;
+   private JComboBox<String> CustomFilters;
+   private JComboBox<String> PresetFilters;
+   private ArrayList<ColorScheme> customColorSchemes = new ArrayList<ColorScheme>();
+   
+   
    public static void main(String[] arg) {
       win = new ImageProcessorGUI("Insta-Paint", null);
       win.pack();
@@ -180,9 +180,9 @@ public class ImageProcessorGUI extends JFrame {
       Exit = new JMenuItem("Exit Program");
 
       Undo = new JMenuItem("Undo");
-      Undo.setEnabled(false);
       Undo.addActionListener(new ActionListener() {
          public void actionPerformed(ActionEvent e) {
+System.out.println("q: " + queueSize);            
             if (!queue.isEmpty()) {
                curImage = deepCopy(queue.elementAt(queueSize));
                ImageDisplay.removeAll();
@@ -190,13 +190,24 @@ public class ImageProcessorGUI extends JFrame {
                pack();
                queueSize--;
             }
-            if (queue.size() <= 1)
+            if (queueSize == 0)
                Undo.setEnabled(false);
             System.out.println(queue.size());
             Redo.setEnabled(true);
          }
       });
       Redo = new JMenuItem("Redo");
+      Redo.addActionListener(new ActionListener() {
+         public void actionPerformed(ActionEvent e) {
+            curImage = deepCopy(queue.elementAt(queueSize));
+            ImageDisplay.removeAll();
+            ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+            pack();
+            queueSize++;
+            if (queueSize == queue.size())
+               Redo.setEnabled(false);
+         }
+      });
       Redo.setEnabled(false);
       Reset = new JMenuItem("Reset");
       Reset.addActionListener(new ActionListener() {
@@ -218,6 +229,8 @@ public class ImageProcessorGUI extends JFrame {
       Menu.add(File);
       Menu.add(Edit);
       setJMenuBar(Menu);
+      
+      Undo.setEnabled(false);
 
       JPanel ColorTop = new JPanel();
       JPanel ColorMiddle = new JPanel();
@@ -311,30 +324,30 @@ public class ImageProcessorGUI extends JFrame {
          }
       });
 
-      Filter = new JComboBox<String>();
-      Filter.addItem("None");
-      Filter.addItem("Sharpen");
-      Filter.addItem("Edge Detector");
-      Filter.addItem("Invert");
-      Filter.addItem("Posterize");
-      Filter.addItem("Blue Invert");
-      Filter.addItem("Obama");
-      Filter.addItem("Fire");
-      Filter.addItem("Morgana");
-      Filter.addItem("Rainbow");
-      Filter.addItem("Neutral");
-      Filter.addItem("Coffee");
-      Filter.addItem("Greyscale");
-      Filter.addItem("tint");
-      Filter.setEnabled(false);
-      Filter.addActionListener(new Filter());
+      UtilityFilters = new JComboBox<String>();
+      UtilityFilters.addItem("None");
+      UtilityFilters.addItem("Sharpen");
+      UtilityFilters.addItem("Edge Detector");
+      UtilityFilters.addItem("Invert");
+      UtilityFilters.addItem("Posterize");
+      UtilityFilters.addItem("Blue Invert");
+      UtilityFilters.addItem("Obama");
+      UtilityFilters.addItem("Fire");
+      UtilityFilters.addItem("Morgana");
+      UtilityFilters.addItem("Rainbow");
+      UtilityFilters.addItem("Neutral");
+      UtilityFilters.addItem("Coffee");
+      UtilityFilters.addItem("Greyscale");
+      UtilityFilters.addItem("tint");
+      UtilityFilters.setEnabled(false);
+      UtilityFilters.addActionListener(new Filter());
 
       stackFilter = new JCheckBox("Stack Filters");
 
       JPanel Instawrap = new JPanel();
       TitledBorder FilterTitle = new TitledBorder("Filter Palette");
       InstaFilter.setBorder(FilterTitle);
-      Instawrap.add(Filter);
+      Instawrap.add(UtilityFilters);
       Instawrap.add(stackFilter);
 
       InstaFilter.add(Instawrap);
@@ -407,7 +420,7 @@ public class ImageProcessorGUI extends JFrame {
 
    public void loadImage(String fileName) {
       // Use a MediaTracker to fully load the image.
-      Filter.setEnabled(true);
+      UtilityFilters.setEnabled(true);
 
       Enter.setEnabled(true);
       Image grabimage = Toolkit.getDefaultToolkit().getImage(fileName);
@@ -440,7 +453,8 @@ public class ImageProcessorGUI extends JFrame {
       curImage = deepCopy(mBufferedImage);
       pack();
       image = new ImageProcessor();
-      Filter.setSelectedItem("None");
+      UtilityFilters.setSelectedItem("None");
+System.out.println("queue: " + queueSize);      
 
       if (socket != null) {
          socket.loadOccurred(mBufferedImage);
@@ -451,7 +465,7 @@ public class ImageProcessorGUI extends JFrame {
    // Image rather than a pathname
    public void loadImage(Image grabimage) {
       // Use a MediaTracker to fully load the image.
-      Filter.setEnabled(true);
+      UtilityFilters.setEnabled(true);
       MediaTracker mt = new MediaTracker(this);
       mt.addImage(grabimage, 0);
       try {
@@ -848,6 +862,12 @@ public class ImageProcessorGUI extends JFrame {
 
    void deepCopyerino(BufferedImage bi) {
       queueSize++;
+      //delete everything else in undo queue
+      for (int i = queue.size() - 1; i >= queueSize; i--)
+      {
+         queue.removeElementAt(i);
+      }
+      
       Undo.setEnabled(true);
       Redo.setEnabled(false);
       BufferedImage save = deepCopy(bi);
@@ -855,7 +875,7 @@ public class ImageProcessorGUI extends JFrame {
          queue.add(save);
          System.out.println(queue.size());
       } else {
-         queue.remove(0);
+         queue.removeElementAt(0);
          queue.add(save);
          System.out.println(queue.size());
       }
