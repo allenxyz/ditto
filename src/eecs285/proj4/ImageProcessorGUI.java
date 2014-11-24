@@ -39,16 +39,17 @@ public class ImageProcessorGUI extends JFrame
   private JMenuItem Undo;
   private JMenuItem Redo;
   private JMenuItem Reset;
+  private JMenuItem Send;
 
   boolean isLoaded = false;
 
   JPanel ImageDisplay = new JPanel();
   JPanel DisplayImage = new JPanel();
-  
+
   JPanel palettePanel;
 
   JDialog ColorPickerDialog;
-  
+
 
   private JPanel ColorBottom;
   private JLabel A;
@@ -59,6 +60,7 @@ public class ImageProcessorGUI extends JFrame
   private JButton Apply;
   private JButton ClearFields;
   private JButton Enter;
+  //private JButton Apply;
 
   JTextField ColorA;
   JTextField ColorB;
@@ -67,9 +69,9 @@ public class ImageProcessorGUI extends JFrame
   JTextField ColorE;
   JTextField ColorF;
   JTextField ColorG;
-  
+
   private JTextField numColors;
-  
+
 
   JRadioButton Color3;
   JRadioButton Color5;
@@ -82,10 +84,10 @@ public class ImageProcessorGUI extends JFrame
   private Color selectedColors[] = new Color[256];
   private int numBins = 0;
   private Graphics2D g2;
-  
   private Vector<BufferedImage> queue = new Vector<BufferedImage>(5);
 
   private ImageProcessor image;
+
   public static void main(String[] arg)
   {
     win = new ImageProcessorGUI("Insta-Paint", null);
@@ -159,17 +161,28 @@ public class ImageProcessorGUI extends JFrame
       }
     });
 
-
+    Send = new JMenuItem("Send Image");
+    Send.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        // socket.sendInfo(curBufferedImage);
+      }
+    });
     Exit = new JMenuItem("Exit Program");
+
+
     Undo = new JMenuItem("Undo");
     Undo.addActionListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
       {
-        if(!queue.isEmpty())
+        if( !queue.isEmpty() )
         {
+          curImage = deepCopy(queue.elementAt(queue.size() - 2));
           ImageDisplay.removeAll();
-          ImageDisplay.add(new JLabel(new ImageIcon((BufferedImage)queue.lastElement())));
+          ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+          pack();
           queue.removeElementAt(queue.size() - 1);
         }
         System.out.println(queue.size());
@@ -185,7 +198,7 @@ public class ImageProcessorGUI extends JFrame
         ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
       }
     });
-    
+
     File.add(Open);
     File.add(Save);
     File.add(Exit);
@@ -198,10 +211,10 @@ public class ImageProcessorGUI extends JFrame
 
     JPanel ColorTop = new JPanel();
     JPanel ColorMiddle = new JPanel();
-    
+
     JLabel blockLabel = new JLabel("Enter Number of Colors:");
     ColorTop.add(blockLabel);
-    
+
     numColors = new JTextField(4);
 
     Enter = new JButton("Enter");
@@ -266,8 +279,8 @@ public class ImageProcessorGUI extends JFrame
         {
           Robot r = new Robot();
           Color color = r.getPixelColor(x, y);
-          //private Color selectedColors[] = new Color[256];
-          
+          // private Color selectedColors[] = new Color[256];
+
           getRed = color.getRed();
           getGreen = color.getGreen();
           getBlue = color.getBlue();
@@ -294,7 +307,11 @@ public class ImageProcessorGUI extends JFrame
     Filter.addItem("Posterize");
     Filter.addItem("Blue Invert");
     Filter.addItem("Obama");
+    Filter.addItem("Fire");
+    Filter.addItem("Morgana");
     Filter.addItem("Valencia");
+    Filter.addItem("Neutral");
+    Filter.addItem("Coffee");
     Filter.addItem("Greyscale");
     Filter.setEnabled(false);
     Filter.addActionListener(new Filter());
@@ -342,7 +359,7 @@ public class ImageProcessorGUI extends JFrame
   {
     // Use a MediaTracker to fully load the image.
     Filter.setEnabled(true);
-    
+
     Enter.setEnabled(true);
     Image grabimage = Toolkit.getDefaultToolkit().getImage(fileName);
     MediaTracker mt = new MediaTracker(this);
@@ -400,7 +417,6 @@ public class ImageProcessorGUI extends JFrame
        // ColorPicker.this.dispose();
       }
   }
-
   // overloaded so that the other player can load the image directly from an
   // Image rather than a pathname
   public void loadImage(Image grabimage)
@@ -466,36 +482,41 @@ public class ImageProcessorGUI extends JFrame
       }
     }
   }
-  
-  class EnterAction implements ActionListener{
+
+  class EnterAction implements ActionListener
+  {
 
     public void actionPerformed(ActionEvent e)
     {
       int number;
-      try{
-        
+      try
+      {
+
         new isEmpty(numColors.getText());
-        
-      }catch(EmptyTextFieldException excep){
-        JOptionPane.showMessageDialog(null,
-            "Text Fields Cannot Be Empty!", "Error!",
-            JOptionPane.ERROR_MESSAGE);
-            return;
+
       }
-      try{
+      catch( EmptyTextFieldException excep )
+      {
+        JOptionPane.showMessageDialog(null, "Text Fields Cannot Be Empty!",
+            "Error!", JOptionPane.ERROR_MESSAGE);
+        return;
+      }
+      try
+      {
         number = Integer.parseInt(numColors.getText());
         numBins = number;
-      }catch(NumberFormatException excep1){
-        JOptionPane.showMessageDialog(null,
-            "Text Field Must be a number!", "Error!",
-            JOptionPane.ERROR_MESSAGE);
-            return;
+      }
+      catch( NumberFormatException excep1 )
+      {
+        JOptionPane.showMessageDialog(null, "Text Field Must be a number!",
+            "Error!", JOptionPane.ERROR_MESSAGE);
+        return;
       }
       ColorPickerDialog = new ColorPicker(number);
-      //palettePanel.setEnabled(true); 
-    }   
+      // palettePanel.setEnabled(true);
+    }
   }
-  
+
   public class ColorPicker extends JDialog
   {
 
@@ -527,14 +548,15 @@ public class ImageProcessorGUI extends JFrame
       Textwrap.setLayout(new BoxLayout(Textwrap, BoxLayout.PAGE_AXIS));
       JPanel first = new JPanel();
       JPanel second = new JPanel();
+      JPanel third = new JPanel();
       JLabel labelcount = new JLabel("Number of Colors Selected: ");
       first.add(labelcount);
       count = new JTextField(3);
       count.setText("0");
       count.setEditable(false);
       first.add(count);
-      
-      
+
+
       JPanel paletteText = new JPanel();
       JLabel red = new JLabel("R: ");
       final JTextField redPal = new JTextField(5);
@@ -542,8 +564,20 @@ public class ImageProcessorGUI extends JFrame
       final JTextField greenPal = new JTextField(5);
       JLabel blue = new JLabel("B: ");
       final JTextField bluePal = new JTextField(5);
-      JButton Apply = new JButton("Apply");
+      Apply = new JButton("Apply");
       Apply.addActionListener(new binColorApply());
+
+      JButton Close = new JButton("Close");
+      Close.addActionListener(new ActionListener(){
+
+        public void actionPerformed(ActionEvent e)
+        {
+          dispose();
+          
+        }
+        
+      });
+      Apply.setEnabled(false);
       /*if(clicks  == numBins ){
         Apply.setEnabled(true);
       }
@@ -561,14 +595,15 @@ public class ImageProcessorGUI extends JFrame
       paletteText.add(bluePal);
       paletteText.add(Apply);
       second.add(paletteText);
+      third.add(Close);
 
-      
-    
+
       palettePanel.addMouseListener(new MouseAdapter()
       {
         @Override
-        public void mouseClicked(MouseEvent e){
-          //TODO: EDIT THIS LISTENER
+        public void mouseClicked(MouseEvent e)
+        {
+          // TODO: EDIT THIS LISTENER
           PointerInfo a = MouseInfo.getPointerInfo();
           Point b = a.getLocation();
           int x = (int) b.getX();
@@ -580,16 +615,20 @@ public class ImageProcessorGUI extends JFrame
           {
             Robot r = new Robot();
             Color color = r.getPixelColor(x, y);
-            if(clicks >= numBins){
-              //THROW EXCEPTION
+            if( clicks >= numBins )
+            {
+              // THROW EXCEPTION
               return;
             }
             else
             {
             //private Color selectedColors[] = new Color[256];
+              if(clicks == numBins - 1){
+                Apply.setEnabled(true);
+              }
               selectedColors[clicks] = color;
               System.out.println(String.valueOf(selectedColors[clicks].getRGB()));
-              
+
             }
             count.setText(String.valueOf(clicks + 1));
             getRed = color.getRed();
@@ -601,7 +640,7 @@ public class ImageProcessorGUI extends JFrame
           {
             System.out.println("You aren't supposed to be here, LEAVE!");
           }
-          if(getRed != 234 && getGreen != 234 && getBlue != 234)
+          if( getRed != 234 && getGreen != 234 && getBlue != 234 )
           {
             redPal.setText(String.valueOf(getRed));
             greenPal.setText(String.valueOf(getGreen));
@@ -611,16 +650,18 @@ public class ImageProcessorGUI extends JFrame
       });
       Textwrap.add(first);
       Textwrap.add(second);
+      Textwrap.add(third);
       apply.add(palettePanel);
       apply.add(Textwrap);
-      //apply.add(paletteText);
+      // apply.add(paletteText);
       add(apply);
-      
+
+
       setModal(true);
       setLayout(new FlowLayout());
       pack();
       setVisible(true);
-      
+
     }
   }
 
@@ -670,6 +711,16 @@ public class ImageProcessorGUI extends JFrame
     pack();
   }
 
+  public void colorScheme(String scheme)
+  {
+    ColorScheme.setColorScheme(scheme, selectedColors, numBins);
+    colorBinTwoPointOh(curImage, 4, selectedColors);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+    pack();
+
+  }
+
   class Filter implements ActionListener
   {
     public void actionPerformed(ActionEvent e)
@@ -703,28 +754,45 @@ public class ImageProcessorGUI extends JFrame
       {
         obama();
       }
-      else if (Filter.getSelectedItem().equals("Valencia"))
+      else if( Filter.getSelectedItem().equals("Morgana") )
       {
-         valencia();
+        colorScheme("Morgana");
       }
-      else if (Filter.getSelectedItem().equals("Greyscale"))
+      else if( Filter.getSelectedItem().equals("Fire") )
       {
-         greyscale();
+        colorScheme("Fire");
+      }
+      else if( Filter.getSelectedItem().equals("Neutral") )
+      {
+        colorScheme("Neutral");
+      }
+      else if( Filter.getSelectedItem().equals("Coffee") )
+      {
+        colorScheme("Coffee");
+      }
+      else if( Filter.getSelectedItem().equals("Valencia") )
+      {
+        valencia();
+      }
+      else if( Filter.getSelectedItem().equals("Greyscale") )
+      {
+        greyscale();
       }
 
       if( socket != null )
         socket.eventOccurred(Filter.getSelectedItem().toString());
     }
   }
-  
-  public void setNumBins(int num){
+
+  public void setNumBins(int num)
+  {
     numBins = num;
   }
-  
+
 
   public void bins()
   {
-    //mBufferedImage = image.getOriginal();
+    // mBufferedImage = image.getOriginal();
     BufferedImage binimage = deepCopy(mBufferedImage);
     // colorBin(binimage);
     ImageDisplay.removeAll();
@@ -753,16 +821,12 @@ public class ImageProcessorGUI extends JFrame
     return (int) Math.sqrt(.241 * r * r + .691 * g * g + .068 * b * b);
 
   }
-  
-  
-  
-  
 
 
   void deepCopyerino(BufferedImage bi)
   {
     BufferedImage save = deepCopy(bi);
-    if(queue.size() != 5)
+    if( queue.size() != 5 )
     {
       queue.add(save);
       System.out.println(queue.size());
@@ -774,9 +838,7 @@ public class ImageProcessorGUI extends JFrame
       System.out.println(queue.size());
     }
   }
-  
-  
-  
+
 
   // color binning code
   // add numbins param later
@@ -827,7 +889,7 @@ public class ImageProcessorGUI extends JFrame
      ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
      pack();
   }
-  
+
   public void greyscale()
   {
      deepCopyerino(curImage);
@@ -836,8 +898,7 @@ public class ImageProcessorGUI extends JFrame
      ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
      pack();
   }
-  
-  
+
 
   public void noFilter()
   {
@@ -894,9 +955,10 @@ public class ImageProcessorGUI extends JFrame
      ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
      pack();
   }
-  
+
   public final int displayImageWidth = 800;
   public final int displayImageHeight = 800;
+
   public void resizeToScale()
   {
      int height = mBufferedImage.getHeight();

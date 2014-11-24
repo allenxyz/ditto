@@ -27,6 +27,7 @@ import java.awt.*;
 
 import eecs285.proj4.pixelTypes.*;
 
+import java.awt.color.ColorSpace;
 import java.awt.event.*;
 import java.awt.image.*;
 import java.util.*;
@@ -45,12 +46,12 @@ public class ImageProcessor extends Frame
   
   public ImageProcessor()
   {
-   // super(kBanner);
+    // super(kBanner);
     createOps();
-   // createUI();
-   // loadImage(fileName);
-   // setVisible(true); 
-  
+    // createUI();
+    // loadImage(fileName);
+    // setVisible(true);
+
   }
 
   /**
@@ -61,7 +62,7 @@ public class ImageProcessor extends Frame
   
   /**
    * The createOps() method creates the image processing operations discussed in
-   * the column.  
+   * the column.
    **/
   private void createOps()
   {
@@ -138,6 +139,14 @@ public class ImageProcessor extends Frame
 //    int y = (screen.height - d.height) / 2;
 //    setLocation(x, y);
 //  }
+  private void center()
+  {
+    Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+    Dimension d = getSize();
+    int x = (screen.width - d.width) / 2;
+    int y = (screen.height - d.height) / 2;
+    setLocation(x, y);
+  }
 
   /**
    * This member variable holds the currently displayed image.
