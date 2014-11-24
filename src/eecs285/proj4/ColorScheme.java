@@ -6,15 +6,17 @@ public class ColorScheme
 {
   static Color colors[];
   static int numbercolors;
+  static String name;
   
   public ColorScheme()
   {
     // TODO Auto-generated constructor stub
   }
   
-  public ColorScheme(Color colArr[], int numCols){
+  public ColorScheme(String s, Color colArr[], int numCols){
     System.arraycopy(colArr, 0, colors, 0, colArr.length);
     numbercolors = numCols;
+    name = s;
   }
   
   public Color[] getColArr() {

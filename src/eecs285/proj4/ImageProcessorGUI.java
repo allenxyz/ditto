@@ -574,21 +574,20 @@ public class ImageProcessorGUI extends JFrame
       Apply = new JButton("Apply");
       Apply.addActionListener(new binColorApply());
       SaveSelection = new JButton("Save Selection");
+      SaveSelection.setEnabled(false);
       SaveSelection.addActionListener(new ActionListener(){
 
         @Override
         public void actionPerformed(ActionEvent e)
         {
-          /*String s = (String)JOptionPane.showInputDialog(
-              frame,
-              "Complete the sentence:\n"
-              + "\"Green eggs and...\"",
-              "Customized Dialog",
+          String s = (String)JOptionPane.showInputDialog(
+              ColorPickerDialog,
+              "Name your Color Scheme\n",
+              "Custom Name",
               JOptionPane.PLAIN_MESSAGE,
-              icon,
-              possibilities,
-              "ham");*/
-          ColorScheme customscheme = new ColorScheme(selectedColors,numBins);
+              
+              null, null, null);
+          ColorScheme customscheme = new ColorScheme(s, selectedColors,numBins);
 
           numCustom = numCustom + 1;
           
