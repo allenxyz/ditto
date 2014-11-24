@@ -82,7 +82,7 @@ public class ImageProcessorGUI extends JFrame
   private Graphics2D g2;
   
   private String storePath;
-
+  private Vector<BufferedImage> queue = new Vector<BufferedImage>(5);
 
   private ImageProcessor image;
   public static void main(String[] arg)
@@ -162,11 +162,24 @@ public class ImageProcessorGUI extends JFrame
 
     Exit = new JMenuItem("Exit Program");
     Undo = new JMenuItem("Undo");
+    Undo.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        if(!queue.isEmpty())
+        {
+          loadImage((BufferedImage)queue.lastElement());
+          queue.removeElementAt(queue.size() - 1);
+        }
+        System.out.println(queue.size());
+      }
+    });
     Redo = new JMenuItem("Redo");
     Reset = new JMenuItem("Reset");
     Reset.addActionListener(new ActionListener()
     {
-      public void actionPerformed(ActionEvent e){
+      public void actionPerformed(ActionEvent e)
+      {
         ImageDisplay.removeAll();
         loadImage(storePath);
       }
@@ -743,7 +756,7 @@ public class ImageProcessorGUI extends JFrame
   
   
   
-  private Vector<BufferedImage> queue = new Vector<BufferedImage>(5);
+
 
   void deepCopyerino(BufferedImage bi)
   {
@@ -751,11 +764,13 @@ public class ImageProcessorGUI extends JFrame
     if(queue.size() != 5)
     {
       queue.add(save);
+      System.out.println(queue.size());
     }
     else
     {
       queue.remove(0);
       queue.add(save);
+      System.out.println(queue.size());
     }
   }
   
@@ -808,10 +823,12 @@ public class ImageProcessorGUI extends JFrame
   {
      //mBufferedImage = image.getOriginal();
      BufferedImage binimage = deepCopy(mBufferedImage);
+
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
      pack();
      deepCopyerino(binimage);
+
   }
 
 
@@ -825,46 +842,47 @@ public class ImageProcessorGUI extends JFrame
      ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
      pack();
      deepCopyerino(binimage);
+
   }
   
   public void edgeDetector() {
+     deepCopyerino(mBufferedImage);
      mBufferedImage = image.getOriginal();
      BufferedImageOp op = (BufferedImageOp) image.mOps.get("Edge detector");
      mBufferedImage = op.filter(mBufferedImage, null);
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
      pack();
-     deepCopyerino(mBufferedImage);
   }
   
   public void invert() {
+     deepCopyerino(mBufferedImage);
      mBufferedImage = image.getOriginal();
      BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert");
      mBufferedImage = op.filter(mBufferedImage, null);
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
      pack();
-     deepCopyerino(mBufferedImage);
   }
   
   public void posterize() {
+     deepCopyerino(mBufferedImage);
      mBufferedImage = image.getOriginal();
      BufferedImageOp op = (BufferedImageOp) image.mOps.get("Posterize");
      mBufferedImage = op.filter(mBufferedImage, null);
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
      pack();
-     deepCopyerino(mBufferedImage);
   }
   
   public void blueInvert() {
+     deepCopyerino(mBufferedImage);
      mBufferedImage = image.getOriginal();
      BufferedImageOp op = (BufferedImageOp) image.mOps.get("Invert blue");
      mBufferedImage = op.filter(mBufferedImage, null);
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
      pack();
-     deepCopyerino(mBufferedImage);
   }
   
   public final int displayImageWidth = 800;
