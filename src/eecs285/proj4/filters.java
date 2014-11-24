@@ -5,7 +5,7 @@ import java.lang.Math.*;
 public class filters
 {
 
-  void valencia(rgb val)
+  static void valencia(rgb val)
   {
     hsl hslLayer = rgb2hsl(val);
     hslLayer.changeL(hslLayer.getL() + 12);
@@ -24,7 +24,7 @@ public class filters
     val.changeB(temp.getB());
   }
   
-  void greyscale(rgb val)
+  static void greyscale(rgb val)
   {
     cmyk cmykLayer = rgb2cmyk(val);
     cmykLayer.changeC(0);
@@ -36,7 +36,7 @@ public class filters
     val.changeB(temp.getB());
   }
   
-  public hsl rgb2hsl(rgb val)
+  static public hsl rgb2hsl(rgb val)
   {
     int rPrime = val.getR()/255;
     int gPrime = val.getG()/255;
@@ -74,7 +74,7 @@ public class filters
       return new hsl(hue, saturation, lightness);
     }
   
-  public rgb hsl2rgb(hsl val)
+  static public rgb hsl2rgb(hsl val)
   {
     int c = (1 - Math.abs(2 * val.getL())) * val.getS();
     int x = c * (1 - Math.abs((val.getH()/60) % 2 - 1));
@@ -126,7 +126,7 @@ public class filters
     return new rgb(red, green, blue);
   }
   
-  public cmyk rgb2cmyk(rgb val)
+  static public cmyk rgb2cmyk(rgb val)
   {
     int rPrime = val.getR()/255;
     int gPrime = val.getG()/255;
@@ -142,7 +142,7 @@ public class filters
   }
 
 
-  public rgb cmyk2rgb(cmyk val)
+  static public rgb cmyk2rgb(cmyk val)
   {
     int c = val.getC();
     int m = val.getM();
