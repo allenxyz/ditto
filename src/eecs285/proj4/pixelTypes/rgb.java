@@ -61,6 +61,10 @@ public class rgb {
    public int getB() {
       return b;
    }
+   
+   public String toString() {
+      return ("R: " + r + " G: " + g + " B: " + b); 
+   }
 
    public static rgb[][] toRGB(BufferedImage im) {
       int width = im.getWidth();

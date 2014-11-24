@@ -20,6 +20,7 @@ import java.io.*;
 
 import eecs285.proj4.Exceptions.EmptyTextFieldException;
 import eecs285.proj4.ImageProcessor;
+import eecs285.proj4.pixelTypes.rgb;
 import eecs285.proj4.server.*;
 
 import java.awt.event.*;
@@ -293,6 +294,7 @@ public class ImageProcessorGUI extends JFrame
     Filter.addItem("Blue Invert");
     Filter.addItem("Obama");
     Filter.addItem("Valencia");
+    Filter.addItem("Greyscale");
     Filter.setEnabled(false);
     Filter.addActionListener(new Filter());
 
@@ -660,7 +662,6 @@ public class ImageProcessorGUI extends JFrame
     }
   }
 
-  // NOT DONE
   public void obama()
   {
     Color darkBlue = new Color(29, 82, 97);
@@ -715,6 +716,10 @@ public class ImageProcessorGUI extends JFrame
       else if (Filter.getSelectedItem().equals("Valencia"))
       {
          valencia();
+      }
+      else if (Filter.getSelectedItem().equals("Greyscale"))
+      {
+         greyscale();
       }
 
       if( socket != null )
@@ -825,11 +830,25 @@ public class ImageProcessorGUI extends JFrame
 
   public void valencia()
   {
-     BufferedImage img = image.filterValencia();
+     deepCopyerino(mBufferedImage);
+     rgb[][] temp = rgb.toRGB(mBufferedImage);
+     mBufferedImage = image.filterValencia();
      ImageDisplay.removeAll();
      ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
      pack();
   }
+  
+  public void greyscale()
+  {
+     deepCopyerino(mBufferedImage);
+     rgb[][] temp = rgb.toRGB(mBufferedImage);
+     mBufferedImage = image.filterGreyscale();
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+     pack();
+  }
+  
+  
 
   public void noFilter()
   {

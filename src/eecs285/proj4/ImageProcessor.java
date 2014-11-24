@@ -290,12 +290,31 @@ public class ImageProcessor extends Frame
   
   
   public BufferedImage filterValencia() {
-     rgb[][] rgbs = rgb.toRGB(mBufferedImage);
+     rgb[][] rgbs = rgb.toRGB(savedOriginal);
+     
+//     for (int i = 0 ; i < rgbs.length ; i += 1) 
+//        for (int j = 0 ; j < rgbs[0].length ; j += 1)
+//           System.out.println(rgbs[i][j].toString());
+//
+//     
      for (int i = 0 ; i < rgbs.length ; i += 1) 
-     {
         for (int j = 0 ; j < rgbs[0].length ; j += 1)
            filters.valencia(rgbs[i][j]);
-     }
+     
+//     for (int i = 0 ; i < rgbs.length ; i += 1) 
+//        for (int j = 0 ; j < rgbs[0].length ; j += 1)
+//           System.out.println(rgbs[i][j].toString());
+//     
+     return rgb.toImage(rgbs);
+  }
+  
+  public BufferedImage filterGreyscale() {
+     rgb[][] rgbs = rgb.toRGB(savedOriginal);
+
+     for (int i = 0 ; i < rgbs.length ; i += 1) 
+      for (int j = 0 ; j < rgbs[0].length ; j += 1)
+         filters.greyscale(rgbs[i][j]);
+     
      return rgb.toImage(rgbs);
   }
   
