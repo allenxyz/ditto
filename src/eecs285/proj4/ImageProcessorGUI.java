@@ -711,7 +711,7 @@ public class ImageProcessorGUI extends JFrame
 
   public void bins()
   {
-    mBufferedImage = image.getOriginal();
+    //mBufferedImage = image.getOriginal();
     BufferedImage binimage = deepCopy(mBufferedImage);
     // colorBin(binimage);
     ImageDisplay.removeAll();
@@ -806,23 +806,25 @@ public class ImageProcessorGUI extends JFrame
 
   public void noFilter()
   {
-     mBufferedImage = image.getOriginal();
+     //mBufferedImage = image.getOriginal();
+     BufferedImage binimage = deepCopy(mBufferedImage);
      ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+     ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
      pack();
-     deepCopyerino(mBufferedImage);
+     deepCopyerino(binimage);
   }
 
 
   public void sharpen()
   {
-     mBufferedImage = image.getOriginal();
+     //mBufferedImage = image.getOriginal();
+     BufferedImage binimage = deepCopy(mBufferedImage);
      BufferedImageOp op = (BufferedImageOp) image.mOps.get("Sharpen");
-     mBufferedImage = op.filter(mBufferedImage, null);
+     binimage = op.filter(binimage, null);
      ImageDisplay.removeAll();
-     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+     ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
      pack();
-     deepCopyerino(mBufferedImage);
+     deepCopyerino(binimage);
   }
   
   public void edgeDetector() {
