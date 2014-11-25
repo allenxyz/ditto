@@ -191,6 +191,7 @@ public class ImageProcessor extends Frame
       radius = halflength;
     else
       radius = halfwidth;
+    System.out.println("radius: " + radius);
     
     for( int i = 0; i < binimage.getWidth(); ++i )
     {
@@ -203,9 +204,10 @@ public class ImageProcessor extends Frame
         int green = (argb >> 8) & 0xff; // green
         int blue = (argb) & 0xff; // blue
         //int currentBrightness = calculateBrightness(red, green, blue);
-        double x = (double)i - radius;
-        double y = (double)j - radius;
-        double radi = Math.sqrt((x*x) *(y*y));
+        double x = (double)i - halfwidth;
+        double y = (double)j - halflength;
+        double radi = Math.sqrt((x*x) +(y*y));
+        //System.out.println(radi);
         if(radi <= radius){
           //Nothing
         }else if(radi > radius){
