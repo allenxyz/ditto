@@ -181,6 +181,48 @@ public class ImageProcessor extends Frame
     return dstImage;
   }
 
+  public static BufferedImage FilterVignette(BufferedImage binimage)
+  {
+
+    double halflength = (binimage.getHeight())/2;
+    double halfwidth = (binimage.getWidth())/2;
+    double radius;
+    if(halflength < halfwidth)
+      radius = halflength;
+    else
+      radius = halfwidth;
+    
+    for( int i = 0; i < binimage.getWidth(); ++i )
+    {
+      for( int j = 0; j < binimage.getHeight(); ++j )
+      {
+        int argb = binimage.getRGB(i, j);
+        //System.out.println("old ARGB =" + argb);
+        int alpha = (argb >> 24) & 0xff;
+        int red = (argb >> 16) & 0xff; // red
+        int green = (argb >> 8) & 0xff; // green
+        int blue = (argb) & 0xff; // blue
+        //int currentBrightness = calculateBrightness(red, green, blue);
+        double x = (double)i - radius;
+        double y = (double)j - radius;
+        double radi = Math.sqrt((x*x) *(y*y));
+        if(radi <= radius){
+          //Nothing
+        }else if(radi > radius){
+          double darkness = radi/radius;
+          red = (int)Math.round(red/darkness);
+          //System.out.println(red);
+          green = (int)Math.round(green/darkness);
+          blue = (int)Math.round(blue/darkness);
+          argb = (alpha << 24) | (red << 16) | (green << 8) | blue;
+          binimage.setRGB(i, j, argb);
+          //System.out.println("new ARGB = " + argb);
+        }
+
+      }
+    }
+    return binimage;
+  }
 
   // /**
   // * All paint() has to do is show the current image.

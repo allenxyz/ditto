@@ -387,6 +387,7 @@ public class ImageProcessorGUI extends JFrame
     UtilityFilters.addItem("Neutral");
     UtilityFilters.addItem("Coffee");
     UtilityFilters.addItem("Greyscale");
+    UtilityFilters.addItem("Vignette");
     UtilityFilters.addItem("tint");
     UtilityFilters.setEnabled(false);
     UtilityFilters.addActionListener(new Filter());
@@ -886,6 +887,8 @@ public class ImageProcessorGUI extends JFrame
     }
     deepCopyerino(binimage);
   }
+  
+
 
   public void obama()
   {
@@ -976,6 +979,9 @@ public class ImageProcessorGUI extends JFrame
       else if( Filter.getSelectedItem().equals("Greyscale") )
       {
         greyscale();
+      }
+      else if(Filter.getSelectedItem().equals("Vignette")){
+        vignette();
       }
       else if( Filter.getSelectedItem().equals("tint") )
       {
@@ -1132,6 +1138,18 @@ public class ImageProcessorGUI extends JFrame
     deepCopyerino(curImage);
   }
 
+  public void vignette()
+  {
+    if( stackFilter.isSelected() )
+      curImage = ImageProcessor.FilterVignette(curImage);
+    else
+      curImage = ImageProcessor.FilterVignette(mBufferedImage);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+    pack();
+    deepCopyerino(curImage);
+  }
+  
   public void noFilter()
   {
     ImageDisplay.removeAll();
