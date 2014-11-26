@@ -153,24 +153,51 @@ public class ImageProcessor extends Frame
   /**
    * This member variable holds the currently displayed image.
    **/
-  public static BufferedImage filterValencia(BufferedImage img)
-  {
-    rgb[][] rgbs = rgb.toRGB(img);
+  public static BufferedImage filterValencia(BufferedImage orig)
+  {/*
+    * rgb[][] rgbs = rgb.toRGB(img);
+    * 
+    * // for (int i = 0 ; i < rgbs.length ; i += 1) // for (int j = 0 ; j <
+    * rgbs[0].length ; j += 1) // System.out.println(rgbs[i][j].toString()); //
+    * // for( int i = 0; i < rgbs.length; i += 1 ) for( int j = 0; j <
+    * rgbs[0].length; j += 1 ) filters.valencia(rgbs[i][j]);
+    * 
+    * // for (int i = 0 ; i < rgbs.length ; i += 1) // for (int j = 0 ; j <
+    * rgbs[0].length ; j += 1) // System.out.println(rgbs[i][j].toString()); //
+    * return rgb.toImage(rgbs)
+    */
 
-    // for (int i = 0 ; i < rgbs.length ; i += 1)
-    // for (int j = 0 ; j < rgbs[0].length ; j += 1)
-    // System.out.println(rgbs[i][j].toString());
-    //
-    //
-    for( int i = 0; i < rgbs.length; i += 1 )
-      for( int j = 0; j < rgbs[0].length; j += 1 )
-        filters.valencia(rgbs[i][j]);
+    BufferedImage img = ImageProcessorGUI.deepCopy(orig);
+    for( int i = 0; i < img.getWidth(); i++ )
+    {
+      for( int j = 0; j < img.getHeight(); j++ )
+      {
 
-    // for (int i = 0 ; i < rgbs.length ; i += 1)
-    // for (int j = 0 ; j < rgbs[0].length ; j += 1)
-    // System.out.println(rgbs[i][j].toString());
-    //
-    return rgb.toImage(rgbs);
+        Color color = new Color(img.getRGB(i, j));
+        // Here's how to mess with hsb/hsv
+        float[] hsb = new float[3];
+        // this guy modifies the float[]
+        Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsb);
+        // decrease saturation
+        if( hsb[1] > .7 )
+        {
+          hsb[1] -= .3;
+        }
+        // increase brightness
+        if( hsb[2] < .88 )
+        {
+          hsb[2] += .05;
+        }
+        Color myRGBColor = Color.getHSBColor(hsb[0], hsb[1], hsb[2]);
+
+        int newRed = ImageProcessorGUI.putInRange(myRGBColor.getRed());
+        int newGreen = ImageProcessorGUI.putInRange(myRGBColor.getGreen());
+        int newBlue = ImageProcessorGUI.putInRange(myRGBColor.getBlue() - 10);
+        myRGBColor = new Color(newRed, newGreen, newBlue);
+        img.setRGB(i, j, myRGBColor.getRGB());
+      }
+    }
+    return img;
   }
 
   public static BufferedImage filterGreyscale(BufferedImage img)
@@ -183,44 +210,69 @@ public class ImageProcessor extends Frame
     return dstImage;
   }
 
+  public static BufferedImage filterTint(BufferedImage loadImg)
+  {
+    BufferedImage img = ImageProcessorGUI.deepCopy(loadImg);
+    for( int i = 0; i < img.getWidth(); i++ )
+    {
+      for( int j = 0; j < img.getHeight(); j++ )
+      {
+
+
+        Color color = new Color(img.getRGB(i, j));
+        // This makes a warm filter
+        int newRed = ImageProcessorGUI.putInRange(color.getRed() + 17);
+        int newGreen = ImageProcessorGUI.putInRange(color.getGreen() - 17);
+        int newBlue = ImageProcessorGUI.putInRange(color.getBlue() - 20);
+        color = new Color(newRed, newGreen, newBlue);
+        Color brighter = color.brighter();
+        img.setRGB(i, j, brighter.getRGB());
+      }
+    }
+    return img;
+  }
+
   public static BufferedImage FilterVignette(BufferedImage orig)
   {
     BufferedImage binimage = ImageProcessorGUI.deepCopy(orig);
-    double halflength = (binimage.getHeight())/2;
-    double halfwidth = (binimage.getWidth())/2;
+    double halflength = (binimage.getHeight()) / 2;
+    double halfwidth = (binimage.getWidth()) / 2;
     double radius;
-    if(halflength < halfwidth)
+    if( halflength < halfwidth )
       radius = halflength;
     else
       radius = halfwidth;
-    //System.out.println("radius: " + radius);
-    
+    // System.out.println("radius: " + radius);
+
     for( int i = 0; i < binimage.getWidth(); ++i )
     {
       for( int j = 0; j < binimage.getHeight(); ++j )
       {
         int argb = binimage.getRGB(i, j);
-        //System.out.println("old ARGB =" + argb);
+        // System.out.println("old ARGB =" + argb);
         int alpha = (argb >> 24) & 0xff;
         int red = (argb >> 16) & 0xff; // red
         int green = (argb >> 8) & 0xff; // green
         int blue = (argb) & 0xff; // blue
-        //int currentBrightness = calculateBrightness(red, green, blue);
-        double x = (double)i - halfwidth;
-        double y = (double)j - halflength;
-        double radi = Math.sqrt((x*x) +(y*y));
-        //System.out.println(radi);
-        if(radi <= radius){
-          //Nothing
-        }else if(radi > radius){
-          double darkness = radi/radius;
-          red = (int)Math.round(red/darkness);
-          //System.out.println(red);
-          green = (int)Math.round(green/darkness);
-          blue = (int)Math.round(blue/darkness);
+        // int currentBrightness = calculateBrightness(red, green, blue);
+        double x = (double) i - halfwidth;
+        double y = (double) j - halflength;
+        double radi = Math.sqrt((x * x) + (y * y));
+        // System.out.println(radi);
+        if( radi <= radius )
+        {
+          // Nothing
+        }
+        else if( radi > radius )
+        {
+          double darkness = radi / radius;
+          red = (int) Math.round(red / darkness);
+          // System.out.println(red);
+          green = (int) Math.round(green / darkness);
+          blue = (int) Math.round(blue / darkness);
           argb = (alpha << 24) | (red << 16) | (green << 8) | blue;
           binimage.setRGB(i, j, argb);
-          //System.out.println("new ARGB = " + argb);
+          // System.out.println("new ARGB = " + argb);
         }
 
       }
@@ -228,30 +280,34 @@ public class ImageProcessor extends Frame
     return binimage;
   }
 
-  public static BufferedImage CircleBlurFilter(BufferedImage orig, BufferedImage op)
+  public static BufferedImage CircleBlurFilter(BufferedImage orig,
+      BufferedImage op)
   {
     BufferedImage binimage = ImageProcessorGUI.deepCopy(orig);
-    double halflength = (binimage.getHeight())/2;
-    double halfwidth = (binimage.getWidth())/2;
+    double halflength = (binimage.getHeight()) / 2;
+    double halfwidth = (binimage.getWidth()) / 2;
     double radius;
-    if(halflength < halfwidth)
+    if( halflength < halfwidth )
       radius = halflength;
     else
       radius = halfwidth;
-    //System.out.println("radius: " + radius);
-    
+    // System.out.println("radius: " + radius);
+
     for( int i = 0; i < binimage.getWidth(); ++i )
     {
       for( int j = 0; j < binimage.getHeight(); ++j )
       {
-        double x = (double)i - halfwidth;
-        double y = (double)j - halflength;
+        double x = (double) i - halfwidth;
+        double y = (double) j - halflength;
 
-        double radi = Math.sqrt((x*x) +(y*y));
-        //System.out.println(radi);
-        if(radi <= radius){
-          //Nothing
-        }else if(radi > radius){
+        double radi = Math.sqrt((x * x) + (y * y));
+        // System.out.println(radi);
+        if( radi <= radius )
+        {
+          // Nothing
+        }
+        else if( radi > radius )
+        {
           int blurred = op.getRGB(i, j);
           binimage.setRGB(i, j, blurred);
 
@@ -261,7 +317,7 @@ public class ImageProcessor extends Frame
     }
     return binimage;
   }
-  
+
   // /**
   // * All paint() has to do is show the current image.
   // **/

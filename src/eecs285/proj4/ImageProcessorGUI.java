@@ -204,9 +204,8 @@ public class ImageProcessorGUI extends JFrame
       {
         System.exit(0);
       }
-      
-      
-      
+
+
     });
 
     Undo = new JMenuItem("Undo");
@@ -389,7 +388,8 @@ public class ImageProcessorGUI extends JFrame
     UtilityFilters.addItem("Greyscale");
     UtilityFilters.addItem("Vignette");
     UtilityFilters.addItem("Circle Blur");
-    UtilityFilters.addItem("tint");
+    UtilityFilters.addItem("Tint");
+    UtilityFilters.addItem("Valencia");
     UtilityFilters.setEnabled(false);
     UtilityFilters.addActionListener(new Filter());
 
@@ -450,9 +450,10 @@ public class ImageProcessorGUI extends JFrame
           colorBinTwoPointOh(curImage, found.getnumber(), found.getColArr());
           ImageDisplay.removeAll();
           ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-          //make the utilities default to none
-          //FIX THIS - issue is that it can set default but then won't apply filter
-          //UtilityFilters.setSelectedItem("None");
+          // make the utilities default to none
+          // FIX THIS - issue is that it can set default but then won't apply
+          // filter
+          // UtilityFilters.setSelectedItem("None");
           pack();
         }
 
@@ -486,17 +487,16 @@ public class ImageProcessorGUI extends JFrame
     // add(apply);
 
     setMinimumSize(new Dimension(1120, 650));
-    
-    
+
+
     START = new JMenuItem("Start");
     Menu.add(START);
-//    START.addActionListener(new ActionListener() {
-//       public void actionPerformered(ActionEvent e) {
-//       }
-//    });
-    
-    
-    
+    // START.addActionListener(new ActionListener() {
+    // public void actionPerformered(ActionEvent e) {
+    // }
+    // });
+
+
   }
 
   public void loadImage(String fileName)
@@ -544,13 +544,14 @@ public class ImageProcessorGUI extends JFrame
     CustomFilters.setSelectedItem("Pick one: ");
     queue.removeElementAt(queueSize);
     queueSize--;
-    
-    if (!isLoaded) {
-       queue.removeElementAt(queueSize);
-       queueSize--;
-       Undo.setEnabled(false);
+
+    if( !isLoaded )
+    {
+      queue.removeElementAt(queueSize);
+      queueSize--;
+      Undo.setEnabled(false);
     }
-    
+
     isLoaded = true;
 
     if( socket != null )
@@ -888,7 +889,6 @@ public class ImageProcessorGUI extends JFrame
     }
     deepCopyerino(binimage);
   }
-  
 
 
   public void obama()
@@ -981,27 +981,28 @@ public class ImageProcessorGUI extends JFrame
       {
         greyscale();
       }
-      else if(Filter.getSelectedItem().equals("Vignette")){
+      else if( Filter.getSelectedItem().equals("Vignette") )
+      {
         vignette();
       }
-      else if(Filter.getSelectedItem().equals("Circle Blur")){
+      else if( Filter.getSelectedItem().equals("Circle Blur") )
+      {
         circleBlur();
       }
-      else if( Filter.getSelectedItem().equals("tint") )
+      else if( Filter.getSelectedItem().equals("Valencia") )
       {
-        Color temp = new Color(225, 161, 82);
-        curImage = tint(curImage, temp.getRed(), temp.getGreen(),
-            temp.getBlue());
-        ImageDisplay.removeAll();
-        ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-        pack();
+        valencia();
+      }
+      else if( Filter.getSelectedItem().equals("Tint") )
+      {
+        tint();
       }
 
       if( socket != null )
         socket.eventOccurred(Filter.getSelectedItem().toString());
-      //make custom filter popup default back to orig
-      //FIX THIS - issue is that it can set default but then won't apply filter
-      //CustomFilters.setSelectedItem("Pick one: ");
+      // make custom filter popup default back to orig
+      // FIX THIS - issue is that it can set default but then won't apply filter
+      // CustomFilters.setSelectedItem("Pick one: ");
     }
   }
 
@@ -1020,17 +1021,20 @@ public class ImageProcessorGUI extends JFrame
     pack();
   }
 
-  public BufferedImage tint(BufferedImage loadImg, int red, int green, int blue)
+  public static int putInRange(int rgbComponent)
   {
-    BufferedImage img = new BufferedImage(loadImg.getWidth(),
-        loadImg.getHeight(), BufferedImage.TRANSLUCENT);
-    Graphics2D graphics = img.createGraphics();
-    Color newColor = new Color(red, green, blue, 0 /* alpha needs to be zero */);
-    graphics.setXORMode(newColor);
-    graphics.drawImage(loadImg, null, 0, 0);
-    // graphics.dispose();
-    return img;
+
+    if( rgbComponent < 0 )
+    {
+      rgbComponent = 0;
+    }
+    else if( rgbComponent > 255 )
+    {
+      rgbComponent = 255;
+    }
+    return rgbComponent;
   }
+
 
   static BufferedImage deepCopy(BufferedImage bi)
   {
@@ -1120,6 +1124,8 @@ public class ImageProcessorGUI extends JFrame
 
   public void valencia()
   {
+
+
     if( stackFilter.isSelected() )
       curImage = ImageProcessor.filterValencia(curImage);
     else
@@ -1153,7 +1159,18 @@ public class ImageProcessorGUI extends JFrame
     pack();
     deepCopyerino(curImage);
   }
-  
+
+  public void tint()
+  {
+    if( stackFilter.isSelected() )
+      curImage = ImageProcessor.filterTint(curImage);
+    else
+      curImage = ImageProcessor.filterTint(mBufferedImage);
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+    pack();
+  }
+
   public void noFilter()
   {
     ImageDisplay.removeAll();
@@ -1177,22 +1194,24 @@ public class ImageProcessorGUI extends JFrame
     pack();
     deepCopyerino(curImage);
   }
-  
+
   public void circleBlur()
   {
     BufferedImageOp op = (BufferedImageOp) image.mOps.get("Blur");
     BufferedImage BlurImage;
-    
-    if( stackFilter.isSelected() ){
+
+    if( stackFilter.isSelected() )
+    {
       BlurImage = op.filter(curImage, null);
       curImage = ImageProcessor.CircleBlurFilter(curImage, BlurImage);
     }
-    else{
+    else
+    {
       BlurImage = op.filter(mBufferedImage, null);
       curImage = ImageProcessor.CircleBlurFilter(mBufferedImage, BlurImage);
     }
-     
-    
+
+
     ImageDisplay.removeAll();
     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
     pack();
