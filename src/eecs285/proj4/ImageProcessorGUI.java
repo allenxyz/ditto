@@ -388,6 +388,7 @@ public class ImageProcessorGUI extends JFrame
     UtilityFilters.addItem("Coffee");
     UtilityFilters.addItem("Greyscale");
     UtilityFilters.addItem("Vignette");
+    UtilityFilters.addItem("Circle Blur");
     UtilityFilters.addItem("tint");
     UtilityFilters.setEnabled(false);
     UtilityFilters.addActionListener(new Filter());
@@ -983,6 +984,9 @@ public class ImageProcessorGUI extends JFrame
       else if(Filter.getSelectedItem().equals("Vignette")){
         vignette();
       }
+      else if(Filter.getSelectedItem().equals("Circle Blur")){
+        circleBlur();
+      }
       else if( Filter.getSelectedItem().equals("tint") )
       {
         Color temp = new Color(225, 161, 82);
@@ -1168,6 +1172,27 @@ public class ImageProcessorGUI extends JFrame
     else
       curImage = op.filter(mBufferedImage, null);
 
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+    pack();
+    deepCopyerino(curImage);
+  }
+  
+  public void circleBlur()
+  {
+    BufferedImageOp op = (BufferedImageOp) image.mOps.get("Blur");
+    BufferedImage BlurImage;
+    
+    if( stackFilter.isSelected() ){
+      BlurImage = op.filter(curImage, null);
+      curImage = ImageProcessor.CircleBlurFilter(curImage, BlurImage);
+    }
+    else{
+      BlurImage = op.filter(mBufferedImage, null);
+      curImage = ImageProcessor.CircleBlurFilter(mBufferedImage, BlurImage);
+    }
+     
+    
     ImageDisplay.removeAll();
     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
     pack();
