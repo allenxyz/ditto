@@ -36,6 +36,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import com.sun.org.apache.xerces.internal.dom.DeepNodeListImpl;
+
 
 public class ImageProcessor extends Frame
 {
@@ -181,9 +183,9 @@ public class ImageProcessor extends Frame
     return dstImage;
   }
 
-  public static BufferedImage FilterVignette(BufferedImage binimage)
+  public static BufferedImage FilterVignette(BufferedImage orig)
   {
-
+    BufferedImage binimage = ImageProcessorGUI.deepCopy(orig);
     double halflength = (binimage.getHeight())/2;
     double halfwidth = (binimage.getWidth())/2;
     double radius;
@@ -226,9 +228,9 @@ public class ImageProcessor extends Frame
     return binimage;
   }
 
-  public static BufferedImage CircleBlurFilter(BufferedImage binimage, BufferedImage op)
+  public static BufferedImage CircleBlurFilter(BufferedImage orig, BufferedImage op)
   {
-
+    BufferedImage binimage = ImageProcessorGUI.deepCopy(orig);
     double halflength = (binimage.getHeight())/2;
     double halfwidth = (binimage.getWidth())/2;
     double radius;
