@@ -14,8 +14,6 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.imageio.ImageIO;
 
-import sun.java2d.loops.RenderCache;
-
 import java.io.*;
 
 import eecs285.proj4.Exceptions.EmptyTextFieldException;
@@ -40,8 +38,6 @@ public class ImageProcessorGUI extends JFrame
   private JMenuItem Undo;
   private JMenuItem Redo;
   private JMenuItem Reset;
-  private JMenuItem Send;
-  private JMenuItem START;
 
   boolean isLoaded = false;
 
@@ -158,9 +154,8 @@ public class ImageProcessorGUI extends JFrame
         String path = fd.getDirectory() + fd.getFile();
         ImageDisplay.removeAll();
         loadImage(path);
-        // repaint();
-        // ImageDisplay.add(DisplayImage);
-        // ImageDisplay.add()
+        if( socket != null )
+           socket.loadOccurred(mBufferedImage);
       }
     });
     Save = new JMenuItem("Save Image");
@@ -189,14 +184,6 @@ public class ImageProcessorGUI extends JFrame
       }
     });
 
-    Send = new JMenuItem("Send Image");
-    Send.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent e)
-      {
-        socket.sendInfo(curImage);
-      }
-    });
     Exit = new JMenuItem("Exit Program");
     Exit.addActionListener(new ActionListener()
     {
@@ -257,7 +244,6 @@ public class ImageProcessorGUI extends JFrame
 
     File.add(Open);
     File.add(Save);
-    File.add(Send);
     File.add(Exit);
     Edit.add(Undo);
     Edit.add(Redo);
@@ -487,17 +473,8 @@ public class ImageProcessorGUI extends JFrame
     // add(apply);
 
     setMinimumSize(new Dimension(1120, 650));
-
-
-    START = new JMenuItem("Start");
-    Menu.add(START);
-    // START.addActionListener(new ActionListener() {
-    // public void actionPerformered(ActionEvent e) {
-    // }
-    // });
-
-
   }
+
 
   public void loadImage(String fileName)
   {
@@ -525,12 +502,6 @@ public class ImageProcessorGUI extends JFrame
     Graphics2D g2 = mBufferedImage.createGraphics();
     g2.drawImage(grabimage, null, ImageDisplay);
 
-    // adjustToImageSize();
-    // center();
-    // ImageDisplay.validate();
-    // ImageDisplay.repaint();
-
-    // setTitle(kBanner + ": " + fileName);
     resizeToScale();
     ImageIcon disp = new ImageIcon(mBufferedImage);
     ImageDisplay.removeAll();
@@ -554,8 +525,6 @@ public class ImageProcessorGUI extends JFrame
 
     isLoaded = true;
 
-    if( socket != null )
-      socket.loadOccurred(mBufferedImage);
   }
 
   // overloaded so that the other player can load the image directly from an
@@ -581,7 +550,6 @@ public class ImageProcessorGUI extends JFrame
         grabimage.getHeight(null), BufferedImage.TYPE_INT_RGB);
     g2 = mBufferedImage.createGraphics();
     g2.drawImage(grabimage, null, ImageDisplay);
-    image = new ImageProcessor();
     ImageIcon disp = new ImageIcon(mBufferedImage);
     ImageDisplay.removeAll();
     ImageDisplay.add(new JLabel(disp));
@@ -589,6 +557,21 @@ public class ImageProcessorGUI extends JFrame
     isLoaded = true;
     resizeToScale();
     curImage = deepCopy(mBufferedImage);
+    
+    // Use a MediaTracker to fully load the image.
+    UtilityFilters.setSelectedItem("None");
+    CustomFilters.setSelectedItem("Pick one: ");
+    queue.removeElementAt(queueSize);
+    queueSize--;
+
+    if( !isLoaded )
+    {
+      queue.removeElementAt(queueSize);
+      queueSize--;
+      Undo.setEnabled(false);
+    }
+
+    isLoaded = true;
   }
 
   public static void saveImage(File outputFile) throws IOException
@@ -1315,5 +1298,20 @@ public class ImageProcessorGUI extends JFrame
     deepCopyerino(mBufferedImage);
     Reset.setEnabled(true);
   }
+  
+  public JComboBox<String> getUtilityFilterComboBox() 
+  {
+     return UtilityFilters;
+  }
+  
+  public JComboBox<String> getCustomFiltersComboBox()
+  {
+     return CustomFilters;
+  }
+  public JComboBox<String> getPresetFiltersComboBox()
+  {
+     return PresetFilters;
+  }
+  
 
 }
