@@ -590,10 +590,10 @@ public class ImageProcessorGUI extends JFrame
           if (paintColor == null || !isLoaded || !filePath.equals("")) return;
           Graphics2D g = (Graphics2D)ImageDisplay.getGraphics();
           g.setColor(paintColor);
-          g.fillOval(e.getX(), e.getY(), brushSize, brushSize);
+          g.fillOval(e.getX() - brushSize/2, e.getY() - brushSize/2, brushSize, brushSize);
           Graphics2D g2 = curImage.createGraphics();
           g2.setColor(paintColor);
-          g2.fill(new Ellipse2D.Float(e.getX(), e.getY(), brushSize, brushSize));
+          g2.fill(new Ellipse2D.Float(e.getX() - brushSize/2, e.getY() - brushSize/2, brushSize, brushSize));
           g2.dispose();
        }
     });
