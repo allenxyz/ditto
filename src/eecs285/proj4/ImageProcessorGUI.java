@@ -351,7 +351,7 @@ public class ImageProcessorGUI extends JFrame
     //***** paintSizePanel
     
     JPanel paintSizePanel = new JPanel();
-    JTextField paintSize = new JTextField(5);
+    final JTextField paintSize = new JTextField(5);
     JButton submitSize =  new JButton("Submit");
     submitSize.addActionListener(new ActionListener()
     {
