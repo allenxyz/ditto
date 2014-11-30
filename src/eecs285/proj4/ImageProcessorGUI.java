@@ -731,7 +731,43 @@ public class ImageProcessorGUI extends JFrame
       isLoaded = true;
       Undo.setEnabled(false);
     }
-  } //end loadImages stuff
+  } 
+
+  //this one doesn't overwrite the original image - need it for networking
+  public void setImage(Image grabimage)
+  {
+    // Use a MediaTracker to fully load the image.
+    UtilityFilters.setEnabled(true);
+    Enter.setEnabled(true);
+    MediaTracker mt = new MediaTracker(this);
+    mt.addImage(grabimage, 0);
+    try
+    {
+      mt.waitForID(0);
+    }
+    catch( InterruptedException ie )
+    {
+      return;
+    }
+    if( mt.isErrorID(0) )
+      return;
+    curImage = new BufferedImage(grabimage.getWidth(null),
+        grabimage.getHeight(null), BufferedImage.TYPE_INT_RGB);
+    g2 = curImage.createGraphics();
+    g2.drawImage(grabimage, null, ImageDisplay);
+    
+    resizeToScale();
+    
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+    pack();
+    
+    deepCopyerino(curImage);
+    if( !isLoaded ) {
+      isLoaded = true;
+      Undo.setEnabled(false);
+    }
+  }  //end loadImages stuff
 
   
   
