@@ -21,6 +21,8 @@ import javax.swing.JOptionPane;
 import eecs285.proj4.ImageProcessorGUI;
 
 public abstract class ImageProcessingSocket {
+   
+   //variables + functions needed
    protected String ipAddr;
    protected int portNum;
    protected ImageProcessorGUI win;
@@ -28,19 +30,31 @@ public abstract class ImageProcessingSocket {
    protected DataOutputStream outData;
    protected DataInputStream inData;
 
+
+   public abstract void start();
+   
+   
+   //************************constructor**************
    public ImageProcessingSocket(String inIPAddr, int inPortNum) {
       ipAddr = inIPAddr;
       portNum = inPortNum;
       outData = null;
       inData = null;
-   }
+   }//end constructor
 
-   public abstract void start();
+   
+   
+   
+   //********************OCCURRED functions********************
+   //these will be called when something happens, 
+   // the other side will need to know what exactly happend
 
    // these are the functions that will write to the outData
    // if the first byte is :
    // 1 - it is an event that occured
    // 2 - a load image occured
+   // 3 - a binning filter occurred
+   // 4 - an image (not LOAD) was sent 
    final public boolean eventOccurred(String e) {
       boolean success = false;
       System.out.println("event Occurred: " + e);
@@ -54,7 +68,7 @@ public abstract class ImageProcessingSocket {
          System.exit(-1);
       }
       return success;
-   }
+   }//end eventOccurred
 
    final public boolean loadOccurred(BufferedImage im) {
       boolean success = false;
@@ -75,32 +89,53 @@ public abstract class ImageProcessingSocket {
          System.exit(-1);
       }
       return success;
-   }
-   
+   }//end loadOccurred
+
    final public boolean binOccurred(int numColors, Color[] colors) {
       boolean success = false;
-      
+
       try {
          outData.writeInt(3);
          outData.writeInt(numColors);
          for (int i = 0; i < numColors; i++) {
             outData.writeInt(colors[i].hashCode());
-            System.out.println("Color: " + colors[i].hashCode() + "; " + colors[i].toString());
-//            outData.writeChar('\0');
+            System.out.println("Color: " + colors[i].hashCode() + "; "
+                  + colors[i].toString());
          }
          success = true;
-      }
-      catch (Exception except) {
+      } catch (Exception except) {
          System.out.println("Failed to send a binned Image");
          except.printStackTrace();
          System.exit(-1);
       }
-      
+
       return success;
-   }
+   }//end binOccurred
+   
+   final public void sendImage(BufferedImage im) {
+      if (im == null)
+         System.out.println("Sending an empty image....");
+      try {
+         outData.writeInt(4);
+         // convert buffered image to byte array
+         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         ImageIO.write(im, "jpg", baos);
+         byte[] size = ByteBuffer.allocate(4).putInt(baos.size()).array();
+         outData.write(size);
+         outData.write(baos.toByteArray());
+      } catch (Exception except) {
+         System.out.println("Filed to load image TO the Server side");
+         System.exit(-1);
+      }
+   }//end sendImage
 
    
-   //this function is the interface to recieve things from inData
+
+   //end occurring functions
+   
+   
+   //**********************RECIEVE INPUT function*******************
+   // this function is the interface to recieve things from inData
    // essentially just needs to check the first byte, then call the
    // corresponding function to do the appropriate job
    final public void receiveInput() {
@@ -118,122 +153,122 @@ public abstract class ImageProcessingSocket {
          binRecieve();
       else if (read == 4)
          imageRecieve();
-   }
-   
+   } //end recieveInput
    
 
+   // check input only checks if there is any input in the input data stream
+   // will try to recieve input if there is
+   final public boolean checkInput() {
+      try {
+         if (inData.available() != 0) {
+            receiveInput();
+            return true;
+         }
+      } catch (Exception e) {
+         System.out.println("Socket Error: checkInput");
+      }
+      return false;
+   } //end checkInput
+   
+   //end input functions
+   
+
+   
+   //*****************************RECEIVING FUNCTIONS**********************
+   //main receiving function that figures out what filter occurred and calls
+   //the corresponding function
    final private void eventRecieve() {
       char recChar;
       String receivedString = "";
 
-      try
-      {
+      try {
          recChar = inData.readChar();
-         while (recChar != '0')
-         {
+         while (recChar != '0') {
             receivedString += recChar;
             recChar = inData.readChar();
          }
-      }catch (IOException ioe) {
+      } catch (IOException ioe) {
          out.println("ERROR: receiving string from socket");
          System.exit(8);
       }
       System.out.println("abcd");
       System.out.println("Received string is: " + receivedString);
       if (receivedString.trim().equals("Sharpen")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("Sharpen");
+         // win.getUtilityFilterComboBox().setSelectedItem("Sharpen");
          System.out.println("Sharpen was called");
          win.sharpen();
          System.out.println("Sharpen was ended");
-      }
-      else if (receivedString.trim().equals("None")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("None");
+      } else if (receivedString.trim().equals("None")) {
+         // win.getUtilityFilterComboBox().setSelectedItem("None");
          win.noFilter();
-      }
-      else if (receivedString.trim().equals("Edge Detector")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("Edge Detector");
+      } else if (receivedString.trim().equals("Edge Detector")) {
+         // win.getUtilityFilterComboBox().setSelectedItem("Edge Detector");
          win.edgeDetector();
-      }
-      else if (receivedString.trim().equals("Invert")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("Invert");
+      } else if (receivedString.trim().equals("Invert")) {
+         // win.getUtilityFilterComboBox().setSelectedItem("Invert");
          win.invert();
-      }
-      else if (receivedString.trim().equals("Posterize")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("Posterize");
+      } else if (receivedString.trim().equals("Posterize")) {
+         // win.getUtilityFilterComboBox().setSelectedItem("Posterize");
          win.posterize();
-      }
-      else if (receivedString.trim().equals("Blue Invert")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("Blue Invert");
+      } else if (receivedString.trim().equals("Blue Invert")) {
+         // win.getUtilityFilterComboBox().setSelectedItem("Blue Invert");
          win.blueInvert();
-      }
-      else if (receivedString.trim().equals("Obama")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("Obama");
+      } else if (receivedString.trim().equals("Obama")) {
+         // win.getUtilityFilterComboBox().setSelectedItem("Obama");
          win.obama();
-      }
-      else if (receivedString.trim().equals("Morgana")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("Morgana");
+      } else if (receivedString.trim().equals("Morgana")) {
+         // win.getUtilityFilterComboBox().setSelectedItem("Morgana");
          win.colorScheme("Morgana");
-      }
-      else if (receivedString.trim().equals("Fire")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("Fire");
+      } else if (receivedString.trim().equals("Fire")) {
+         // win.getUtilityFilterComboBox().setSelectedItem("Fire");
          win.colorScheme("Fire");
-      }
-      else if (receivedString.trim().equals("Rainbow")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("Rainbow");
+      } else if (receivedString.trim().equals("Rainbow")) {
+         // win.getUtilityFilterComboBox().setSelectedItem("Rainbow");
          win.colorScheme("Rainbow");
-      }
-      else if (receivedString.trim().equals("Neutral")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("Neutral");
+      } else if (receivedString.trim().equals("Neutral")) {
+         // win.getUtilityFilterComboBox().setSelectedItem("Neutral");
          win.colorScheme("Neutral");
-      }
-      else if (receivedString.trim().equals("Coffee")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("Coffee");
+      } else if (receivedString.trim().equals("Coffee")) {
+         // win.getUtilityFilterComboBox().setSelectedItem("Coffee");
          win.colorScheme("Coffee");
-      }
-      else if (receivedString.trim().equals("Greyscale")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("Greyscale");
+      } else if (receivedString.trim().equals("Greyscale")) {
+         // win.getUtilityFilterComboBox().setSelectedItem("Greyscale");
          win.greyscale();
-      }
-      else if (receivedString.trim().equals("Vignette")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("Vignette");
+      } else if (receivedString.trim().equals("Vignette")) {
+         // win.getUtilityFilterComboBox().setSelectedItem("Vignette");
          win.vignette();
-      }
-      else if (receivedString.trim().equals("Circle Blue")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("Circle Blur");
+      } else if (receivedString.trim().equals("Circle Blue")) {
+         // win.getUtilityFilterComboBox().setSelectedItem("Circle Blur");
          win.circleBlur();
-      }
-      else if (receivedString.trim().equals("Tint")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("Tint");
+      } else if (receivedString.trim().equals("Tint")) {
+         // win.getUtilityFilterComboBox().setSelectedItem("Tint");
          win.tint();
-      }
-      else if (receivedString.trim().equals("Valencia")) {
-//         win.getUtilityFilterComboBox().setSelectedItem("Valencia");
+      } else if (receivedString.trim().equals("Valencia")) {
+         // win.getUtilityFilterComboBox().setSelectedItem("Valencia");
          win.valencia();
-      }
-      else if (receivedString.trim().equals("stack")) {
+      } else if (receivedString.trim().equals("stack")) {
          JCheckBox temp = win.getStackCheckBox();
          if (temp.isSelected())
             temp.setSelected(false);
          else
             temp.setSelected(true);
-      }
-      else if (receivedString.trim().equals("Undo"))
+      } else if (receivedString.trim().equals("Undo"))
          win.undo();
       else if (receivedString.trim().equals("Redo"))
          win.redo();
       else if (receivedString.trim().equals("Reset"))
          win.reset();
       else if (receivedString.trim().equals("Exit")) {
-         JOptionPane.showMessageDialog(win,
-               "Your friend disconnected", "Exit",
+         JOptionPane.showMessageDialog(win, "Your friend disconnected", "Exit",
                JOptionPane.WARNING_MESSAGE);
          System.exit(0);
       }
-         
+
       else
-         System.out.println("Unrecognized command when recieving Event " );
+         System.out.println("Unrecognized command when recieving Event ");
       System.out.println(receivedString);
-   }
+   }//end eventRecieve
+   
    
    
    final private void loadRecieve() {
@@ -252,7 +287,8 @@ public abstract class ImageProcessingSocket {
       }
       System.out.println("img loaded");
       win.loadImage(img);
-   }
+   }//end loadRecieve
+
    
    final private void binRecieve() {
       System.out.println("Bin recieved!");
@@ -261,35 +297,19 @@ public abstract class ImageProcessingSocket {
       try {
          numCol = inData.readInt();
          colors = new Color[numCol];
-         for (int i = 0; i < numCol; i++) {  
+         for (int i = 0; i < numCol; i++) {
             colors[i] = new Color(inData.readInt());
             System.out.println(colors[i].toString());
          }
-         
-      }
-      catch (Exception e) {
+
+      } catch (Exception e) {
          System.out.println("Failed to read bin info");
          e.printStackTrace();
          System.exit(8);
       }
       win.colorBinTwoPointOh(win.getCurImage(), numCol, colors);
-   }
-   
-   
-   
-   //check input only checks if there is any input in the input data stream
-   //will try to recieve input if there is
-   final public boolean checkInput() {
-      try {
-         if (inData.available() != 0) {
-            receiveInput();
-            return true;
-         }
-      } catch (Exception e) {
-         System.out.println("Socket Error: checkInput");
-      }
-      return false;
-   }
+   }//end binRecieve
+
 
    final public void imageRecieve() {
       BufferedImage img = null;
@@ -304,23 +324,9 @@ public abstract class ImageProcessingSocket {
          System.out.println("Error recieving image: " + ex);
       }
       win.loadImage(img);
-   }
+   }//end imageRecieve
    
-   final public void sendImage(BufferedImage im) {
-      if (im == null)
-         System.out.println("Sending an empty image....");
-      try {
-         outData.writeInt(4);
-         // convert buffered image to byte array
-         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-         ImageIO.write(im, "jpg", baos);
-         byte[] size = ByteBuffer.allocate(4).putInt(baos.size()).array();
-         outData.write(size);
-         outData.write(baos.toByteArray());
-      } catch (Exception except) {
-         System.out.println("Filed to load image TO the Server side");
-         System.exit(-1);
-      }
-   }
+   //*************End of recieving functions**************8
 
+   
 }
