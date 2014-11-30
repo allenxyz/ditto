@@ -41,8 +41,9 @@ public abstract class ImageProcessingSocket {
    // if the first byte is :
    // 1 - it is an event that occured
    // 2 - a load image occured
-   public boolean eventOccurred(String e) {
+   final public boolean eventOccurred(String e) {
       boolean success = false;
+      System.out.println("event Occurred: " + e);
       try {
          outData.writeInt(1);
          outData.writeChars(e);
@@ -55,7 +56,7 @@ public abstract class ImageProcessingSocket {
       return success;
    }
 
-   public boolean loadOccurred(BufferedImage im) {
+   final public boolean loadOccurred(BufferedImage im) {
       boolean success = false;
       if (im == null) {
          System.out.println("tried to load an empty image...");
@@ -76,7 +77,7 @@ public abstract class ImageProcessingSocket {
       return success;
    }
    
-   public boolean binOccurred(int numColors, Color[] colors) {
+   final public boolean binOccurred(int numColors, Color[] colors) {
       boolean success = false;
       
       try {
@@ -102,7 +103,7 @@ public abstract class ImageProcessingSocket {
    //this function is the interface to recieve things from inData
    // essentially just needs to check the first byte, then call the
    // corresponding function to do the appropriate job
-   public void receiveInput() {
+   final public void receiveInput() {
       int read = 0;
       try {
          read = inData.readInt();
@@ -119,7 +120,7 @@ public abstract class ImageProcessingSocket {
    
    
 
-   private void eventRecieve() {
+   final private void eventRecieve() {
       char recChar;
       String receivedString = "";
 
@@ -138,73 +139,73 @@ public abstract class ImageProcessingSocket {
       System.out.println("abcd");
       System.out.println("Received string is: " + receivedString);
       if (receivedString.trim().equals("Sharpen")) {
-         win.getUtilityFilterComboBox().setSelectedItem("Sharpen");
+//         win.getUtilityFilterComboBox().setSelectedItem("Sharpen");
          System.out.println("Sharpen was called");
          win.sharpen();
          System.out.println("Sharpen was ended");
       }
       else if (receivedString.trim().equals("None")) {
-         win.getUtilityFilterComboBox().setSelectedItem("None");
+//         win.getUtilityFilterComboBox().setSelectedItem("None");
          win.noFilter();
       }
       else if (receivedString.trim().equals("Edge Detector")) {
-         win.getUtilityFilterComboBox().setSelectedItem("Edge Detector");
+//         win.getUtilityFilterComboBox().setSelectedItem("Edge Detector");
          win.edgeDetector();
       }
       else if (receivedString.trim().equals("Invert")) {
-         win.getUtilityFilterComboBox().setSelectedItem("Invert");
+//         win.getUtilityFilterComboBox().setSelectedItem("Invert");
          win.invert();
       }
       else if (receivedString.trim().equals("Posterize")) {
-         win.getUtilityFilterComboBox().setSelectedItem("Posterize");
+//         win.getUtilityFilterComboBox().setSelectedItem("Posterize");
          win.posterize();
       }
       else if (receivedString.trim().equals("Blue Invert")) {
-         win.getUtilityFilterComboBox().setSelectedItem("Blue Invert");
+//         win.getUtilityFilterComboBox().setSelectedItem("Blue Invert");
          win.blueInvert();
       }
       else if (receivedString.trim().equals("Obama")) {
-         win.getUtilityFilterComboBox().setSelectedItem("Obama");
+//         win.getUtilityFilterComboBox().setSelectedItem("Obama");
          win.obama();
       }
       else if (receivedString.trim().equals("Morgana")) {
-         win.getUtilityFilterComboBox().setSelectedItem("Morgana");
+//         win.getUtilityFilterComboBox().setSelectedItem("Morgana");
          win.colorScheme("Morgana");
       }
       else if (receivedString.trim().equals("Fire")) {
-         win.getUtilityFilterComboBox().setSelectedItem("Fire");
+//         win.getUtilityFilterComboBox().setSelectedItem("Fire");
          win.colorScheme("Fire");
       }
       else if (receivedString.trim().equals("Rainbow")) {
-         win.getUtilityFilterComboBox().setSelectedItem("Rainbow");
+//         win.getUtilityFilterComboBox().setSelectedItem("Rainbow");
          win.colorScheme("Rainbow");
       }
       else if (receivedString.trim().equals("Neutral")) {
-         win.getUtilityFilterComboBox().setSelectedItem("Neutral");
+//         win.getUtilityFilterComboBox().setSelectedItem("Neutral");
          win.colorScheme("Neutral");
       }
       else if (receivedString.trim().equals("Coffee")) {
-         win.getUtilityFilterComboBox().setSelectedItem("Coffee");
+//         win.getUtilityFilterComboBox().setSelectedItem("Coffee");
          win.colorScheme("Coffee");
       }
       else if (receivedString.trim().equals("Greyscale")) {
-         win.getUtilityFilterComboBox().setSelectedItem("Greyscale");
+//         win.getUtilityFilterComboBox().setSelectedItem("Greyscale");
          win.greyscale();
       }
       else if (receivedString.trim().equals("Vignette")) {
-         win.getUtilityFilterComboBox().setSelectedItem("Vignette");
+//         win.getUtilityFilterComboBox().setSelectedItem("Vignette");
          win.vignette();
       }
       else if (receivedString.trim().equals("Circle Blue")) {
-         win.getUtilityFilterComboBox().setSelectedItem("Circle Blur");
+//         win.getUtilityFilterComboBox().setSelectedItem("Circle Blur");
          win.circleBlur();
       }
       else if (receivedString.trim().equals("Tint")) {
-         win.getUtilityFilterComboBox().setSelectedItem("Tint");
+//         win.getUtilityFilterComboBox().setSelectedItem("Tint");
          win.tint();
       }
       else if (receivedString.trim().equals("Valencia")) {
-         win.getUtilityFilterComboBox().setSelectedItem("Valencia");
+//         win.getUtilityFilterComboBox().setSelectedItem("Valencia");
          win.valencia();
       }
       else if (receivedString.trim().equals("stack")) {
@@ -233,7 +234,7 @@ public abstract class ImageProcessingSocket {
    }
    
    
-   private void loadRecieve() {
+   final private void loadRecieve() {
       System.out.println("Load recieved!");
       BufferedImage img = null;
       try {
@@ -251,7 +252,7 @@ public abstract class ImageProcessingSocket {
       win.loadImage(img);
    }
    
-   private void binRecieve() {
+   final private void binRecieve() {
       System.out.println("Bin recieved!");
       int numCol = 0;
       Color[] colors = null;
@@ -276,7 +277,7 @@ public abstract class ImageProcessingSocket {
    
    //check input only checks if there is any input in the input data stream
    //will try to recieve input if there is
-   public boolean checkInput() {
+   final public boolean checkInput() {
       try {
          if (inData.available() != 0) {
             receiveInput();
@@ -288,7 +289,7 @@ public abstract class ImageProcessingSocket {
       return false;
    }
 
-   public void receiveImage() {
+   final public void receiveImage() {
       BufferedImage img = null;
       try {
          img = ImageIO.read(ImageIO.createImageInputStream(inData));
@@ -299,7 +300,7 @@ public abstract class ImageProcessingSocket {
       win.loadImage(img);
    }
    
-   public void sendImage(BufferedImage im) {
+   final public void sendImage(BufferedImage im) {
       if (im == null)
          System.out.println("Sending an empty image....");
       try {

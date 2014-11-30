@@ -12,6 +12,8 @@ import java.awt.color.*;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.MouseInputAdapter;
+import javax.swing.event.MouseInputListener;
 import javax.imageio.ImageIO;
 
 import java.io.*;
@@ -41,7 +43,7 @@ public class ImageProcessorGUI extends JFrame
 
   boolean isLoaded = false;
 
-  private JPanel ImageDisplay = new JPanel();
+  private ImageDisplay imageDisplay = new ImageDisplay();
 
   private JPanel palettePanel;
 
@@ -66,8 +68,14 @@ public class ImageProcessorGUI extends JFrame
   private JTextField ColorE;
   private JTextField ColorF;
   private JTextField ColorG;
+  
+  private JTextField redPal;
+  private JTextField greenPal;
+  private JTextField bluePal;
 
   private JTextField numColors;
+  
+  private boolean painting = false;
 
   private JCheckBox stackFilter;
 
@@ -89,8 +97,7 @@ public class ImageProcessorGUI extends JFrame
   private JComboBox<String> CustomFilters;
   private JComboBox<String> PresetFilters;
   private ArrayList<ColorScheme> customColorSchemes = new ArrayList<ColorScheme>();
-
-
+  
   public static void main(String[] arg)
   {
     win = new ImageProcessorGUI("Insta-Paint", null);
@@ -112,26 +119,26 @@ public class ImageProcessorGUI extends JFrame
     // setResizable(false);
     socket = inSocket;
 
-    ImageDisplay.addMouseListener(new MouseAdapter()
-    {
-      @Override
-      public void mouseEntered(MouseEvent e)
-      {
-        try
-        {
-          PointerInfo a = MouseInfo.getPointerInfo();
-          Point b = a.getLocation();
-          int x = (int) b.getX();
-          int y = (int) b.getY();
-          stickers current = new stickers(mBufferedImage);
-          current.addSticker(currentSticker, x, y);
-        }
-        catch( Exception except )
-        {
-
-        }
-      }
-    });
+//    ImageDisplay.addMouseListener(new MouseAdapter()
+//    {
+//      @Override
+//      public void mouseEntered(MouseEvent e)
+//      {
+//        try
+//        {
+//          PointerInfo a = MouseInfo.getPointerInfo();
+//          Point b = a.getLocation();
+//          int x = (int) b.getX();
+//          int y = (int) b.getY();
+//          stickers current = new stickers(mBufferedImage);
+//          current.addSticker(currentSticker, x, y);
+//        }
+//        catch( Exception except )
+//        {
+//
+//        }
+//      }
+//    });
 
     JPanel EditPalette = new JPanel();
     JPanel ColorBlock = new JPanel();
@@ -152,7 +159,7 @@ public class ImageProcessorGUI extends JFrame
         if( fd.getFile() == null )
           return;
         String path = fd.getDirectory() + fd.getFile();
-        ImageDisplay.removeAll();
+        imageDisplay.remove();
         loadImage(path);
         if( socket != null )
            socket.loadOccurred(mBufferedImage);
@@ -189,8 +196,8 @@ public class ImageProcessorGUI extends JFrame
     {
       public void actionPerformed(ActionEvent e)
       {
-        System.exit(0);
         socket.eventOccurred("Exit");
+        System.exit(0);
       }
 
 
@@ -202,6 +209,8 @@ public class ImageProcessorGUI extends JFrame
       public void actionPerformed(ActionEvent e)
       {
          undo();
+         if (socket != null)
+            socket.eventOccurred("Undo");
       }
     });
     Redo = new JMenuItem("Redo");
@@ -210,6 +219,8 @@ public class ImageProcessorGUI extends JFrame
       public void actionPerformed(ActionEvent e)
       {
          redo();
+         if (socket != null)
+            socket.eventOccurred("Redo");
       }
     });
     Reset = new JMenuItem("Reset");
@@ -218,6 +229,8 @@ public class ImageProcessorGUI extends JFrame
       public void actionPerformed(ActionEvent e)
       {
          reset();
+         if (socket != null)
+            socket.eventOccurred("Reset");
       }
     });
     Reset.setEnabled(false);
@@ -273,11 +286,11 @@ public class ImageProcessorGUI extends JFrame
 
     JPanel paletteText = new JPanel();
     JLabel red = new JLabel("R: ");
-    final JTextField redPal = new JTextField(5);
+    redPal = new JTextField(5);
     JLabel green = new JLabel("G: ");
-    final JTextField greenPal = new JTextField(5);
+    greenPal = new JTextField(5);
     JLabel blue = new JLabel("B: ");
-    final JTextField bluePal = new JTextField(5);
+    bluePal = new JTextField(5);
     redPal.setEditable(false);
     greenPal.setEditable(false);
     bluePal.setEditable(false);
@@ -305,7 +318,7 @@ public class ImageProcessorGUI extends JFrame
           Robot r = new Robot();
           Color color = r.getPixelColor(x, y);
           // private Color selectedColors[] = new Color[256];
-
+          paintListener.setColor(color);
           getRed = color.getRed();
           getGreen = color.getGreen();
           getBlue = color.getBlue();
@@ -358,7 +371,7 @@ public class ImageProcessorGUI extends JFrame
     UtilityFilters.addItem("Tint");
     UtilityFilters.addItem("Valencia");
     UtilityFilters.setEnabled(false);
-    UtilityFilters.addItemListener(new Filter());
+    UtilityFilters.addActionListener(new Filter());
 
     stackFilter = new JCheckBox("Stack Filters");
     stackFilter.addMouseListener(new MouseAdapter() {
@@ -448,6 +461,9 @@ public class ImageProcessorGUI extends JFrame
     // ImageDisplay.setLayout(new BoxLayout(ImageDisplay,
     // BoxLayout.LINE_AXIS));
     add(ImageDisplay);
+    
+    ImageDisplay.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+    ImageDisplay.addMouseInputListener(paintListener);
 
     // apply.add(Menu, BorderLayout.NORTH);
 
@@ -480,12 +496,10 @@ public class ImageProcessorGUI extends JFrame
     mBufferedImage = new BufferedImage(grabimage.getWidth(null),
         grabimage.getHeight(null), BufferedImage.TYPE_INT_RGB);
     Graphics2D g2 = mBufferedImage.createGraphics();
-    g2.drawImage(grabimage, null, ImageDisplay);
+    g2.drawImage(grabimage, null, imageDisplay);
 
     resizeToScale();
-    ImageIcon disp = new ImageIcon(mBufferedImage);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(disp));
+    imageDisplay.update(mBufferedImage);
     curImage = deepCopy(mBufferedImage);
     pack();
     image = new ImageProcessor();
@@ -528,9 +542,7 @@ public class ImageProcessorGUI extends JFrame
     g2 = mBufferedImage.createGraphics();
     g2.drawImage(grabimage, null, ImageDisplay);
     resizeToScale();
-    ImageIcon disp = new ImageIcon(mBufferedImage);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(disp));
+    imageDisplay.update(mBufferedImage);
     curImage = deepCopy(mBufferedImage);
     pack();
     image = new ImageProcessor();
@@ -868,9 +880,9 @@ public class ImageProcessorGUI extends JFrame
     colorBinTwoPointOh(curImage, numBins, selectedColors);
   }
 
-  class Filter implements ItemListener
+  class Filter implements ActionListener
   {
-    public void itemStateChanged(ItemEvent e)
+    public void actionPerformed(ActionEvent e)
     {
       JComboBox<String> Filter = (JComboBox<String>) e.getSource();
 System.out.println(Filter.getSelectedItem());      
@@ -880,7 +892,6 @@ System.out.println(Filter.getSelectedItem());
       }
       else if( Filter.getSelectedItem().equals("Sharpen") )
       {
-         System.out.println("Sharpen was clicked");
         sharpen();
       }
       else if( Filter.getSelectedItem().equals("Edge Detector") )
@@ -951,7 +962,112 @@ System.out.println(Filter.getSelectedItem());
       // CustomFilters.setSelectedItem("Pick one: ");
     }
   }
+  
+//     public void mouseClicked(MouseEvent e) {
+//         if (redPal.getText().equals("") || 
+//              greenPal.getText().equals("") ||
+//              bluePal.getText().equals("") ||
+//              !isLoaded)
+//             return;
+//         if (!painting) {
+//System.out.println("Now painting!");
+//            painting = true;
+//         }
+//         else {
+//System.out.println("Not painting anymore...");            
+//            painting = false;
+//            deepCopyerino(curImage);
+//         }
+//     }
+//     public class PaintMouseListener extends MouseInputAdapter {
+//        private int mX, mY;
+//        private int width, height;
+//        private Color c = null;
+//        private BufferedImage overlay;
+//        private Graphics2D overlayGraphics;
+//        
+//        public void setColor(Color inColor) {
+//           c = inColor;
+//        }
+//
+//        
+//        public void mouseMoved(MouseEvent me) {
+//          mX = (int) me.getPoint().getX();
+//          mY = (int) me.getPoint().getY();
+//        }
+//        
+//        public void mouseClicked(MouseEvent me) {
+//System.out.println("Mouse clicked");
+//           width = curImage.getWidth();
+//           height = curImage.getHeight();
+//           overlay = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+//           overlayGraphics = overlay.createGraphics();
+//           overlayGraphics.setPaint(new Color(255, 255, 255, 0));
+//           overlayGraphics.fillRect(0, 0, width, height);
+//           overlayGraphics.setColor(c);
+//        }
+//
+//        public void mouseDragged(MouseEvent e) {
+//           System.out.println("Dragging");
+//           if (c == null || !isLoaded) return;
+//           
+//           overlayGraphics.fillOval(mX, mY, 20, 20);
+//           
+//           
+//
+//           System.out.println(e.getX() + " " + e.getY());
+//
+////           JFrame frame = new JFrame();
+////           frame.getContentPane().setLayout(new FlowLayout());
+////           frame.getContentPane().add(new JLabel(new ImageIcon(curImage)));
+////           frame.pack();
+////           frame.setVisible(true);
+//           
+////          g.setColor(Color.blue);
+////          g.fillRect(mX, mY, 5, 5);
+//        }
+//        public void mouseReleased(MouseEvent e) {
+//           Graphics curGraphic = curImage.getGraphics();
+//           curGraphic.drawImage(overlay, 0, 0, null);
+//           ImageDisplay.removeAll();
+//           ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+//           pack();
+//        }
+//      }
 
+  
+  public class ImageDisplay extends JPanel implements MouseMotionListener {
+     private int mX, mY;
+     private BufferedImage bkg = null;
+
+     public ImageDisplay() {
+       addMouseMotionListener(this);
+       setVisible(true);
+     }
+
+     public void mouseMoved(MouseEvent me) {
+       mX = (int) me.getPoint().getX();
+       mY = (int) me.getPoint().getY();
+       repaint();
+     }
+
+     public void mouseDragged(MouseEvent me) {
+       mouseMoved(me);
+     }
+
+     public void paint(Graphics g) {
+       g.setColor(Color.blue);
+       g.fillRect(mX, mY, 5, 5);
+     }
+     public void remove() {
+        bkg = null;
+     }
+     public void update(BufferedImage im) {
+        bkg = deepCopy(im);
+     }
+   }
+  
+  
   public void setNumBins(int num)
   {
     numBins = num;
@@ -1256,7 +1372,9 @@ System.out.println(Filter.getSelectedItem());
     ImageDisplay.removeAll();
     display = new JLabel(new ImageIcon(mBufferedImage));
     ImageDisplay.add(display);
-
+    ImageDisplay.setMaximumSize(new Dimension(width, height));
+    ImageDisplay.setMinimumSize(new Dimension(width, height));
+    setMinimumSize(new Dimension(width, height));
     System.out.println(mBufferedImage.getHeight());
     System.out.println(mBufferedImage.getWidth());
     pack();
@@ -1290,8 +1408,6 @@ System.out.println(Filter.getSelectedItem());
      if( queueSize == 0 )
        Undo.setEnabled(false);
      Redo.setEnabled(true);
-     if (socket != null)
-        socket.eventOccurred("Undo");
   }
   public void redo() {
      queueSize++;
@@ -1302,8 +1418,6 @@ System.out.println(Filter.getSelectedItem());
      if( queueSize == queue.size() )
        Redo.setEnabled(false);
      Undo.setEnabled(true);
-     if (socket != null)
-        socket.eventOccurred("Redo");
   }
   
   public void reset() {
@@ -1312,8 +1426,6 @@ System.out.println(Filter.getSelectedItem());
      curImage = deepCopy(mBufferedImage);
      deepCopyerino(curImage);
      pack();
-     if (socket != null)
-        socket.eventOccurred("Reset");
   }
   
   
