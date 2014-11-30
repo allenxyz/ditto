@@ -336,7 +336,7 @@ public class ImageProcessorGUI extends JFrame
         {
           System.out.println("You aren't supposed to be here, LEAVE!");
         }
-        if( getRed != 238 && getGreen != 238 && getBlue != 238
+        if( getRed != 234 && getGreen != 234 && getBlue != 234
               )
         {
           redPal.setText(String.valueOf(getRed));
