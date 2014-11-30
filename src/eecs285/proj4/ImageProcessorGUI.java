@@ -25,6 +25,7 @@ import eecs285.proj4.pixelTypes.rgb;
 import eecs285.proj4.server.*;
 
 import java.awt.event.*;
+import java.awt.geom.Ellipse2D;
 import java.awt.Robot;
 import java.util.ArrayList;
 import java.util.Vector;
@@ -557,36 +558,25 @@ public class ImageProcessorGUI extends JFrame
     
 ///******* attempted to draw...     
     
-    //OMFG THIS IS KILLING ME
-    //    save = new BufferedImage(800, 800, BufferedImage.TYPE_INT_RGB);
     ImageDisplay.addMouseMotionListener(new MouseMotionAdapter() {
        public void mouseDragged(MouseEvent e) {
-          if (paintColor == null || !isLoaded) return;
+          if (paintColor == null || !isLoaded || !filePath.equals("")) return;
           Graphics2D g = (Graphics2D)ImageDisplay.getGraphics();
           g.setColor(paintColor);
-          g.fillOval(e.getX(), e.getY(), 50, 50);
-//          curImage.createGraphics().setColor(paintColor);
-//          curImage.createGraphics().fill(new Rectangle(e.getX(), e.getY(), 20, 20));
-//          ImageDisplay.repaint();
+          g.fillOval(e.getX(), e.getY(), 20, 20);
+          Graphics2D g2 = curImage.createGraphics();
+          g2.setColor(paintColor);
+          g2.fill(new Ellipse2D.Float(e.getX(), e.getY(), 20, 20));
+          g2.dispose();
        }
     });
     
     ImageDisplay.addMouseListener(new MouseAdapter() {
        public void mouseReleased(MouseEvent me) {
-          if (paintColor == null || !isLoaded) return;
-          Graphics2D g = (Graphics2D)ImageDisplay.getGraphics();
-          ImageDisplay.paintAll(curImage.getGraphics());
-          ((Graphics2D)ImageDisplay.getGraphics()).drawImage(curImage, null, 0, 0);
-//          JFrame win = new JFrame();
-//          win.add(new JLabel(new ImageIcon(ImageDisplay.createImage(curImage.getWidth(), curImage.getHeight()))));
-//          win.setVisible(true);
-//          win.pack();
-          JFrame win2 = new JFrame();
-          win2.add(new JLabel(new ImageIcon(curImage)));
-          win2.setVisible(true);
-          win2.pack();
+          if (paintColor == null || !isLoaded || !filePath.equals("")) return;
           deepCopyerino(curImage);
-//          socket.sendImage(curImage);
+          if (socket != null)
+             socket.sendImage(curImage);
        }
     });
     
@@ -596,9 +586,8 @@ public class ImageProcessorGUI extends JFrame
     //*** Sticker mouse Listener
     ImageDisplay.addMouseListener(new MouseAdapter() {
        public void mousePressed(MouseEvent me) {
-          System.out.println("Pressed");
           //Some kind of check that it is not trying to paint
-          if (filePath == "" || !isLoaded) return;
+          if (filePath.equals("") || !isLoaded) return;
           Image sticker = null;
           try {
              sticker = ImageIO.read(new File("src/img/"+filePath));
@@ -611,6 +600,7 @@ public class ImageProcessorGUI extends JFrame
           ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
           pack();
           deepCopyerino(curImage);
+          filePath = "";
           if (socket != null)
              socket.sendImage(curImage);
           
@@ -1139,111 +1129,6 @@ public class ImageProcessorGUI extends JFrame
 
   
   
-//     public void mouseClicked(MouseEvent e) {
-//         if (redPal.getText().equals("") || 
-//              greenPal.getText().equals("") ||
-//              bluePal.getText().equals("") ||
-//              !isLoaded)
-//             return;
-//         if (!painting) {
-//System.out.println("Now painting!");
-//            painting = true;
-//         }
-//         else {
-//System.out.println("Not painting anymore...");            
-//            painting = false;
-//            deepCopyerino(curImage);
-//         }
-//     }
-//     public class PaintMouseListener extends MouseInputAdapter {
-//        private int mX, mY;
-//        private int width, height;
-//        private Color c = null;
-//        private BufferedImage overlay;
-//        private Graphics2D overlayGraphics;
-//        
-//        public void setColor(Color inColor) {
-//           c = inColor;
-//        }
-//
-//        
-//        public void mouseMoved(MouseEvent me) {
-//          mX = (int) me.getPoint().getX();
-//          mY = (int) me.getPoint().getY();
-//        }
-//        
-//        public void mouseClicked(MouseEvent me) {
-//System.out.println("Mouse clicked");
-//           width = curImage.getWidth();
-//           height = curImage.getHeight();
-//           overlay = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-//           overlayGraphics = overlay.createGraphics();
-//           overlayGraphics.setPaint(new Color(255, 255, 255, 0));
-//           overlayGraphics.fillRect(0, 0, width, height);
-//           overlayGraphics.setColor(c);
-//        }
-//
-//        public void mouseDragged(MouseEvent e) {
-//           System.out.println("Dragging");
-//           if (c == null || !isLoaded) return;
-//           
-//           overlayGraphics.fillOval(mX, mY, 20, 20);
-//           
-//           
-//
-//           System.out.println(e.getX() + " " + e.getY());
-//
-////           JFrame frame = new JFrame();
-////           frame.getContentPane().setLayout(new FlowLayout());
-////           frame.getContentPane().add(new JLabel(new ImageIcon(curImage)));
-////           frame.pack();
-////           frame.setVisible(true);
-//           
-////          g.setColor(Color.blue);
-////          g.fillRect(mX, mY, 5, 5);
-//        }
-//        public void mouseReleased(MouseEvent e) {
-//           Graphics curGraphic = curImage.getGraphics();
-//           curGraphic.drawImage(overlay, 0, 0, null);
-//           ImageDisplay.removeAll();
-//           ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-//           pack();
-//        }
-//      }
-
-  
-//  public class ImageDisplay extends JPanel implements MouseMotionListener {
-//     private int mX, mY;
-//     private BufferedImage bkg = null;
-//
-//     public ImageDisplay() {
-//       addMouseMotionListener(this);
-//       setVisible(true);
-//     }
-//
-//     public void mouseMoved(MouseEvent me) {
-//       mX = (int) me.getPoint().getX();
-//       mY = (int) me.getPoint().getY();
-//       repaint();
-//     }
-//
-//     public void mouseDragged(MouseEvent me) {
-//       mouseMoved(me);
-//     }
-//
-//     public void paint(Graphics g) {
-//       g.setColor(Color.blue);
-//       g.fillRect(mX, mY, 5, 5);
-//     }
-//     public void remove() {
-//        bkg = null;
-//     }
-//     public void update(BufferedImage im) {
-//        bkg = deepCopy(im);
-//     }
-//   }
-//  
-  
   
   //*******************MOAR helper functions**************
   //my OCD wants me to move these up with the other helper functions
@@ -1319,6 +1204,7 @@ public class ImageProcessorGUI extends JFrame
     }
     else
     {
+      queueSize--;
       queue.removeElementAt(0);
       queue.add(save);
     }
