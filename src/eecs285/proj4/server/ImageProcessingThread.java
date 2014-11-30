@@ -10,13 +10,11 @@ public class ImageProcessingThread extends Thread {
       socket = inSocket;
    }
    
-   
    public void run()
    {
       while (true) 
          socket.checkInput();
    }
-   
    
    
 }

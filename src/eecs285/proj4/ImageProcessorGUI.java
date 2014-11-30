@@ -190,6 +190,7 @@ public class ImageProcessorGUI extends JFrame
       public void actionPerformed(ActionEvent e)
       {
         System.exit(0);
+        socket.eventOccurred("Exit");
       }
 
 
@@ -200,18 +201,7 @@ public class ImageProcessorGUI extends JFrame
     {
       public void actionPerformed(ActionEvent e)
       {
-        System.out.println("q: " + queueSize);
-        if( !queue.isEmpty() )
-        {
-          queueSize--;
-          curImage = deepCopy(queue.elementAt(queueSize));
-          ImageDisplay.removeAll();
-          ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-          pack();
-        }
-        if( queueSize == 0 )
-          Undo.setEnabled(false);
-        Redo.setEnabled(true);
+         undo();
       }
     });
     Redo = new JMenuItem("Redo");
@@ -219,14 +209,7 @@ public class ImageProcessorGUI extends JFrame
     {
       public void actionPerformed(ActionEvent e)
       {
-        queueSize++;
-        curImage = deepCopy(queue.elementAt(queueSize));
-        ImageDisplay.removeAll();
-        ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-        pack();
-        if( queueSize == queue.size() )
-          Redo.setEnabled(false);
-        Undo.setEnabled(true);
+         redo();
       }
     });
     Reset = new JMenuItem("Reset");
@@ -234,10 +217,7 @@ public class ImageProcessorGUI extends JFrame
     {
       public void actionPerformed(ActionEvent e)
       {
-        deepCopyerino(curImage);
-        ImageDisplay.removeAll();
-        ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
-        pack();
+         reset();
       }
     });
     Reset.setEnabled(false);
@@ -334,7 +314,8 @@ public class ImageProcessorGUI extends JFrame
         {
           System.out.println("You aren't supposed to be here, LEAVE!");
         }
-        if( getRed != 234 && getGreen != 234 && getBlue != 234 )
+        if( getRed != 238 && getGreen != 238 && getBlue != 238
+              )
         {
           redPal.setText(String.valueOf(getRed));
           greenPal.setText(String.valueOf(getGreen));
@@ -377,9 +358,15 @@ public class ImageProcessorGUI extends JFrame
     UtilityFilters.addItem("Tint");
     UtilityFilters.addItem("Valencia");
     UtilityFilters.setEnabled(false);
-    UtilityFilters.addActionListener(new Filter());
+    UtilityFilters.addItemListener(new Filter());
 
     stackFilter = new JCheckBox("Stack Filters");
+    stackFilter.addMouseListener(new MouseAdapter() {
+       public void mouseClicked(MouseEvent e)
+       {
+          socket.eventOccurred("stack");
+       }
+    });
 
     JPanel Instawrap = new JPanel();
     TitledBorder FilterTitle = new TitledBorder("Filter Palette");
@@ -400,16 +387,16 @@ public class ImageProcessorGUI extends JFrame
       {
         String s = (String) ((JComboBox<String>) e.getSource())
             .getSelectedItem();
-        if( s == "Pick one: " )
-        {
+        if( s == "Pick one: " ) {
           noFilter();
+          if (socket != null)
+             socket.eventOccurred("None");
           return;
         }
 
         // find it in the array of customColorSchemes
         ColorScheme found = null;
-        for( ColorScheme c : customColorSchemes )
-        {
+        for( ColorScheme c : customColorSchemes ) {
           if( c.getName() == s )
             found = c;
         }
@@ -422,10 +409,6 @@ public class ImageProcessorGUI extends JFrame
         }
         else
         {
-          if( !stackFilter.isSelected() )
-          {
-            curImage = deepCopy(mBufferedImage);
-          }
           for( int i = 0; i < found.getnumber(); ++i )
           {
             System.out.println("first color: Red:"
@@ -434,13 +417,11 @@ public class ImageProcessorGUI extends JFrame
                 + found.getColArr()[i].getBlue());
           }
           colorBinTwoPointOh(curImage, found.getnumber(), found.getColArr());
-          ImageDisplay.removeAll();
-          ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+          if (socket != null) socket.binOccurred(found.getnumber(), found.getColArr());
           // make the utilities default to none
           // FIX THIS - issue is that it can set default but then won't apply
           // filter
           // UtilityFilters.setSelectedItem("None");
-          pack();
         }
 
 
@@ -480,7 +461,6 @@ public class ImageProcessorGUI extends JFrame
   {
     // Use a MediaTracker to fully load the image.
     UtilityFilters.setEnabled(true);
-
     Enter.setEnabled(true);
     Image grabimage = Toolkit.getDefaultToolkit().getImage(fileName);
     MediaTracker mt = new MediaTracker(this);
@@ -510,21 +490,17 @@ public class ImageProcessorGUI extends JFrame
     pack();
     image = new ImageProcessor();
 
-    // these makes a call to noFilter -> screwing up UNDO
-    UtilityFilters.setSelectedItem("None");
-    CustomFilters.setSelectedItem("Pick one: ");
-    queue.removeElementAt(queueSize);
-    queueSize--;
-
-    if( !isLoaded )
-    {
-      queue.removeElementAt(queueSize);
-      queueSize--;
+    // these are making a call to noFilter -> screwing up UNDO
+    // can't get them working with multi-player - srry gonna remove them :(!
+//    UtilityFilters.setSelectedItem("None");
+//    CustomFilters.setSelectedItem("Pick one: ");
+    deepCopyerino(curImage);
+    if( !isLoaded ) {
+       System.out.println("This is loaded now");
+      isLoaded = true;
       Undo.setEnabled(false);
     }
-
-    isLoaded = true;
-
+    
   }
 
   // overloaded so that the other player can load the image directly from an
@@ -533,6 +509,7 @@ public class ImageProcessorGUI extends JFrame
   {
     // Use a MediaTracker to fully load the image.
     UtilityFilters.setEnabled(true);
+    Enter.setEnabled(true);
     MediaTracker mt = new MediaTracker(this);
     mt.addImage(grabimage, 0);
     try
@@ -550,28 +527,23 @@ public class ImageProcessorGUI extends JFrame
         grabimage.getHeight(null), BufferedImage.TYPE_INT_RGB);
     g2 = mBufferedImage.createGraphics();
     g2.drawImage(grabimage, null, ImageDisplay);
+    resizeToScale();
     ImageIcon disp = new ImageIcon(mBufferedImage);
     ImageDisplay.removeAll();
     ImageDisplay.add(new JLabel(disp));
-    pack();
-    isLoaded = true;
-    resizeToScale();
     curImage = deepCopy(mBufferedImage);
+    pack();
+    image = new ImageProcessor();
     
-    // Use a MediaTracker to fully load the image.
-    UtilityFilters.setSelectedItem("None");
-    CustomFilters.setSelectedItem("Pick one: ");
-    queue.removeElementAt(queueSize);
-    queueSize--;
-
-    if( !isLoaded )
-    {
-      queue.removeElementAt(queueSize);
-      queueSize--;
+//    UtilityFilters.setSelectedItem("None");
+//    CustomFilters.setSelectedItem("Pick one: ");
+//    removeUndoHistory(2);
+    deepCopyerino(curImage);
+    if( !isLoaded ) {
+       System.out.println("This is loaded now");
+      isLoaded = true;
       Undo.setEnabled(false);
     }
-
-    isLoaded = true;
   }
 
   public static void saveImage(File outputFile) throws IOException
@@ -698,12 +670,8 @@ public class ImageProcessorGUI extends JFrame
       {
         public void actionPerformed(ActionEvent e)
         {
-          if( !stackFilter.isSelected() )
-            curImage = deepCopy(mBufferedImage);
           colorBinTwoPointOh(curImage, numBins, selectedColors);
-          ImageDisplay.removeAll();
-          ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-          ImageProcessorGUI.win.pack();
+          if (socket != null) socket.binOccurred(numBins, selectedColors);
           dispose();
         }
       });
@@ -750,6 +718,7 @@ public class ImageProcessorGUI extends JFrame
 
         public void actionPerformed(ActionEvent e)
         {
+          socket.eventOccurred("Exit");
           dispose();
 
         }
@@ -779,7 +748,6 @@ public class ImageProcessorGUI extends JFrame
         @Override
         public void mouseClicked(MouseEvent e)
         {
-          // TODO: EDIT THIS LISTENER
           PointerInfo a = MouseInfo.getPointerInfo();
           Point b = a.getLocation();
           int x = (int) b.getX();
@@ -791,6 +759,11 @@ public class ImageProcessorGUI extends JFrame
           {
             Robot r = new Robot();
             Color color = r.getPixelColor(x, y);
+            getRed = color.getRed();
+            getGreen = color.getGreen();
+            getBlue = color.getBlue();
+            if (getRed == 238 && getGreen == 238 && getBlue == 238 ) return;
+            
             if( clicks >= numBins )
             {
               // THROW EXCEPTION
@@ -810,21 +783,16 @@ public class ImageProcessorGUI extends JFrame
               // System.out.println(String.valueOf(selectedColors[clicks].getRGB()));
 
             }
+            redPal.setText(String.valueOf(getRed));
+            greenPal.setText(String.valueOf(getGreen));
+            bluePal.setText(String.valueOf(getBlue));
             count.setText(String.valueOf(clicks + 1));
-            getRed = color.getRed();
-            getGreen = color.getGreen();
-            getBlue = color.getBlue();
             clicks = clicks + 1;
+            
           }
           catch( AWTException e1 )
           {
             System.out.println("You aren't supposed to be here, LEAVE!");
-          }
-          if( getRed != 234 && getGreen != 234 && getBlue != 234 )
-          {
-            redPal.setText(String.valueOf(getRed));
-            greenPal.setText(String.valueOf(getGreen));
-            bluePal.setText(String.valueOf(getBlue));
           }
         }
       });
@@ -847,8 +815,11 @@ public class ImageProcessorGUI extends JFrame
   // color binning code 2.0
   // add numbins param later
   // WILL FIX BUT IT WORKS OMG YAYYYYYYY
-  void colorBinTwoPointOh(BufferedImage binimage, int numBins, Color colors[])
+  public void colorBinTwoPointOh(BufferedImage binimage, int numBins, Color colors[])
   {
+     if( !stackFilter.isSelected() )
+       curImage = deepCopy(mBufferedImage);
+     
     // TODO: make an exception for if numBins == 0
     int binEdges = 256 / numBins;
     for( int i = 0; i < binimage.getWidth(); ++i )
@@ -870,6 +841,9 @@ public class ImageProcessorGUI extends JFrame
         }
       }
     }
+    ImageDisplay.removeAll();
+    ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
+    pack();
     deepCopyerino(binimage);
   }
 
@@ -885,39 +859,28 @@ public class ImageProcessorGUI extends JFrame
     selectedColors[2] = teal;
     selectedColors[3] = beige;
 
-    if( !stackFilter.isSelected() )
-      curImage = deepCopy(mBufferedImage);
-
     colorBinTwoPointOh(curImage, 4, selectedColors);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-    pack();
   }
 
   public void colorScheme(String scheme)
   {
-    if( !stackFilter.isSelected() )
-      curImage = deepCopy(mBufferedImage);
-
     numBins = ColorScheme.setColorScheme(scheme, selectedColors, numBins);
     colorBinTwoPointOh(curImage, numBins, selectedColors);
-    ImageDisplay.removeAll();
-    ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
-    pack();
-
   }
 
-  class Filter implements ActionListener
+  class Filter implements ItemListener
   {
-    public void actionPerformed(ActionEvent e)
+    public void itemStateChanged(ItemEvent e)
     {
       JComboBox<String> Filter = (JComboBox<String>) e.getSource();
+System.out.println(Filter.getSelectedItem());      
       if( Filter.getSelectedItem().equals("None") )
       {
         noFilter();
       }
       else if( Filter.getSelectedItem().equals("Sharpen") )
       {
+         System.out.println("Sharpen was clicked");
         sharpen();
       }
       else if( Filter.getSelectedItem().equals("Edge Detector") )
@@ -1060,8 +1023,9 @@ public class ImageProcessorGUI extends JFrame
     {
       queue.removeElementAt(0);
       queue.add(save);
-      System.out.println(queue.size());
     }
+    if (queueSize == 0)
+       Undo.setEnabled(false);
   }
 
   // color binning code
@@ -1152,6 +1116,8 @@ public class ImageProcessorGUI extends JFrame
     ImageDisplay.removeAll();
     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
     pack();
+
+    deepCopyerino(curImage);
   }
 
   public void noFilter()
@@ -1295,9 +1261,62 @@ public class ImageProcessorGUI extends JFrame
     System.out.println(mBufferedImage.getWidth());
     pack();
     image = new ImageProcessor();
-    deepCopyerino(mBufferedImage);
     Reset.setEnabled(true);
   }
+  
+  private void removeUndoHistory(int numTimes) {
+     for (int i = 0 ; i < numTimes; i++) {
+        queue.removeElementAt(queueSize);
+        queueSize--;
+        System.out.println(queueSize);
+     }
+  }
+  private void clearUndoHistory() {
+     queue = new Vector<BufferedImage>(UNDO_MAX);
+     queueSize = 0;
+     Undo.setEnabled(false);
+     Redo.setEnabled(false);
+  }
+  
+  public void undo() {
+     if( !queue.isEmpty() )
+     {
+       queueSize--;
+       curImage = deepCopy(queue.elementAt(queueSize));
+       ImageDisplay.removeAll();
+       ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+       pack();
+     }
+     if( queueSize == 0 )
+       Undo.setEnabled(false);
+     Redo.setEnabled(true);
+     if (socket != null)
+        socket.eventOccurred("Undo");
+  }
+  public void redo() {
+     queueSize++;
+     curImage = deepCopy(queue.elementAt(queueSize));
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(curImage)));
+     pack();
+     if( queueSize == queue.size() )
+       Redo.setEnabled(false);
+     Undo.setEnabled(true);
+     if (socket != null)
+        socket.eventOccurred("Redo");
+  }
+  
+  public void reset() {
+     ImageDisplay.removeAll();
+     ImageDisplay.add(new JLabel(new ImageIcon(mBufferedImage)));
+     curImage = deepCopy(mBufferedImage);
+     deepCopyerino(curImage);
+     pack();
+     if (socket != null)
+        socket.eventOccurred("Reset");
+  }
+  
+  
   
   public JComboBox<String> getUtilityFilterComboBox() 
   {
@@ -1312,6 +1331,12 @@ public class ImageProcessorGUI extends JFrame
   {
      return PresetFilters;
   }
-  
+  public JCheckBox getStackCheckBox() 
+  {
+     return stackFilter;
+  }
+  public BufferedImage getCurImage() {
+     return curImage;
+  }
 
 }
