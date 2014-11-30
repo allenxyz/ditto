@@ -116,6 +116,8 @@ public abstract class ImageProcessingSocket {
          loadRecieve();
       else if (read == 3)
          binRecieve();
+      else if (read == 4)
+         imageRecieve();
    }
    
    
@@ -289,11 +291,15 @@ public abstract class ImageProcessingSocket {
       return false;
    }
 
-   final public void receiveImage() {
+   final public void imageRecieve() {
       BufferedImage img = null;
       try {
-         img = ImageIO.read(ImageIO.createImageInputStream(inData));
-         System.out.println("Image received!!!!");
+         byte[] sizeAr = new byte[4];
+         inData.read(sizeAr);
+         int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
+         byte[] imageAr = new byte[size];
+         inData.read(imageAr);
+         img = ImageIO.read(new ByteArrayInputStream(imageAr));
       } catch (IOException ex) {
          System.out.println("Error recieving image: " + ex);
       }
@@ -304,8 +310,13 @@ public abstract class ImageProcessingSocket {
       if (im == null)
          System.out.println("Sending an empty image....");
       try {
-         outData.writeByte(3);
-         ImageIO.write((RenderedImage) im, "JPG", outData);
+         outData.writeInt(4);
+         // convert buffered image to byte array
+         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         ImageIO.write(im, "jpg", baos);
+         byte[] size = ByteBuffer.allocate(4).putInt(baos.size()).array();
+         outData.write(size);
+         outData.write(baos.toByteArray());
       } catch (Exception except) {
          System.out.println("Filed to load image TO the Server side");
          System.exit(-1);
