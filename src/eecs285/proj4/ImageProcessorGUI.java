@@ -114,6 +114,7 @@ public class ImageProcessorGUI extends JFrame
   //****** end of variable initialization
   
   
+  public int brushSize = 0;
   
   public static void main(String[] arg)
   {
@@ -347,6 +348,31 @@ public class ImageProcessorGUI extends JFrame
       }
     }); //end palletePanel
 
+    //***** paintSizePanel
+    
+    JPanel paintSizePanel = new JPanel();
+    JTextField paintSize = new JTextField(5);
+    JButton submitSize =  new JButton("Submit");
+    submitSize.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        try{
+          brushSize = Integer.parseInt(paintSize.getText());
+        }
+        catch (Exception eeee){
+          JOptionPane.showMessageDialog(getParent(), "STOP TRYING TO FUCK WIT IT");
+        }
+        if(brushSize < 0 || brushSize > 500){
+          JOptionPane.showMessageDialog(getParent(), "STOP TRYING TO FUCK WIT IT");
+          brushSize = 0;
+        }
+      }
+    });
+    
+    paintSizePanel.add(paintSize);
+    paintSizePanel.add(submitSize);
+    add(paintSizePanel);
     
     
     
@@ -540,6 +566,7 @@ public class ImageProcessorGUI extends JFrame
     EditPalette.add(ColorBlock);
     EditPalette.add(palettePanel);
     EditPalette.add(paletteText);
+    EditPalette.add(paintSizePanel);
     EditPalette.add(InstaFilter);
     EditPalette.add(Custom);
     EditPalette.add(stickers);
@@ -563,10 +590,10 @@ public class ImageProcessorGUI extends JFrame
           if (paintColor == null || !isLoaded || !filePath.equals("")) return;
           Graphics2D g = (Graphics2D)ImageDisplay.getGraphics();
           g.setColor(paintColor);
-          g.fillOval(e.getX(), e.getY(), 20, 20);
+          g.fillOval(e.getX(), e.getY(), brushSize, brushSize);
           Graphics2D g2 = curImage.createGraphics();
           g2.setColor(paintColor);
-          g2.fill(new Ellipse2D.Float(e.getX(), e.getY(), 20, 20));
+          g2.fill(new Ellipse2D.Float(e.getX(), e.getY(), brushSize, brushSize));
           g2.dispose();
        }
     });
