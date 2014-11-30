@@ -323,7 +323,8 @@ public abstract class ImageProcessingSocket {
       } catch (IOException ex) {
          System.out.println("Error recieving image: " + ex);
       }
-      win.loadImage(img);
+      
+      win.setImage(img);
    }//end imageRecieve
    
    //*************End of recieving functions**************8
