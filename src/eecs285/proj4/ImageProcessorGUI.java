@@ -1014,7 +1014,7 @@ public class ImageProcessorGUI extends JFrame
 
         public void actionPerformed(ActionEvent e)
         {
-          socket.eventOccurred("Exit");
+          if (socket != null) socket.eventOccurred("Exit");
           dispose();
 
         }

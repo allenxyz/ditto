@@ -41,9 +41,18 @@ public class MainFile {
       {
          public void mouseClicked(MouseEvent e)
          {
-            String ip = "";
             try {
-               Server serverWindow = new Server(Inet4Address.getLocalHost().getHostAddress());
+            String ip = "";
+            Enumeration en = NetworkInterface.getNetworkInterfaces();
+            NetworkInterface ni=(NetworkInterface) en.nextElement();
+            Enumeration ee = ni.getInetAddresses();
+            while(ee.hasMoreElements()) {
+            InetAddress ia= (InetAddress) ee.nextElement();
+                 ip = ia.getHostAddress();
+                 System.out.println(ia.getHostAddress());
+             }
+//            ip = Inet4Address.getLocalHost().getHostAddress();
+               Server serverWindow = new Server(ip);
                win.dispose();
             }
             catch (Exception except) {
