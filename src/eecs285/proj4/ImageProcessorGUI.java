@@ -86,7 +86,7 @@ public class ImageProcessorGUI extends JFrame
   private int numBins = 0;
   private Graphics2D g2;
 
-  final private static int UNDO_MAX = 10;
+  final private static int UNDO_MAX = 30;
   private Vector<BufferedImage> queue = new Vector<BufferedImage>(UNDO_MAX);
   private static int queueSize = -1;
 
@@ -423,7 +423,12 @@ public class ImageProcessorGUI extends JFrame
     stackFilter.addMouseListener(new MouseAdapter() {
        public void mouseClicked(MouseEvent e)
        {
-          if (socket != null) socket.eventOccurred("stack");
+          if (socket != null) {
+             if (stackFilter.isSelected())
+                socket.eventOccurred("stack1");
+             else
+                socket.eventOccurred("stack0");
+          }
        }
     });
     checkBoxPan.add(stackFilter);
