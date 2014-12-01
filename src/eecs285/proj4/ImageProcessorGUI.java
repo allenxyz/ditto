@@ -100,6 +100,7 @@ public class ImageProcessorGUI extends JFrame
   private ArrayList<ColorScheme> customColorSchemes = new ArrayList<ColorScheme>();
   
   private Color paintColor = null;
+  private JButton submitSize;
   private Point oldPoint;
   private Point newPoint;
   private Image save;
@@ -354,7 +355,8 @@ public class ImageProcessorGUI extends JFrame
     
     JPanel paintSizePanel = new JPanel();
     final JTextField paintSize = new JTextField(5);
-    JButton submitSize =  new JButton("Submit");
+    submitSize =  new JButton("Submit");
+    submitSize.setEnabled(false);
     submitSize.addActionListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
@@ -413,13 +415,16 @@ public class ImageProcessorGUI extends JFrame
     
     
     //*** stacking filter mouse listener
+    JPanel checkBoxPan = new JPanel(new GridLayout(1, 8));
     stackFilter = new JCheckBox("Stack Filters");
+    stackFilter.setEnabled(false);
     stackFilter.addMouseListener(new MouseAdapter() {
        public void mouseClicked(MouseEvent e)
        {
           socket.eventOccurred("stack");
        }
     });
+    checkBoxPan.add(stackFilter);
     //end stacking filters mouse listener
 
     
@@ -430,13 +435,11 @@ public class ImageProcessorGUI extends JFrame
     TitledBorder FilterTitle = new TitledBorder("Filter Palette");
     InstaFilter.setBorder(FilterTitle);
     Instawrap.add(UtilityFilters);
-    Instawrap.add(stackFilter);
 
     JPanel presets = new JPanel();
     TitledBorder presetTitle = new TitledBorder("Preset Filters");
     presets.setBorder(presetTitle);
     presets.add(PresetFilters);
-    presets.add(stackFilter);
 
     
     
@@ -583,6 +586,7 @@ public class ImageProcessorGUI extends JFrame
     EditPalette.add(palettePanel);
     EditPalette.add(paletteText);
     EditPalette.add(paintSizePanel);
+    EditPalette.add(checkBoxPan);
     EditPalette.add(InstaFilter);
     EditPalette.add(presets);
     EditPalette.add(Custom);
@@ -712,6 +716,8 @@ public class ImageProcessorGUI extends JFrame
     // Use a MediaTracker to fully load the image.
     UtilityFilters.setEnabled(true);
     PresetFilters.setEnabled(true);
+    stackFilter.setEnabled(true);
+    submitSize.setEnabled(true);
     Enter.setEnabled(true);
     Image grabimage = Toolkit.getDefaultToolkit().getImage(fileName);
     MediaTracker mt = new MediaTracker(this);
