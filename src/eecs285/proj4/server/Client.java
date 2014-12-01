@@ -14,7 +14,7 @@ public class Client
    
    public Client(String inIP)
    {
-      socket = new ClientSideSocket(inIP, 45000);
+      socket = new ClientSideSocket(inIP, 45001);
       socket.start();
       
       ImageProcessingThread thread1 = new ImageProcessingThread(socket);

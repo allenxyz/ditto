@@ -9,9 +9,8 @@ public class Server
    
    public Server(String inIP) 
    {
-      socket = new ServerSideSocket(inIP, 45000);
+      socket = new ServerSideSocket(inIP, 45001);
       socket.start();
-      
       
       ImageProcessingThread thread1 = new ImageProcessingThread(socket);
       thread1.start();
