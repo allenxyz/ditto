@@ -252,7 +252,7 @@ public class ImageProcessorGUI extends JFrame {
 
       BufferedImage myPicture = null;
       try {
-         myPicture = ImageIO.read(new File("wheel.png"));
+         myPicture = ImageIO.read(new File("src/wheel.png"));
       } catch (IOException e) {
          System.out.println("rip\n");
       }
@@ -775,7 +775,17 @@ public class ImageProcessorGUI extends JFrame {
       }
       try {
          outputFile = new File(outputFile.getAbsolutePath() + ".jpg");
+         
+         
+         JFrame win = new JFrame();
+         win.add(new JLabel(new ImageIcon(curImage)));
+         win.setVisible(true);
+         win.pack();
+         
+      
          ImageIO.write(curImage, "jpg", outputFile);
+
+         
          JOptionPane.showMessageDialog(ImageProcessorGUI.win,
                "Output Has Been Saved", "Saved Output",
                JOptionPane.PLAIN_MESSAGE);
@@ -840,7 +850,7 @@ public class ImageProcessorGUI extends JFrame {
 
          BufferedImage myPicture = null;
          try {
-            myPicture = ImageIO.read(new File("wheel.png"));
+            myPicture = ImageIO.read(new File("src/wheel.png"));
          } catch (IOException e) {
             System.out.println("rip\n");
          }
@@ -1035,6 +1045,7 @@ public class ImageProcessorGUI extends JFrame {
       ImageDisplay.removeAll();
       ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
       pack();
+      curImage = deepCopy(binimage);
       deepCopyerino(binimage);
    } // end binning functions
 

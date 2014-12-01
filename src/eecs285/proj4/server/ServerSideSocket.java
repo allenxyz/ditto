@@ -27,7 +27,7 @@ public class ServerSideSocket extends ImageProcessingSocket {
    public ServerSideSocket(String inIPAddr, int inPortNum) {
       super(inIPAddr, inPortNum);
       socket = null;
-      win = new ImageProcessorGUI("Server Side", this);
+      win = new ImageProcessorGUI("Insta-Paint", this);
       win.setVisible(true);
    }
 

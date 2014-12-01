@@ -32,7 +32,7 @@ public class ClientSideSocket extends ImageProcessingSocket {
    public ClientSideSocket(String inIPAddr, int inPortNum) {
       super(inIPAddr, inPortNum);
       socket = null;
-      win = new ImageProcessorGUI("Client Side", this);
+      win = new ImageProcessorGUI("Insta-Paint", this);
       win.setVisible(true);
    }
 
