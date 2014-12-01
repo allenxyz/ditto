@@ -12,6 +12,7 @@ import java.util.Enumeration;
 
 public class MainFile {
    static JFrame win;
+   public static int port = 45000;;
    
    public static void center(JFrame win) {
 
@@ -36,25 +37,13 @@ public class MainFile {
       
       center(win);
       
-      
       hostButton.addMouseListener(new MouseAdapter() 
       {
          public void mouseClicked(MouseEvent e)
          {
             String ip = "";
             try {
-               Enumeration en = NetworkInterface.getNetworkInterfaces();
-               while(en.hasMoreElements()){
-                   NetworkInterface ni=(NetworkInterface) en.nextElement();
-                   Enumeration ee = ni.getInetAddresses();
-                   while(ee.hasMoreElements()) {
-                       InetAddress ia= (InetAddress) ee.nextElement();
-                       if (ia.getHostAddress().charAt(3) == '.' && ia.getHostAddress().charAt(4) != '0')
-                          ip = ia.getHostAddress();
-                       System.out.println(ia.getHostAddress());
-                   }
-                }
-               Server serverWindow = new Server(ip);
+               Server serverWindow = new Server(Inet4Address.getLocalHost().getHostAddress());
                win.dispose();
             }
             catch (Exception except) {
@@ -72,17 +61,15 @@ public class MainFile {
             try {
                String ip = "";
                Enumeration en = NetworkInterface.getNetworkInterfaces();
-               while(en.hasMoreElements()){
-                  NetworkInterface ni=(NetworkInterface) en.nextElement();
-                  Enumeration ee = ni.getInetAddresses();
-                  while(ee.hasMoreElements()) {
-                      InetAddress ia= (InetAddress) ee.nextElement();
-                      if (ia.getHostAddress().charAt(3) == '.' && ia.getHostAddress().charAt(4) != '0')
-                         ip = ia.getHostAddress();
-                      System.out.println(ia.getHostAddress());
-                  }
-               }
-               Client clientWindow = new Client(Inet4Address.getLocalHost().getHostAddress());
+               NetworkInterface ni=(NetworkInterface) en.nextElement();
+               Enumeration ee = ni.getInetAddresses();
+               while(ee.hasMoreElements()) {
+               InetAddress ia= (InetAddress) ee.nextElement();
+                    ip = ia.getHostAddress();
+                    System.out.println(ia.getHostAddress());
+                }
+//               ip = Inet4Address.getLocalHost().getHostAddress();
+               Client clientWindow = new Client(ip);
                win.dispose();
             }
             catch (Exception except) {

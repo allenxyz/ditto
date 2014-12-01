@@ -9,7 +9,7 @@ public class Server
    
    public Server(String inIP) 
    {
-      socket = new ServerSideSocket(inIP, 40000);
+      socket = new ServerSideSocket(inIP, 45000);
       socket.start();
       
       
