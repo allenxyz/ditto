@@ -153,6 +153,7 @@ public abstract class ImageProcessingSocket {
       int read = 0;
       try {
          read = inData.readInt();
+         System.out.println(read + "was read");
       } catch (Exception e) {
          System.out.println("Failed to read the input quantifier");
       }
@@ -172,6 +173,7 @@ public abstract class ImageProcessingSocket {
    final public boolean checkInput() {
       try {
          if (inData.available() != 0) {
+            System.out.println("Thi sis finally avaliable " + inData.available());
             receiveInput();
             return true;
          }
@@ -263,8 +265,10 @@ public abstract class ImageProcessingSocket {
             temp.setSelected(false);
          else
             temp.setSelected(true);
-      } else if (receivedString.trim().equals("Undo"))
+      } else if (receivedString.trim().equals("Undo")) {
+         System.out.println("Sytem is undoing");
          win.undo();
+      }
       else if (receivedString.trim().equals("Redo"))
          win.redo();
       else if (receivedString.trim().equals("Reset"))

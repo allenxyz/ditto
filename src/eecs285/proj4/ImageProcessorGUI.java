@@ -217,8 +217,10 @@ public class ImageProcessorGUI extends JFrame
       public void actionPerformed(ActionEvent e)
       {
          undo();
-         if (socket != null)
+         if (socket != null) {
+            System.out.println("Undo signal Sent!");
             socket.eventOccurred("Undo");
+         }
       }
     });
     Redo = new JMenuItem("Redo");
@@ -769,8 +771,11 @@ public class ImageProcessorGUI extends JFrame
   public void loadImage(Image grabimage)
   {
     // Use a MediaTracker to fully load the image.
-    UtilityFilters.setEnabled(true);
-    Enter.setEnabled(true);
+     UtilityFilters.setEnabled(true);
+     PresetFilters.setEnabled(true);
+     stackFilter.setEnabled(true);
+     submitSize.setEnabled(true);
+     Enter.setEnabled(true);
     MediaTracker mt = new MediaTracker(this);
     mt.addImage(grabimage, 0);
     try
@@ -807,7 +812,11 @@ public class ImageProcessorGUI extends JFrame
   public void setImage(Image grabimage)
   {
     // Use a MediaTracker to fully load the image.
+
     UtilityFilters.setEnabled(true);
+    PresetFilters.setEnabled(true);
+    stackFilter.setEnabled(true);
+    submitSize.setEnabled(true);
     Enter.setEnabled(true);
     MediaTracker mt = new MediaTracker(this);
     mt.addImage(grabimage, 0);

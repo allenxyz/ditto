@@ -39,11 +39,14 @@ public class ServerSideSocket extends ImageProcessingSocket {
          out.println("Waiting for client to connect...");
          socket = serverSock.accept();
          
-         outBufferedData = new BufferedOutputStream(socket.getOutputStream());
-         inBufferedData = new BufferedInputStream(socket.getInputStream());
+//         outBufferedData = new BufferedOutputStream(socket.getOutputStream());
+//         inBufferedData = new BufferedInputStream(socket.getInputStream());
+//         
+//         outData = new DataOutputStream(outBufferedData);
+//         inData = new DataInputStream(inBufferedData);
          
-         outData = new DataOutputStream(outBufferedData);
-         inData = new DataInputStream(inBufferedData);
+         outData = new DataOutputStream(socket.getOutputStream());
+         inData = new DataInputStream(socket.getInputStream());
          
          out.println("Client connection accepted");
       } catch (IOException ioe) {

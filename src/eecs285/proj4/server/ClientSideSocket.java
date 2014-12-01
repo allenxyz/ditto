@@ -42,11 +42,14 @@ public class ClientSideSocket extends ImageProcessingSocket {
          socket = new Socket(ipAddr, portNum);
 
          
-         outBufferedData = new BufferedOutputStream(socket.getOutputStream());
-         inBufferedData = new BufferedInputStream(socket.getInputStream());
+//         outBufferedData = new BufferedOutputStream(socket.getOutputStream());
+//         inBufferedData = new BufferedInputStream(socket.getInputStream());
+//         
+//         outData = new DataOutputStream(outBufferedData);
+//         inData = new DataInputStream(inBufferedData);
          
-         outData = new DataOutputStream(outBufferedData);
-         inData = new DataInputStream(inBufferedData);
+         outData = new DataOutputStream(socket.getOutputStream());
+         inData = new DataInputStream(socket.getInputStream());
          
       } catch (IOException ioe) {
          System.out.println("ERROR: Unable to connect - "
