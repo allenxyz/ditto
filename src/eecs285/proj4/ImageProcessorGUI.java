@@ -100,6 +100,8 @@ public class ImageProcessorGUI extends JFrame
   private ArrayList<ColorScheme> customColorSchemes = new ArrayList<ColorScheme>();
   
   private Color paintColor = null;
+  private Point oldPoint;
+  private Point newPoint;
   private Image save;
   
   private JButton stickerSpeechLeft;
@@ -385,20 +387,28 @@ public class ImageProcessorGUI extends JFrame
     UtilityFilters.addItem("Invert");
     UtilityFilters.addItem("Posterize");
     UtilityFilters.addItem("Blue Invert");
-    UtilityFilters.addItem("Obama");
-    UtilityFilters.addItem("Fire");
-    UtilityFilters.addItem("Morgana");
-    UtilityFilters.addItem("Rainbow");
-    UtilityFilters.addItem("Neutral");
-    UtilityFilters.addItem("Coffee");
     UtilityFilters.addItem("Greyscale");
     UtilityFilters.addItem("Vignette");
     UtilityFilters.addItem("Circle Blur");
-    UtilityFilters.addItem("Tint");
-    UtilityFilters.addItem("Valencia");
     UtilityFilters.setEnabled(false);
     UtilityFilters.addActionListener(new Filter());
     //end utilityfilters
+    
+
+    //***** preset filters
+    PresetFilters = new JComboBox<String>();
+    PresetFilters.addItem("None");
+    PresetFilters.addItem("Obama");
+    PresetFilters.addItem("Fire");
+    PresetFilters.addItem("Morgana");
+    PresetFilters.addItem("Rainbow");
+    PresetFilters.addItem("Neutral");
+    PresetFilters.addItem("Coffee");
+    PresetFilters.addItem("Tint");
+    PresetFilters.addItem("Valencia");
+    PresetFilters.setEnabled(false);
+    PresetFilters.addActionListener(new Filter());
+    //end presetfilters
     
     
     
@@ -421,7 +431,13 @@ public class ImageProcessorGUI extends JFrame
     InstaFilter.setBorder(FilterTitle);
     Instawrap.add(UtilityFilters);
     Instawrap.add(stackFilter);
-    
+
+    JPanel presets = new JPanel();
+    TitledBorder presetTitle = new TitledBorder("Preset Filters");
+    presets.setBorder(presetTitle);
+    presets.add(PresetFilters);
+    presets.add(stackFilter);
+
     
     
     
@@ -568,6 +584,7 @@ public class ImageProcessorGUI extends JFrame
     EditPalette.add(paletteText);
     EditPalette.add(paintSizePanel);
     EditPalette.add(InstaFilter);
+    EditPalette.add(presets);
     EditPalette.add(Custom);
     EditPalette.add(stickers);
 
@@ -584,22 +601,68 @@ public class ImageProcessorGUI extends JFrame
     
     
 ///******* attempted to draw...     
-    
+   
     ImageDisplay.addMouseMotionListener(new MouseMotionAdapter() {
+      
+      
        public void mouseDragged(MouseEvent e) {
           if (paintColor == null || !isLoaded || !filePath.equals("")) return;
+          
+          newPoint = e.getPoint();
+          if(oldPoint.equals(null)){
+            oldPoint = newPoint;
+          }
+          Stroke stroke = new BasicStroke(brushSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
           Graphics2D g = (Graphics2D)ImageDisplay.getGraphics();
           g.setColor(paintColor);
-          g.fillOval(e.getX() - brushSize/2, e.getY() - brushSize/2, brushSize, brushSize);
+          g.setStroke(stroke);
+         
+          //g.fillOval(e.getX() - brushSize/2, e.getY() - brushSize/2, brushSize, brushSize);
+          g.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
           Graphics2D g2 = curImage.createGraphics();
           g2.setColor(paintColor);
-          g2.fill(new Ellipse2D.Float(e.getX() - brushSize/2, e.getY() - brushSize/2, brushSize, brushSize));
-          g2.dispose();
+          g2.setStroke(stroke);
+          g2.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
+          //g2.fill(new Ellipse2D.Float(e.getX() - brushSize/2, e.getY() - brushSize/2, brushSize, brushSize));
+          oldPoint = newPoint;
+          g2.dispose();           
        }
+       
     });
     
     ImageDisplay.addMouseListener(new MouseAdapter() {
-       public void mouseReleased(MouseEvent me) {
+    
+    public void mousePressed(MouseEvent e)
+      {
+        
+        oldPoint = e.getPoint();
+        newPoint = oldPoint;
+        
+        if (paintColor == null || !isLoaded || !filePath.equals("")) return;
+        
+        newPoint = e.getPoint();
+        if(oldPoint.equals(null)){
+          oldPoint = newPoint;
+        }
+        //repeat code of previous to be able to draw dots
+        Stroke stroke = new BasicStroke(brushSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+        Graphics2D g = (Graphics2D)ImageDisplay.getGraphics();
+        g.setColor(paintColor);
+        g.setStroke(stroke);
+       
+        //g.fillOval(e.getX() - brushSize/2, e.getY() - brushSize/2, brushSize, brushSize);
+        g.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
+        Graphics2D g2 = curImage.createGraphics();
+        g2.setColor(paintColor);
+        g2.setStroke(stroke);
+        g2.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
+        //g2.fill(new Ellipse2D.Float(e.getX() - brushSize/2, e.getY() - brushSize/2, brushSize, brushSize));
+        oldPoint = newPoint;
+        g2.dispose();  
+        
+      }
+
+      public void mouseReleased(MouseEvent me) {
           if (paintColor == null || !isLoaded || !filePath.equals("")) return;
           deepCopyerino(curImage);
           if (socket != null)
@@ -648,6 +711,7 @@ public class ImageProcessorGUI extends JFrame
   {
     // Use a MediaTracker to fully load the image.
     UtilityFilters.setEnabled(true);
+    PresetFilters.setEnabled(true);
     Enter.setEnabled(true);
     Image grabimage = Toolkit.getDefaultToolkit().getImage(fileName);
     MediaTracker mt = new MediaTracker(this);
