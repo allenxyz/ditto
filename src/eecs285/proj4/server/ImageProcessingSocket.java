@@ -6,6 +6,8 @@ import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -118,16 +120,25 @@ public abstract class ImageProcessingSocket {
       try {
          outData.writeInt(4);
          // convert buffered image to byte array
-         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-         ImageIO.write(im, "jpg", baos);
-         byte[] size = ByteBuffer.allocate(4).putInt(baos.size()).array();
-         outData.write(size);
-         outData.write(baos.toByteArray());
+         BufferedOutputStream out = new BufferedOutputStream(outData);
+         
+         ImageIO.write(im, "jpg", out);
+         
+         byte[] size = ByteBuffer.allocate(4).putInt(out.size()).array();
+         outData.write(out.toByteArray());
+         
+//         
+//         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//         ImageIO.write(im, "jpg", baos);
+//         byte[] size = ByteBuffer.allocate(4).putInt(baos.size()).array();
+//         outData.write(size);
+//         outData.write(baos.toByteArray());
       } catch (Exception except) {
          System.out.println("Filed to load image TO the Server side");
          System.exit(-1);
       }
    }//end sendImage
+   
 
    
 
@@ -328,6 +339,7 @@ public abstract class ImageProcessingSocket {
    }//end imageRecieve
    
    //*************End of recieving functions**************8
-
+   
+   
    
 }

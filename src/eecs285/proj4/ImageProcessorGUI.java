@@ -92,8 +92,6 @@ public class ImageProcessorGUI extends JFrame
 
   private ImageProcessor image;
 
-  private stickers currentSticker;
-
   private JComboBox<String> UtilityFilters;
   private JComboBox<String> CustomFilters;
   private JComboBox<String> PresetFilters;
@@ -354,6 +352,7 @@ public class ImageProcessorGUI extends JFrame
     
     JPanel paintSizePanel = new JPanel();
     final JTextField paintSize = new JTextField(5);
+    final JLabel paintSizeLabel = new JLabel("Brush Size: ");
     JButton submitSize =  new JButton("Submit");
     submitSize.addActionListener(new ActionListener()
     {
@@ -372,6 +371,7 @@ public class ImageProcessorGUI extends JFrame
       }
     });
     
+    paintSizePanel.add(paintSizeLabel);
     paintSizePanel.add(paintSize);
     paintSizePanel.add(submitSize);
     add(paintSizePanel);
@@ -417,7 +417,7 @@ public class ImageProcessorGUI extends JFrame
     stackFilter.addMouseListener(new MouseAdapter() {
        public void mouseClicked(MouseEvent e)
        {
-          socket.eventOccurred("stack");
+          if (socket != null) socket.eventOccurred("stack");
        }
     });
     //end stacking filters mouse listener
@@ -469,12 +469,12 @@ public class ImageProcessorGUI extends JFrame
     stickers.add(stickerHeart);
     stickerSpeechLeft.addActionListener(new ActionListener() {
        public void actionPerformed(ActionEvent e) {
-          filePath = "speech_left.gif";
+          filePath = "speech_left_big.gif";
        }
     });
     stickerSpeechRight.addActionListener(new ActionListener() {
        public void actionPerformed(ActionEvent e) {
-          filePath = "speech_right.gif";
+          filePath = "speech_right_big.gif";
        }
     });
     stickerSkull.addActionListener(new ActionListener() {
@@ -698,7 +698,7 @@ public class ImageProcessorGUI extends JFrame
     });
     //end sticker mouse listener
     
-    setMinimumSize(new Dimension(1120, 650));
+    setMinimumSize(new Dimension(1120, 800));
   } //end of constructor
 
   

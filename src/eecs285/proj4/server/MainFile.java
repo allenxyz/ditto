@@ -54,18 +54,17 @@ public class MainFile {
          public void mouseClicked(MouseEvent e)
          {
             try {
-//               Enumeration en = NetworkInterface.getNetworkInterfaces();
-//               while (en.hasMoreElements()) {
-//                  NetworkInterface ni=(NetworkInterface) en.nextElement();
-//                  Enumeration ee = ni.getInetAddresses();
-//                  while(ee.hasMoreElements()) {
-//                       InetAddress ia= (InetAddress) ee.nextElement();
-//                       String temp = ia.getHostAddress();
-//                       if (temp.contains(".0.0.") || temp.contains(":")) continue;
-//                       ip = temp;
-//                       System.out.println(ia.getHostAddress());
-//                   }
-//               }
+               Enumeration en = NetworkInterface.getNetworkInterfaces();
+               while (en.hasMoreElements()) {
+                  NetworkInterface ni=(NetworkInterface) en.nextElement();
+                  Enumeration ee = ni.getInetAddresses();
+                  while(ee.hasMoreElements()) {
+                       InetAddress ia= (InetAddress) ee.nextElement();
+                       String temp = ia.getHostAddress();
+                       if (temp.contains(".0.0.") || temp.contains(":")) continue;
+                       System.out.println(ia.getHostAddress());
+                   }
+               }
                String ip = Inet4Address.getLocalHost().getHostAddress();
                Server serverWindow = new Server(ip);
                win.dispose();
