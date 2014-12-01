@@ -2,8 +2,11 @@ package eecs285.proj4.server;
 
 import javax.swing.*;
 
+import java.util.Vector;
+
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.Array;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -42,15 +45,19 @@ public class MainFile {
          public void mouseClicked(MouseEvent e)
          {
             try {
-            String ip = "";
-            Enumeration en = NetworkInterface.getNetworkInterfaces();
-            NetworkInterface ni=(NetworkInterface) en.nextElement();
-            Enumeration ee = ni.getInetAddresses();
-            while(ee.hasMoreElements()) {
-            InetAddress ia= (InetAddress) ee.nextElement();
-                 ip = ia.getHostAddress();
-                 System.out.println(ia.getHostAddress());
-             }
+               String ip = "";
+               Enumeration en = NetworkInterface.getNetworkInterfaces();
+               while (en.hasMoreElements()) {
+                  NetworkInterface ni=(NetworkInterface) en.nextElement();
+                  Enumeration ee = ni.getInetAddresses();
+                  while(ee.hasMoreElements()) {
+                       InetAddress ia= (InetAddress) ee.nextElement();
+                       String temp = ia.getHostAddress();
+                       if (temp.contains(".0.0.") || temp.contains(":")) continue;
+                       ip = temp;
+                       System.out.println(ia.getHostAddress());
+                   }
+               }
 //            ip = Inet4Address.getLocalHost().getHostAddress();
                Server serverWindow = new Server(ip);
                win.dispose();
@@ -70,13 +77,17 @@ public class MainFile {
             try {
                String ip = "";
                Enumeration en = NetworkInterface.getNetworkInterfaces();
-               NetworkInterface ni=(NetworkInterface) en.nextElement();
-               Enumeration ee = ni.getInetAddresses();
-               while(ee.hasMoreElements()) {
-               InetAddress ia= (InetAddress) ee.nextElement();
-                    ip = ia.getHostAddress();
-                    System.out.println(ia.getHostAddress());
-                }
+               while (en.hasMoreElements()) {
+                  NetworkInterface ni=(NetworkInterface) en.nextElement();
+                  Enumeration ee = ni.getInetAddresses();
+                  while(ee.hasMoreElements()) {
+                       InetAddress ia= (InetAddress) ee.nextElement();
+                       String temp = ia.getHostAddress();
+                       if (temp.contains(".0.0.") || temp.contains(":")) continue;
+                       ip = temp;
+                       System.out.println(ia.getHostAddress());
+                   }
+               }
 //               ip = Inet4Address.getLocalHost().getHostAddress();
                Client clientWindow = new Client(ip);
                win.dispose();
