@@ -120,19 +120,19 @@ public abstract class ImageProcessingSocket {
       try {
          outData.writeInt(4);
          // convert buffered image to byte array
-         BufferedOutputStream out = new BufferedOutputStream(outData);
-         
-         ImageIO.write(im, "jpg", out);
-         
-         byte[] size = ByteBuffer.allocate(4).putInt(out.size()).array();
-         outData.write(out.toByteArray());
-         
+//         BufferedOutputStream out = new BufferedOutputStream(outData);
 //         
-//         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//         ImageIO.write(im, "jpg", baos);
-//         byte[] size = ByteBuffer.allocate(4).putInt(baos.size()).array();
-//         outData.write(size);
-//         outData.write(baos.toByteArray());
+//         ImageIO.write(im, "jpg", out);
+//         
+//         byte[] size = ByteBuffer.allocate(4).putInt(out.size()).array();
+//         outData.write(out.toByteArray());
+//         
+//         
+         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         ImageIO.write(im, "jpg", baos);
+         byte[] size = ByteBuffer.allocate(4).putInt(baos.size()).array();
+         outData.write(size);
+         outData.write(baos.toByteArray());
       } catch (Exception except) {
          System.out.println("Filed to load image TO the Server side");
          System.exit(-1);
