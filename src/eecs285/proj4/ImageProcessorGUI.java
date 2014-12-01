@@ -423,12 +423,7 @@ public class ImageProcessorGUI extends JFrame
     stackFilter.addMouseListener(new MouseAdapter() {
        public void mouseClicked(MouseEvent e)
        {
-          if (socket != null) {
-             if (stackFilter.isSelected())
-                socket.eventOccurred("stack1");
-             else
-                socket.eventOccurred("stack0");
-          }
+          if (socket != null) socket.eventOccurred("stack");
        }
     });
     checkBoxPan.add(stackFilter);

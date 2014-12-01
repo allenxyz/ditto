@@ -259,10 +259,12 @@ public abstract class ImageProcessingSocket {
       } else if (receivedString.trim().equals("Valencia")) {
          // win.getUtilityFilterComboBox().setSelectedItem("Valencia");
          win.valencia();
-      } else if (receivedString.trim().equals("stack1")) {
-         win.getStackCheckBox().setSelected(true);
-      } else if (receivedString.trim().equals("stack0")) {
-         win.getStackCheckBox().setSelected(false);
+      } else if (receivedString.trim().equals("stack")) {
+         JCheckBox temp = win.getStackCheckBox();
+         if (temp.isSelected())
+            temp.setSelected(false);
+         else
+            temp.setSelected(true);
       } else if (receivedString.trim().equals("Undo")) {
          System.out.println("Sytem is undoing");
          win.undo();
