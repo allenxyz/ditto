@@ -6,6 +6,7 @@ import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -31,6 +32,11 @@ public abstract class ImageProcessingSocket {
 
    protected DataOutputStream outData;
    protected DataInputStream inData;
+   
+   protected BufferedOutputStream outBufferedData;
+   protected BufferedInputStream inBufferedData;
+   
+   
 
 
    public abstract void start();
@@ -82,9 +88,12 @@ public abstract class ImageProcessingSocket {
          // convert buffered image to byte array
          ByteArrayOutputStream baos = new ByteArrayOutputStream();
          ImageIO.write(im, "jpg", baos);
-         byte[] size = ByteBuffer.allocate(4).putInt(baos.size()).array();
-         outData.write(size);
-         outData.write(baos.toByteArray());
+         byte[] data = baos.toByteArray();
+         //         byte[] data = ByteBuffer.allocate(4).putInt(baos.size()).array();
+         System.out.println("The load Occured size is : " + data.length);
+         outData.writeInt(data.length);
+         //outData.write(baos.toByteArray());
+         baos.writeTo(outData);
          success = true;
       } catch (Exception except) {
          System.out.println("Failed to load an image");
@@ -119,20 +128,11 @@ public abstract class ImageProcessingSocket {
          System.out.println("Sending an empty image....");
       try {
          outData.writeInt(4);
-         // convert buffered image to byte array
-//         BufferedOutputStream out = new BufferedOutputStream(outData);
-//         
-//         ImageIO.write(im, "jpg", out);
-//         
-//         byte[] size = ByteBuffer.allocate(4).putInt(out.size()).array();
-//         outData.write(out.toByteArray());
-//         
-//         
          ByteArrayOutputStream baos = new ByteArrayOutputStream();
          ImageIO.write(im, "jpg", baos);
-         byte[] size = ByteBuffer.allocate(4).putInt(baos.size()).array();
-         outData.write(size);
-         outData.write(baos.toByteArray());
+         byte[] data = baos.toByteArray();
+         outData.writeInt(data.length);
+         outData.write(data);
       } catch (Exception except) {
          System.out.println("Filed to load image TO the Server side");
          System.exit(-1);
@@ -286,11 +286,12 @@ public abstract class ImageProcessingSocket {
       System.out.println("Load recieved!");
       BufferedImage img = null;
       try {
-         byte[] sizeAr = new byte[4];
-         inData.read(sizeAr);
-         int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
+         int size = inData.readInt();
+         System.out.println("The load size recieved is: " + size);
+//         int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
          byte[] imageAr = new byte[size];
-         inData.read(imageAr);
+         inData.readFully(imageAr);
+         
          img = ImageIO.read(new ByteArrayInputStream(imageAr));
          System.out.println("Image received!!!!");
       } catch (Exception ex) {
@@ -325,11 +326,10 @@ public abstract class ImageProcessingSocket {
    final public void imageRecieve() {
       BufferedImage img = null;
       try {
-         byte[] sizeAr = new byte[4];
-         inData.read(sizeAr);
-         int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
+         int size = inData.readInt();
+         System.out.println("The load imgsize recieved is: " + size);
          byte[] imageAr = new byte[size];
-         inData.read(imageAr);
+         inData.readFully(imageAr);
          img = ImageIO.read(new ByteArrayInputStream(imageAr));
       } catch (IOException ex) {
          System.out.println("Error recieving image: " + ex);

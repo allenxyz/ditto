@@ -6,6 +6,8 @@ import eecs285.proj4.*;
 import java.net.Socket;
 import java.net.ServerSocket;
 import java.net.InetAddress;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -38,8 +40,14 @@ public class ClientSideSocket extends ImageProcessingSocket {
       try {
          System.out.println("ipaddr: " + ipAddr + " portNum: " + portNum);
          socket = new Socket(ipAddr, portNum);
-         outData = new DataOutputStream(socket.getOutputStream());
-         inData = new DataInputStream(socket.getInputStream());
+
+         
+         outBufferedData = new BufferedOutputStream(socket.getOutputStream());
+         inBufferedData = new BufferedInputStream(socket.getInputStream());
+         
+         outData = new DataOutputStream(outBufferedData);
+         inData = new DataInputStream(inBufferedData);
+         
       } catch (IOException ioe) {
          System.out.println("ERROR: Unable to connect - "
                + "is the server running?");

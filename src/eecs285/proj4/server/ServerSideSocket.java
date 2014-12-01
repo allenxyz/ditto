@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.net.ServerSocket;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -36,8 +38,13 @@ public class ServerSideSocket extends ImageProcessingSocket {
          serverSock = new ServerSocket(portNum);
          out.println("Waiting for client to connect...");
          socket = serverSock.accept();
-         outData = new DataOutputStream(socket.getOutputStream());
-         inData = new DataInputStream(socket.getInputStream());
+         
+         outBufferedData = new BufferedOutputStream(socket.getOutputStream());
+         inBufferedData = new BufferedInputStream(socket.getInputStream());
+         
+         outData = new DataOutputStream(outBufferedData);
+         inData = new DataInputStream(inBufferedData);
+         
          out.println("Client connection accepted");
       } catch (IOException ioe) {
          ioe.printStackTrace();
