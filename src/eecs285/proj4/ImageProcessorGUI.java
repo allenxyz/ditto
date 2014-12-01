@@ -363,10 +363,10 @@ public class ImageProcessorGUI extends JFrame
           brushSize = Integer.parseInt(paintSize.getText());
         }
         catch (Exception eeee){
-          JOptionPane.showMessageDialog(getParent(), "STOP TRYING TO FUCK WIT IT");
+          JOptionPane.showMessageDialog(getParent(), "ERROR! INVALID FIELD");
         }
         if(brushSize < 0 || brushSize > 500){
-          JOptionPane.showMessageDialog(getParent(), "STOP TRYING TO FUCK WIT IT");
+          JOptionPane.showMessageDialog(getParent(), "ERROR! INVALID BRUSH SIZE");
           brushSize = 0;
         }
       }
