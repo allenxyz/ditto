@@ -1046,7 +1046,7 @@ public class ImageProcessorGUI extends JFrame {
       ImageDisplay.add(new JLabel(new ImageIcon(binimage)));
       pack();
       curImage = deepCopy(binimage);
-      deepCopyerino(binimage);
+      deepCopyerino(curImage);
    } // end binning functions
 
    // ***************Main Filter ActionListener******************
